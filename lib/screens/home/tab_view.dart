@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:med_connect/app_resources.dart';
 import 'package:med_connect/screens/home/appointment/appointments_list_page.dart';
 import 'package:med_connect/screens/home/chat/chats_list_page.dart';
 import 'package:med_connect/screens/home/doctor/doctors_list_page.dart';
 import 'package:med_connect/screens/home/homepage/homepage.dart';
 import 'package:med_connect/screens/home/more_page.dart';
+import 'package:med_connect/utils/constants.dart';
 
 class TabView extends StatefulWidget {
   const TabView({Key? key}) : super(key: key);

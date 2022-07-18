@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:med_connect/app_resources.dart';
 import 'package:med_connect/screens/auth/sign_in_screen.dart';
 import 'package:med_connect/screens/shared/custom_buttons.dart';
+import 'package:med_connect/utils/constants.dart';
 
 class AuthWidget extends StatelessWidget {
   const AuthWidget({Key? key}) : super(key: key);

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:med_connect/app_resources.dart';
 import 'package:med_connect/screens/auth/auth_screen.dart';
+import 'package:med_connect/utils/constants.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);

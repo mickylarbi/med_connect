@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:med_connect/app_resources.dart';
 import 'package:med_connect/screens/auth/sign_up_screen.dart';
 import 'package:med_connect/screens/home/tab_view.dart';
 import 'package:med_connect/screens/shared/custom_buttons.dart';
 import 'package:med_connect/screens/shared/custom_text_span.dart';
 import 'package:med_connect/screens/shared/custom_textformfield.dart';
+import 'package:med_connect/utils/constants.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({Key? key}) : super(key: key);
