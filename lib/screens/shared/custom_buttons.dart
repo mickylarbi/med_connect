@@ -102,3 +102,41 @@ class GoogleButton extends StatelessWidget {
     );
   }
 }
+
+class CustomFlatButton extends StatelessWidget {
+  final void Function()? onPressed;
+  final Widget? child;
+  final Color? backgroundColor;
+  final AlignmentGeometry alignment;
+  const CustomFlatButton({
+    Key? key,
+    required this.child,
+    this.backgroundColor,
+    required this.onPressed,
+    this.alignment = Alignment.center,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      textStyle: TextStyle(
+        color: onPressed != null ? Colors.white : Colors.grey,
+        letterSpacing: .5,
+      ),
+      borderRadius: BorderRadius.circular(14),
+      color: onPressed != null ? backgroundColor : Colors.grey[200],
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onPressed,
+        child: IconTheme(
+          data: IconThemeData(
+              color: onPressed != null ? Colors.white : Colors.grey),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24),
+            child: Align(alignment: alignment, child: child),
+          ),
+        ),
+      ),
+    );
+  }
+}

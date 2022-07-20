@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:med_connect/models/experience.dart';
 import 'package:med_connect/models/review.dart';
 
@@ -10,19 +12,35 @@ class Doctor {
   List<Review>? reviews;
   String? bio;
   String? currentLocation;
+  List<String>? services;
 
-  Doctor({this.id, this.name, this.mainSpecialty, this.otherSpecialties,
-      this.experiences, this.reviews, this.bio, this.currentLocation});
+  Doctor(
+      {this.id,
+      this.name,
+      this.mainSpecialty,
+      this.otherSpecialties,
+      this.experiences,
+      this.reviews,
+      this.bio,
+      this.currentLocation,
+      this.services});
 
   Doctor.fromFireStore(Map<String, dynamic> map, String dId) {
     id = dId;
     name = map['name'] as String?;
     mainSpecialty = map['mainSpecialty'] as String?;
-    otherSpecialties = map['otherSpecialties'] as List<String>?;
-    experiences = map['experiences'] as List<Experience>?;
-    reviews = map['reviews'] as List<Review>?;
+    
+    otherSpecialties = [];
+    experiences = (map['experiences'] as List<dynamic>?)!
+        .map((e) => Experience.fromFirestore(e))
+        .toList();
+    reviews = (map['reviews'] as List<dynamic>?)!
+        .map((e) => Review.fromFirestore(e))
+        .toList();
     bio = map['bio'] as String?;
     currentLocation = map['currentLocation'] as String?;
+    services =
+        (map['services'] as List<dynamic>?)!.map((e) => e.toString()).toList();
   }
 
   Map<String, dynamic> toMap() {
@@ -34,6 +52,7 @@ class Doctor {
       'reviews': reviews,
       'bio': bio,
       'currentLocation': currentLocation,
+      'services': services,
     };
   }
 }

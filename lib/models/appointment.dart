@@ -4,14 +4,17 @@ class Appointment {
   String? id;
   String? location;
   String? doctorId;
+  String? service;
   DateTime? dateTime;
 
-  Appointment(this.id, this.location, this.doctorId, this.dateTime);
+  Appointment(
+      {this.id, this.location, this.doctorId, this.dateTime, this.service});
 
   Appointment.fromFirestore(Map<String, dynamic> map, String aId) {
     id = aId;
     location = map['location'] as String?;
     doctorId = map['doctorId'] as String?;
+    service = map['service'] as String?;
     dateTime = DateTime.fromMillisecondsSinceEpoch(
         (map['dateTime'] as Timestamp).millisecondsSinceEpoch);
   }

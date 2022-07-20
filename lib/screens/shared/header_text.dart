@@ -17,6 +17,7 @@ class HeaderText extends StatelessWidget {
       style: TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: isLarge ? 18 : 16,
+        color: Colors.blueGrey,
       ),
     );
   }

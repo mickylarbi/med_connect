@@ -1,194 +1,276 @@
+import 'dart:math';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:med_connect/models/doctor.dart';
+import 'package:med_connect/models/doctor.dart';
+import 'package:med_connect/models/review.dart';
+import 'package:med_connect/screens/home/doctor/doctor_card.dart';
+import 'package:med_connect/screens/home/doctor/review_card.dart';
+import 'package:med_connect/screens/home/doctor/reviews_list_screen.dart';
+import 'package:med_connect/screens/shared/custom_app_bar.dart';
+import 'package:med_connect/screens/shared/custom_buttons.dart';
 import 'package:med_connect/screens/shared/header_text.dart';
+import 'package:med_connect/screens/shared/outline_icon_button.dart';
+import 'package:med_connect/utils/constants.dart';
+import 'package:med_connect/utils/functions.dart';
 
 class DoctorDetailsScreen extends StatefulWidget {
-  const DoctorDetailsScreen({Key? key}) : super(key: key);
+  final Doctor doctor;
+  const DoctorDetailsScreen({Key? key, required this.doctor}) : super(key: key);
 
   @override
   State<DoctorDetailsScreen> createState() => _DoctorDetailsScreenState();
 }
 
 class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
+  final Reference ref = FirebaseStorage.instance
+      .ref()
+      .child('profile_pictures/${images[Random().nextInt(images.length)]}');
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.phone)),
-          IconButton(onPressed: () {}, icon: Icon(Icons.chat)),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(24),
-        children: [
-          SizedBox(
-            height: 140,
-            child: Row(
+      body: SafeArea(
+        child: Stack(
+          children: [
+            ListView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(36, 88, 38, 36),
               children: [
-                Container(
-                  height: 140,
-                  width: 140,
-                  color: Colors.grey,
-                ),
-                const SizedBox(width: 14),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    const HeaderText(text: 'Dr. Amanda Arthur'),
-                    Text('Urologist'),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(Icons.location_pin, color: Colors.blue),
-                        Flexible(
-                          child: Text(
-                            'Tech Hospital, Kumasi',
-                            overflow: TextOverflow.ellipsis,
-                            // maxLines: 3,
-                            softWrap: true,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          children: const [
-                            Icon(Icons.star, color: Colors.yellow),
-                            Text(
-                              '4.5',
-                              overflow: TextOverflow.fade,
-                              // maxLines: 3,
-                              // softWrap: true,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 30),
-                        Row(
-                          children: const [
-                            CircleAvatar(
-                              radius: 7,
-                              backgroundColor: Colors.grey,
-                            ),
-                            SizedBox(width: 5),
-                            Text(
-                              '20 reviews',
-                              overflow: TextOverflow.fade,
-                              // maxLines: 3,
-                              // softWrap: true,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
-          SizedBox(height: 30),
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 30,
-                  color: Colors.black.withOpacity(.15),
-                  offset: const Offset(0, 10),
-                )
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const HeaderText(text: 'Bio'),
-                Text(
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut laore et delore magna aliqua'),
-                SizedBox(height: 20),
-                const HeaderText(text: 'Studied at'),
-                Text('UCC SMS'),
-                SizedBox(height: 20),
-                const HeaderText(text: 'Experience'),
-                Text('10 years'),
-                Divider(height: 50),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    HeaderText(text: 'Reviews'),
-                    TextButton(
-                      style: ButtonStyle(
-                          padding: MaterialStateProperty.all(
-                              const EdgeInsets.symmetric(vertical: 14))),
-                      onPressed: () {},
-                      child: const Text('See all'),
-                    ),
-                  ],
-                ),
                 Row(
                   children: [
-                    Container(
-                      height: 40,
-                      width: 40,
-                      color: Colors.grey,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        height: 120,
+                        width: 110,
+                        alignment: Alignment.center,
+                        color: Colors.grey.withOpacity(.1),
+                        child: FutureBuilder<String>(
+                          future: ref.getDownloadURL(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return GestureDetector(
+                                onTap: () async {
+                                  // print(await ref.getDownloadURL());
+                                },
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: const [
+                                    Text(
+                                      'Tap to reload',
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
+                                    Icon(
+                                      Icons.refresh,
+                                      color: Colors.grey,
+                                    )
+                                  ],
+                                ),
+                              );
+                            }
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              return Image.network(
+                                snapshot.data!,
+                                height: 120,
+                                width: 110,
+                                fit: BoxFit.cover,
+                              );
+                              // return const FlutterLogo();
+                            }
+                            return const CircularProgressIndicator.adaptive();
+                          },
+                        ),
+                      ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 30),
                     Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        HeaderText(text: 'Juliet Rene'),
-                        Text('4 hours ago'),
+                        Text(
+                          '${widget.doctor.name}',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '${widget.doctor.mainSpecialty}',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.grey),
+                        ),
+                        Text(
+                          '${widget.doctor.currentLocation}',
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.grey),
+                        ),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.star,
+                              color: Color.fromARGB(80, 252, 228, 6),
+                            ),
+                            Text(calculateRating(widget.doctor.reviews!)
+                                .toStringAsFixed(2)),
+                            const SizedBox(width: 10),
+                            Text(
+                              '(${widget.doctor.reviews!.length} reviews)',
+                              style: const TextStyle(color: Colors.grey),
+                            )
+                          ],
+                        )
                       ],
                     ),
-                    Spacer(),
-                    Icon(
-                      Icons.star,
-                      color: Colors.yellow,
-                    ),
-                    HeaderText(text: '4.0'),
                   ],
                 ),
-                SizedBox(height: 10),
-                Text(
-                    'Excepteur sint occaecat cupidatat no proident, sunt in culpa qui officia descrunt mellit anim id est laborum.')
+
+                ///OTHER SPECIALTIES
+
+                if (widget.doctor.otherSpecialties != null &&
+                    widget.doctor.otherSpecialties!.isNotEmpty)
+                  const SizedBox(height: 30),
+                if (widget.doctor.otherSpecialties != null &&
+                    widget.doctor.otherSpecialties!.isNotEmpty)
+                  const HeaderText(text: 'Other specialties'),
+                if (widget.doctor.otherSpecialties != null &&
+                    widget.doctor.otherSpecialties!.isNotEmpty)
+                  ...widget.doctor.otherSpecialties!
+                      .map((e) => Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2.5),
+                            child: Row(
+                              children: [
+                                const CircleAvatar(
+                                  radius: 2,
+                                  backgroundColor: Colors.blueGrey,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(e)
+                              ],
+                            ),
+                          ))
+                      .toList(),
+
+                ///SERVICES
+
+                if (widget.doctor.services != null &&
+                    widget.doctor.services!.isNotEmpty)
+                  const SizedBox(height: 30),
+                if (widget.doctor.services != null &&
+                    widget.doctor.services!.isNotEmpty)
+                  const HeaderText(text: 'Services Offered'),
+                if (widget.doctor.services != null &&
+                    widget.doctor.services!.isNotEmpty)
+                  ...widget.doctor.services!
+                      .map((e) => Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2.5),
+                            child: Row(
+                              children: [
+                                const CircleAvatar(
+                                  radius: 2,
+                                  backgroundColor: Colors.blueGrey,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(e)
+                              ],
+                            ),
+                          ))
+                      .toList(),
+
+                ///EXPERIENCE
+
+                if (widget.doctor.experiences != null &&
+                    widget.doctor.experiences!.isNotEmpty)
+                  const SizedBox(height: 30),
+                if (widget.doctor.experiences != null &&
+                    widget.doctor.experiences!.isNotEmpty)
+                  const HeaderText(text: 'Experience'),
+                if (widget.doctor.experiences != null &&
+                    widget.doctor.experiences!.isNotEmpty)
+                  ...widget.doctor.experiences!
+                      .map((e) => Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2.5),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const CircleAvatar(
+                                  radius: 2,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(e.toString()),
+                              ],
+                            ),
+                          ))
+                      .toList(),
+                if (widget.doctor.bio != null) const SizedBox(height: 30),
+                if (widget.doctor.bio != null) const HeaderText(text: 'Bio'),
+                if (widget.doctor.bio != null) const SizedBox(height: 2.5),
+                if (widget.doctor.bio != null) Text(widget.doctor.bio!),
+                const Divider(height: 50),
+
+                ///REVIEWS
+
+                if (widget.doctor.reviews != null &&
+                    widget.doctor.reviews!.isNotEmpty)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const HeaderText(text: 'Reviews'),
+                      TextButton(
+                        style: ButtonStyle(
+                            padding: MaterialStateProperty.all(
+                                const EdgeInsets.symmetric(vertical: 14))),
+                        onPressed: () {
+                          navigate(
+                              context,
+                              ReviewListScreen(
+                                  reviews: widget.doctor.reviews!));
+                        },
+                        child: const Text('See all'),
+                      ),
+                    ],
+                  ),
+                if (widget.doctor.reviews != null &&
+                    widget.doctor.reviews!
+                        .isNotEmpty) //TODO: check if comment is empty
+                  ReviewCard(
+                    review: widget.doctor.reviews!
+                        .where((element) =>
+                            element.comment != null &&
+                            element.comment!.isNotEmpty)
+                        .toList()[0],
+                  ),
+
+                ///BUTTON
+
+                const SizedBox(height: 50),
+                CustomFlatButton(
+                  onPressed: () {},
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Text('Book an appointment'),
+                      Icon(Icons.keyboard_arrow_right)
+                    ],
+                  ),
+                  backgroundColor: Colors.blueGrey,
+                ),
               ],
             ),
-          ),
-          Padding(
-              padding: const EdgeInsets.symmetric(vertical: 30),
-              child: SizedBox(
-                height: 40,
-                child: ElevatedButton(
-                    onPressed: () {},
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Book an appointment'),
-                        Icon(Icons.arrow_right_alt)
-                      ],
-                    )),
-              ))
-        ],
+            CustomAppBar(
+              leading: Icons.arrow_back,
+              title: 'Doctor info',
+              actions: [
+                OutlineIconButton(
+                  iconData: Icons.more_horiz,
+                  onPressed: () {},
+                )
+              ],
+            ),
+          ],
+        ),
       ),
     );
-  }
-}
-
-void func() {
-  List arr = [20, 2, 70, 80, 90, 1, 7, 91, 73, 101];
-
-  arr.forEach((element) {
-    if (element == 72 + 1) {
-      print(element);
-    }
-  });
-  
-  for (int i=0; i<arr.length; i++){
-    if(arr[i]== 72 + 1){
-      print (arr[i]);
-    }
   }
 }
