@@ -48,16 +48,16 @@ void uploadDoctors = (BuildContext context, FirebaseFirestore db) async {
           Random().nextInt(2),
           (index) => '${specialties[Random().nextInt(specialties.length)]}',
         ),
-        'experiences': List.generate(
-          Random().nextInt(5),
-          (index) => Experience(
-            generateRandomString(Random().nextInt(15)),
-            DateTime(2000 + Random().nextInt(2010 - 2000),
-                1 + Random().nextInt(11), 1 + Random().nextInt(28)),
-            DateTime(2010 + Random().nextInt(2020 - 2010),
-                1 + Random().nextInt(11), 1 + Random().nextInt(28)),
-          ).toMap(),
-        ),
+        // 'experiences': List.generate(
+        //   Random().nextInt(5),
+        //   (index) => Experience(
+        //     generateRandomString(Random().nextInt(15)),
+        //     DateTime(2000 + Random().nextInt(2010 - 2000),
+        //         1 + Random().nextInt(11), 1 + Random().nextInt(28)),
+        //     DateTime(2010 + Random().nextInt(2020 - 2010),
+        //         1 + Random().nextInt(11), 1 + Random().nextInt(28)),
+        //   ).toMap(),
+        // ),
         'reviews': List.generate(
           Random().nextInt(15),
           (index) => Review(

@@ -1,58 +1,118 @@
-import 'dart:ffi';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:med_connect/models/experience.dart';
 import 'package:med_connect/models/review.dart';
+import 'package:flutter/material.dart';
 
 class Doctor {
   String? id;
-  String? name;
+  String? firstName;
+  String? surname;
   String? mainSpecialty;
   List<String>? otherSpecialties;
   List<Experience>? experiences;
   List<Review>? reviews;
   String? bio;
-  String? currentLocation;
+  Experience? currentLocation;
   List<String>? services;
+  List<DateTimeRange>? availablehours;
 
-  Doctor(
-      {this.id,
-      this.name,
-      this.mainSpecialty,
-      this.otherSpecialties,
-      this.experiences,
-      this.reviews,
-      this.bio,
-      this.currentLocation,
-      this.services});
+  Doctor({
+    this.id,
+    this.firstName,
+    this.surname,
+    this.bio,
+    this.mainSpecialty,
+    this.otherSpecialties,
+    this.experiences,
+    this.services,
+    this.currentLocation,
+    this.availablehours,
+    this.reviews,
+  });
 
   Doctor.fromFireStore(Map<String, dynamic> map, String dId) {
     id = dId;
-    name = map['name'] as String?;
-    mainSpecialty = map['mainSpecialty'] as String?;
-    
-    otherSpecialties = [];
-    experiences = (map['experiences'] as List<dynamic>?)!
-        .map((e) => Experience.fromFirestore(e))
-        .toList();
-    reviews = (map['reviews'] as List<dynamic>?)!
-        .map((e) => Review.fromFirestore(e))
-        .toList();
+    firstName = map['firstName'] as String?;
+    surname = map['surname'] as String?;
     bio = map['bio'] as String?;
-    currentLocation = map['currentLocation'] as String?;
+
+    mainSpecialty = map['mainSpecialty'] as String?;
+
+    otherSpecialties = (map['otherSpecialties'] as List<dynamic>?)!
+        .map((e) => e.toString())
+        .toList();
+
+    List? tempList = map['experiences'] as List<dynamic>?;
+    if (tempList != null) {
+      experiences = [];
+      for (Map<String, dynamic> element in tempList) {
+        experiences!.add(Experience.fromFirestore(element));
+      }
+    }
+
     services =
         (map['services'] as List<dynamic>?)!.map((e) => e.toString()).toList();
+
+    currentLocation = Experience.fromFirestore(
+        map['currentLocation'] as Map<String, dynamic>);
+
+    List<Map>? al = map['availableHours'] as List<Map>?;
+    if (al != null) {
+      for (Map element in al) {
+        availablehours!.add(DateTimeRange(
+            start: element['startDate'], end: element['endDate']));
+      }
+    }
+
+    tempList = map['reviews'] as List<Map<String, dynamic>>?;
+    if (tempList != null) {
+      reviews = [];
+      for (Map<String, dynamic> element in tempList) {
+        reviews!.add(Review.fromFirestore(element));
+      }
+    }
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'name': name,
+      'firstName': firstName,
+      'surname': surname,
+      'bio': bio,
       'mainSpecialty': mainSpecialty,
       'otherSpecialties': otherSpecialties,
-      'experiences': experiences,
-      'reviews': reviews,
-      'bio': bio,
-      'currentLocation': currentLocation,
+      if (experiences != null)
+        'experiences': experiences!.map((e) => e.toMap()).toList(),
       'services': services,
+      if (currentLocation != null) 'currentLocation': currentLocation!.toMap(),
+      if (availablehours != null)
+        'availableHours': availablehours!
+            .map((e) => {'startDate': e.start, 'endDate': e.end})
+            .toList(),
+      'reviews': reviews,
     };
   }
+
+  String get name => '$firstName $surname';
+
+  @override
+  bool operator ==(other) =>
+      other is Doctor &&
+      name == other.name &&
+      bio == other.bio &&
+      mainSpecialty == other.mainSpecialty &&
+      otherSpecialties == other.otherSpecialties &&
+      experiences == other.experiences &&
+      services == other.services &&
+      currentLocation == other.currentLocation;
+
+  @override
+  int get hashCode => hashValues(
+        name,
+        bio,
+        mainSpecialty,
+        hashList(otherSpecialties),
+        hashList(experiences),
+        hashList(services),
+        currentLocation,
+      );
 }

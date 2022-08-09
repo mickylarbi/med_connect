@@ -10,9 +10,10 @@ class Src extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const TabView(),
+      home: const SplashScreen(),
       theme: ThemeData(
         primaryColor: Colors.blueGrey,
+        primarySwatch: Colors.blueGrey,
         iconTheme: const IconThemeData(color: Colors.blueGrey),
         textTheme: GoogleFonts.openSansTextTheme(
           const TextTheme(

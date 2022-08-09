@@ -30,10 +30,19 @@ class _DoctorsListPageState extends State<DoctorsListPage> {
   Doctor doctor = Doctor(
       bio:
           'This is the bioThis is the bioThis is the bioThis is the bioThis is the bio\nThis is the bioThis is the bioThis is the bio\nThis is the bioThis is the bio\nThis is the bioThis is the bioThis is the bioThis is the bioThis is the bio',
-      currentLocation: 'Cape Coast Teaching Hospital',
-      experiences: [Experience('Interberton', DateTime.now(), DateTime.now())],
+      currentLocation: Experience(
+          location: 'Cape Coast Teaching Hospital',
+          dateTimeRange:
+              DateTimeRange(start: DateTime.now(), end: DateTime.now())),
+      experiences: [
+        Experience(
+            location: 'UCC Hospital',
+            dateTimeRange:
+                DateTimeRange(start: DateTime.now(), end: DateTime.now())),
+      ],
       mainSpecialty: 'Oncology',
-      name: 'Michael Larbi',
+      firstName: 'Michael',
+      surname: 'Larbi',
       reviews: List.generate(
           5,
           (index) => Review(

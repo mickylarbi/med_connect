@@ -45,3 +45,62 @@ void showAlertDialog(BuildContext context,
             ),
           ));
 }
+
+void showConfirmationDialog(BuildContext context,
+    {String? message, required Function confirmFunction}) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: const [
+          Icon(Icons.info_outline, color: Colors.amber),
+        ],
+      ),
+      content: Text(message ?? 'Are you sure?'),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text(
+            'NO',
+            style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                letterSpacing: .5),
+          ),
+          style: ButtonStyle(
+            backgroundColor:
+                MaterialStateProperty.all(Theme.of(context).primaryColor),
+            shape: MaterialStateProperty.all(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+            ),
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            confirmFunction();
+          },
+          child: const Text(
+            'YES',
+            style: TextStyle(
+                // color: Colors.white,
+                fontWeight: FontWeight.bold,
+                letterSpacing: .5),
+          ),
+          style: ButtonStyle(
+            backgroundColor:
+                MaterialStateProperty.all(Theme.of(context).backgroundColor),
+            shape: MaterialStateProperty.all(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+            ),
+          ),
+        ),
+      ],
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      actionsPadding: const EdgeInsets.symmetric(horizontal: 14),
+    ),
+  );
+}

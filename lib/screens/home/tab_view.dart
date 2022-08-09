@@ -20,7 +20,7 @@ class _TabViewState extends State<TabView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kBackgroundColor,
+      // backgroundColor: kBackgroundColor,
       body: SafeArea(
         child: PageView(
             controller: _pageController,

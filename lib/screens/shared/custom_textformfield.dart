@@ -4,15 +4,19 @@ class CustomTextFormField extends StatelessWidget {
   final String hintText;
   final TextEditingController? controller;
   final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
   final TextCapitalization textCapitalization;
   final int? minLines;
+  final void Function(String)? onFieldSubmitted;
   const CustomTextFormField({
     Key? key,
     required this.hintText,
     this.controller,
     this.keyboardType,
     this.textCapitalization = TextCapitalization.none,
-    this.minLines,
+    this.textInputAction,
+    this.minLines = 1,
+    this.onFieldSubmitted,
   }) : super(key: key);
 
   @override
@@ -23,15 +27,17 @@ class CustomTextFormField extends StatelessWidget {
       textCapitalization: textCapitalization,
       minLines: minLines,
       maxLines: minLines,
+      textInputAction: textInputAction,
+      onFieldSubmitted: onFieldSubmitted,
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: const TextStyle(color: Colors.grey),
         contentPadding:
-            const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         filled: true,
         fillColor: const Color(0xFFE4E4E4),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
         ),
       ),
@@ -41,9 +47,11 @@ class CustomTextFormField extends StatelessWidget {
 
 class PasswordTextFormField extends StatefulWidget {
   final String? hintText;
+  final TextEditingController controller;
   const PasswordTextFormField({
     Key? key,
     this.hintText = 'Password',
+    required this.controller,
   }) : super(key: key);
 
   @override
@@ -59,15 +67,17 @@ class _PasswordTextFormFieldState extends State<PasswordTextFormField> {
         valueListenable: obscureText,
         builder: (context, value, child) {
           return TextFormField(
+            controller: widget.controller,
             obscureText: value,
             decoration: InputDecoration(
                 hintText: widget.hintText,
-                hintStyle: TextStyle(color: Colors.grey),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                hintStyle: const TextStyle(color: Colors.grey),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 filled: true,
                 fillColor: const Color(0xFFE4E4E4),
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide.none),
                 suffixIcon: IconButton(
                     icon: Icon(value ? Icons.visibility_off : Icons.visibility),

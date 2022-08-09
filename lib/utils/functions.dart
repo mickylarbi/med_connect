@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:med_connect/models/review.dart';
 
-double calculateRating(List<Review> reviewList) {
-  if (reviewList.isEmpty) return 0.0;
+double calculateRating(List<Review>? reviewList) {
+  if (reviewList==null || reviewList.isEmpty) return 0.0;
 
   double? sum = 0;
 

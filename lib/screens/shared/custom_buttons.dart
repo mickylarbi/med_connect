@@ -111,7 +111,7 @@ class CustomFlatButton extends StatelessWidget {
   const CustomFlatButton({
     Key? key,
     required this.child,
-    this.backgroundColor,
+    this.backgroundColor = Colors.blueGrey,
     required this.onPressed,
     this.alignment = Alignment.center,
   }) : super(key: key);

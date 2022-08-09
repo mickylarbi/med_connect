@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:med_connect/firebase_services/storage_service.dart';
 import 'package:med_connect/models/doctor.dart';
 import 'package:med_connect/models/doctor.dart';
 import 'package:med_connect/models/review.dart';
@@ -25,9 +26,7 @@ class DoctorDetailsScreen extends StatefulWidget {
 }
 
 class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
-  final Reference ref = FirebaseStorage.instance
-      .ref()
-      .child('profile_pictures/${images[Random().nextInt(images.length)]}');
+  StorageService storage = StorageService();
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +48,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                         alignment: Alignment.center,
                         color: Colors.grey.withOpacity(.1),
                         child: FutureBuilder<String>(
-                          future: ref.getDownloadURL(),
+                          future: storage.profileImageUrl(widget.doctor.id!),
                           builder: (context, snapshot) {
                             if (snapshot.hasError) {
                               return GestureDetector(
@@ -87,44 +86,58 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                       ),
                     ),
                     const SizedBox(width: 30),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${widget.doctor.name}',
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          '${widget.doctor.mainSpecialty}',
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.grey),
-                        ),
-                        Text(
-                          '${widget.doctor.currentLocation}',
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.grey),
-                        ),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.star,
-                              color: Color.fromARGB(80, 252, 228, 6),
-                            ),
-                            Text(calculateRating(widget.doctor.reviews!)
-                                .toStringAsFixed(2)),
-                            const SizedBox(width: 10),
-                            Text(
-                              '(${widget.doctor.reviews!.length} reviews)',
-                              style: const TextStyle(color: Colors.grey),
-                            )
-                          ],
-                        )
-                      ],
+                    Container(
+                      height: 150,
+                      padding: const EdgeInsets.symmetric(vertical: 30),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.doctor.name,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            widget.doctor.mainSpecialty!,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey),
+                          ),
+                          Text(
+                            widget.doctor.currentLocation!.location!,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey),
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.star,
+                                color: Color.fromARGB(80, 252, 228, 6),
+                              ),
+                              Text(calculateRating(widget.doctor.reviews)
+                                  .toStringAsFixed(2)),
+                              const SizedBox(width: 10),
+                              Text(
+                                widget.doctor.reviews == null
+                                    ? 'No reviews yet'
+                                    : '(${widget.doctor.reviews!.length} reviews)',
+                                style: const TextStyle(color: Colors.grey),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
                     ),
                   ],
                 ),
+
+                if (widget.doctor.bio != null) const SizedBox(height: 30),
+                if (widget.doctor.bio != null) const HeaderText(text: 'Bio'),
+                if (widget.doctor.bio != null) const SizedBox(height: 2.5),
+                if (widget.doctor.bio != null) Text(widget.doctor.bio!),
+                const Divider(height: 50),
 
                 ///OTHER SPECIALTIES
 
@@ -137,32 +150,6 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                 if (widget.doctor.otherSpecialties != null &&
                     widget.doctor.otherSpecialties!.isNotEmpty)
                   ...widget.doctor.otherSpecialties!
-                      .map((e) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 2.5),
-                            child: Row(
-                              children: [
-                                const CircleAvatar(
-                                  radius: 2,
-                                  backgroundColor: Colors.blueGrey,
-                                ),
-                                const SizedBox(width: 10),
-                                Text(e)
-                              ],
-                            ),
-                          ))
-                      .toList(),
-
-                ///SERVICES
-
-                if (widget.doctor.services != null &&
-                    widget.doctor.services!.isNotEmpty)
-                  const SizedBox(height: 30),
-                if (widget.doctor.services != null &&
-                    widget.doctor.services!.isNotEmpty)
-                  const HeaderText(text: 'Services Offered'),
-                if (widget.doctor.services != null &&
-                    widget.doctor.services!.isNotEmpty)
-                  ...widget.doctor.services!
                       .map((e) => Padding(
                             padding: const EdgeInsets.symmetric(vertical: 2.5),
                             child: Row(
@@ -203,11 +190,32 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                             ),
                           ))
                       .toList(),
-                if (widget.doctor.bio != null) const SizedBox(height: 30),
-                if (widget.doctor.bio != null) const HeaderText(text: 'Bio'),
-                if (widget.doctor.bio != null) const SizedBox(height: 2.5),
-                if (widget.doctor.bio != null) Text(widget.doctor.bio!),
-                const Divider(height: 50),
+
+                ///SERVICES
+
+                if (widget.doctor.services != null &&
+                    widget.doctor.services!.isNotEmpty)
+                  const SizedBox(height: 30),
+                if (widget.doctor.services != null &&
+                    widget.doctor.services!.isNotEmpty)
+                  const HeaderText(text: 'Services Offered'),
+                if (widget.doctor.services != null &&
+                    widget.doctor.services!.isNotEmpty)
+                  ...widget.doctor.services!
+                      .map((e) => Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2.5),
+                            child: Row(
+                              children: [
+                                const CircleAvatar(
+                                  radius: 2,
+                                  backgroundColor: Colors.blueGrey,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(e)
+                              ],
+                            ),
+                          ))
+                      .toList(),
 
                 ///REVIEWS
 
@@ -245,19 +253,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                 ///BUTTON
 
                 const SizedBox(height: 50),
-                CustomFlatButton(
-                  onPressed: () {},
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Text('Book an appointment'),
-                      Icon(Icons.keyboard_arrow_right)
-                    ],
-                  ),
-                  backgroundColor: Colors.blueGrey,
-                ),
               ],
             ),
+            // Align(align)
             CustomAppBar(
               leading: Icons.arrow_back,
               title: 'Doctor info',
