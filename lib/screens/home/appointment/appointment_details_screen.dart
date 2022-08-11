@@ -25,7 +25,7 @@ class AppointmentDetailsScreen extends StatefulWidget {
 }
 
 class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
-  ValueNotifier<Doctor?> selectedDoctorNotifier = ValueNotifier<Doctor?>(null);
+  ValueNotifier<String?> doctorIdNotifier = ValueNotifier<String?>(null);
   ValueNotifier<DateTime?> dateTimeNotifier = ValueNotifier<DateTime?>(null);
 
   ValueNotifier<String?> servicesGroupValue = ValueNotifier<String?>(null);
@@ -48,6 +48,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
     super.initState();
 
     if (widget.appointment.doctorId != null) {
+      doctorIdNotifier.value = widget.appointment.doctorId;
       dateTimeNotifier.value = widget.appointment.dateTime;
       servicesGroupValue.value = widget.appointment.service;
       //TODO: add location
@@ -60,15 +61,15 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (widget.appointment == newAppointment) return true;
+        // if (widget.appointment == newAppointment) return true;
 
-        showConfirmationDialog(
-          context,
-          message: 'Save changes to appointment?',
-          confirmFunction: () async {
-            await db.updateAppointment(context, newAppointment);
-          },
-        );
+        // showConfirmationDialog(
+        //   context,
+        //   message: 'Save changes to appointment?',
+        //   confirmFunction: () async {
+        //     await db.updateAppointment(context, newAppointment);
+        //   },
+        // );
 
         return false;
       },
@@ -80,335 +81,461 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
           body: SafeArea(
             child: Stack(
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 88),
-                  child: Center(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.fromLTRB(36, 20, 36, 36),
-                      child: widget.appointment.doctorId == null
-                          ? Material(
-                              borderRadius: BorderRadius.circular(14),
-                              color: Colors.blueGrey.withOpacity(.1),
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(14),
-                                onTap: () {},
-                                child: const Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 24, vertical: 14),
-                                  child: Text('Choose doctor'),
-                                ),
-                              ),
-                            )
-                          : FutureBuilder<
-                              DocumentSnapshot<Map<String, dynamic>>>(
-                              future: db.doctor(widget.appointment.doctorId!),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<
-                                          DocumentSnapshot<
-                                              Map<String, dynamic>>>
-                                      snapshot) {
-                                if (snapshot.hasError) {
-                                  return const Text(
-                                      'Couldn\'t get doctor info');
-                                }
+                ValueListenableBuilder<String?>(
+                    valueListenable: doctorIdNotifier,
+                    builder: (context, value, child) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 88),
+                        child: Center(
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.fromLTRB(36, 20, 36, 36),
+                            child: value == null
+                                ? Material(
+                                    borderRadius: BorderRadius.circular(14),
+                                    color: Colors.blueGrey.withOpacity(.1),
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(14),
+                                      onTap: () async {
+                                        String? result = await navigate(
+                                            context,
+                                            const ChooseDoctorScreen(
+                                              isFromAppointment: true,
+                                            ));
 
-                                if (snapshot.connectionState ==
-                                    ConnectionState.done) {
-                                  selectedDoctorNotifier.value =
-                                      Doctor.fromFireStore(
-                                          snapshot.data!.data()!,
-                                          snapshot.data!.id);
-
-                                  return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Material(
-                                        color: Colors.blueGrey.withOpacity(.1),
-                                        borderRadius: BorderRadius.circular(14),
-                                        textStyle: const TextStyle(
-                                            color: Colors.blueGrey),
-                                        child: InkWell(
-                                          borderRadius:
-                                              BorderRadius.circular(14),
-                                          onTap: () {
-                                            showCustomBottomSheet(
-                                              context,
-                                              [
-                                                ListTile(
-                                                  leading: const Icon(Icons
-                                                      .calendar_today_rounded),
-                                                  title:
-                                                      const Text('Change date'),
-                                                  onTap: () {
-                                                    Navigator.pop(context);
-                                                  },
-                                                ),
-                                                const Divider(height: 10),
-                                                ListTile(
-                                                  leading: const Icon(
-                                                      Icons.timer_outlined),
-                                                  title:
-                                                      const Text('Change time'),
-                                                  onTap: () {},
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 24, vertical: 16),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  DateFormat.yMMMMEEEEd()
-                                                      .format(dateTimeNotifier
-                                                          .value!),
-                                                ),
-                                                Text(
-                                                  DateFormat.jm().format(
-                                                      dateTimeNotifier.value!),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
+                                        if (result != null) {
+                                          doctorIdNotifier.value = result;
+                                        }
+                                      },
+                                      child: const Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 24, vertical: 14),
+                                        child: Text('Choose doctor'),
                                       ),
-                                      const Divider(height: 50),
-                                      DoctorCard(
-                                        doctor: Doctor.fromFireStore(
+                                    ),
+                                  )
+                                : FutureBuilder<
+                                    DocumentSnapshot<Map<String, dynamic>>>(
+                                    future: db.doctor(value),
+                                    builder: (BuildContext context,
+                                        AsyncSnapshot<
+                                                DocumentSnapshot<
+                                                    Map<String, dynamic>>>
+                                            snapshot) {
+                                      if (snapshot.hasError) {
+                                        return const Text(
+                                            'Couldn\'t get doctor info');
+                                      }
+
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.done) {
+                                        Doctor doctor = Doctor.fromFireStore(
                                             snapshot.data!.data()!,
-                                            snapshot.data!.id),
-                                        padding: const EdgeInsets.all(0),
-                                      ),
-                                      const Divider(height: 50),
-                                      const Text(
-                                          'What services would you want to patronize?'),
-                                      const SizedBox(height: 10),
-                                      ValueListenableBuilder<String?>(
-                                        valueListenable: servicesGroupValue,
-                                        builder: (BuildContext context,
-                                            String? serviceValue,
-                                            Widget? child) {
-                                          return ListView.builder(
-                                            shrinkWrap: true,
-                                            itemCount: selectedDoctorNotifier
-                                                .value!.services!.length,
-                                            itemBuilder: (BuildContext context,
-                                                int index) {
-                                              return RadioListTile<String?>(
-                                                value: serviceValue,
-                                                groupValue:
-                                                    servicesGroupValue.value,
-                                                onChanged: (radioValue) {
-                                                  servicesGroupValue.value =
-                                                      serviceValue;
-                                                },
-                                                title: Text(
-                                                    selectedDoctorNotifier
-                                                        .value!
-                                                        .services![index]),
-                                              );
-                                            },
-                                          );
-                                        },
-                                      ),
-                                      const Divider(height: 50),
-                                      const Text(
-                                          'Where would you want to meet?'),
-                                      const SizedBox(height: 10),
-                                      Container(
-                                          color: Colors.pink.withOpacity(.1),
-                                          padding: const EdgeInsets.all(36),
-                                          child: const Text(
-                                              'some implementation of google maps will go on here')),
-                                      const Divider(height: 50),
-                                      const Text(
-                                          'What symptoms are you experiencing?'),
-                                      const SizedBox(height: 10),
-                                      ValueListenableBuilder(
-                                        valueListenable: symptomsNotifier,
-                                        builder: (BuildContext context,
-                                            List<String> value, Widget? child) {
-                                          return ListView.separated(
-                                            shrinkWrap: true,
-                                            primary: false,
-                                            physics:
-                                                const NeverScrollableScrollPhysics(),
-                                            itemCount: value.length,
-                                            separatorBuilder:
-                                                (BuildContext context,
-                                                    int index) {
-                                              return const SizedBox(height: 10);
-                                            },
-                                            itemBuilder: (BuildContext context,
-                                                int index) {
-                                              return Material(
-                                                color: Colors.grey[100],
-                                                borderRadius:
-                                                    BorderRadius.circular(14),
-                                                child: Padding(
-                                                  padding: const EdgeInsets
-                                                          .symmetric(
-                                                      horizontal: 36,
-                                                      vertical: 14),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Text(value[index]),
-                                                      InkWell(
-                                                        onTap: () {
-                                                          List<String> temp =
-                                                              value;
-                                                          temp.removeAt(index);
-                                                          symptomsNotifier
-                                                              .value = [
-                                                            ...temp
-                                                          ];
-                                                        },
-                                                        child: const Icon(
-                                                            Icons.clear),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          );
-                                        },
-                                      ),
-                                      const SizedBox(height: 10),
-                                      CustomTextFormField(
-                                        hintText: 'Add symptom',
-                                        controller: symptomsController,
-                                        onFieldSubmitted: (value) {
-                                          if (!symptomsNotifier.value.contains(
-                                                  symptomsController.text
-                                                      .trim()) &&
-                                              symptomsController.text
-                                                  .trim()
-                                                  .isNotEmpty) {
-                                            List<String> temp =
-                                                symptomsNotifier.value;
-                                            temp.add(
-                                                symptomsController.text.trim());
-                                            symptomsNotifier.value = [...temp];
-                                            symptomsController.clear();
-                                          } else {
-                                            showAlertDialog(context,
-                                                message: symptomsController.text
-                                                        .trim()
-                                                        .isEmpty
-                                                    ? 'Textfield is empty'
-                                                    : 'Symptom has already been added');
-                                          }
-                                        },
-                                      ),
-                                      const Divider(height: 50),
-                                      const Text(
-                                          'What underlying conditions do you have?'),
-                                      const SizedBox(height: 10),
-                                      ValueListenableBuilder(
-                                        valueListenable: conditionsNotifier,
-                                        builder: (BuildContext context,
-                                            List<String> value, Widget? child) {
-                                          return ListView.separated(
-                                            shrinkWrap: true,
-                                            primary: false,
-                                            physics:
-                                                const NeverScrollableScrollPhysics(),
-                                            itemCount: value.length,
-                                            separatorBuilder:
-                                                (BuildContext context,
-                                                    int index) {
-                                              return const SizedBox(height: 10);
-                                            },
-                                            itemBuilder: (BuildContext context,
-                                                int index) {
-                                              return Material(
-                                                color: Colors.grey[100],
-                                                borderRadius:
-                                                    BorderRadius.circular(14),
-                                                child: Padding(
-                                                  padding: const EdgeInsets
-                                                          .symmetric(
-                                                      horizontal: 36,
-                                                      vertical: 14),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Text(value[index]),
-                                                      InkWell(
-                                                        onTap: () {
-                                                          List<String> temp =
-                                                              value;
-                                                          temp.removeAt(index);
-                                                          conditionsNotifier
-                                                              .value = [
-                                                            ...temp
-                                                          ];
-                                                        },
-                                                        child: const Icon(
-                                                            Icons.clear),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          );
-                                        },
-                                      ),
-                                      const SizedBox(height: 10),
-                                      CustomTextFormField(
-                                        hintText: 'Add condition',
-                                        controller: conditionsController,
-                                        onFieldSubmitted: (value) {
-                                          if (!conditionsNotifier.value
-                                                  .contains(conditionsController
-                                                      .text
-                                                      .trim()) &&
-                                              conditionsController.text
-                                                  .trim()
-                                                  .isNotEmpty) {
-                                            List<String> temp =
-                                                conditionsNotifier.value;
-                                            temp.add(conditionsController.text
-                                                .trim());
-                                            conditionsNotifier.value = [
-                                              ...temp
-                                            ];
-                                            conditionsController.clear();
-                                          } else {
-                                            showAlertDialog(context,
-                                                message: conditionsController
-                                                        .text
-                                                        .trim()
-                                                        .isEmpty
-                                                    ? 'Textfield is empty'
-                                                    : 'Symptom has already been added');
-                                          }
-                                        },
-                                      )
-                                    ],
-                                  );
-                                }
+                                            snapshot.data!.id);
 
-                                return const Center(
-                                    child:
-                                        CircularProgressIndicator.adaptive());
-                              },
-                            ),
-                    ),
-                  ),
-                ),
+                                        return Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            ValueListenableBuilder<DateTime?>(
+                                                valueListenable:
+                                                    dateTimeNotifier,
+                                                builder: (context, doctorValue,
+                                                    child) {
+                                                  return Material(
+                                                    color: Colors.blueGrey
+                                                        .withOpacity(.1),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            14),
+                                                    textStyle: const TextStyle(
+                                                        color: Colors.blueGrey),
+                                                    child: InkWell(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              14),
+                                                      onTap: () {
+                                                        showCustomBottomSheet(
+                                                          context,
+                                                          [
+                                                            ListTile(
+                                                              leading: const Icon(
+                                                                  Icons
+                                                                      .calendar_today_rounded),
+                                                              title: const Text(
+                                                                  'Change date'),
+                                                              onTap: () async {
+                                                                Navigator.pop(
+                                                                    context);
+                                                                DateTime? result = await showDatePicker(
+                                                                    context:
+                                                                        context,
+                                                                    initialDate:
+                                                                        doctorValue ??
+                                                                            DateTime
+                                                                                .now(),
+                                                                    firstDate:
+                                                                        DateTime(
+                                                                            1950),
+                                                                    lastDate:
+                                                                        DateTime(
+                                                                            2100));
+
+                                                                if (result !=
+                                                                    null) {
+                                                                  dateTimeNotifier
+                                                                          .value =
+                                                                      result;
+                                                                }
+                                                              },
+                                                            ),
+                                                            const Divider(
+                                                                height: 10),
+                                                            ListTile(
+                                                              leading: const Icon(
+                                                                  Icons
+                                                                      .timer_outlined),
+                                                              title: const Text(
+                                                                  'Change time'),
+                                                              onTap: () async {
+                                                                Navigator.pop(
+                                                                    context);
+                                                                TimeOfDay? result = await showTimePicker(
+                                                                    context:
+                                                                        context,
+                                                                    initialTime:
+                                                                        TimeOfDay.fromDateTime(doctorValue ??
+                                                                            DateTime.now()));
+
+                                                                if (result !=
+                                                                    null) {
+                                                                  DateTime
+                                                                      temp =
+                                                                      doctorValue ??
+                                                                          DateTime
+                                                                              .now();
+                                                                  dateTimeNotifier.value = DateTime(
+                                                                      temp.year,
+                                                                      temp
+                                                                          .month,
+                                                                      temp.day,
+                                                                      result
+                                                                          .hour,
+                                                                      result
+                                                                          .minute);
+                                                                }
+                                                              },
+                                                            ),
+                                                          ],
+                                                        );
+                                                      },
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .symmetric(
+                                                                horizontal: 24,
+                                                                vertical: 16),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Text(
+                                                              DateFormat
+                                                                      .yMMMMEEEEd()
+                                                                  .format(dateTimeNotifier
+                                                                          .value ??
+                                                                      DateTime
+                                                                          .now()),
+                                                            ),
+                                                            Text(
+                                                              DateFormat.jm().format(
+                                                                  dateTimeNotifier
+                                                                      .value!),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                }),
+                                            const Divider(height: 50),
+                                            InkWell(
+                                              onTap: () async {
+                                                String? result = await navigate(
+                                                    context,
+                                                    const ChooseDoctorScreen(
+                                                      isFromAppointment: true,
+                                                    ));
+
+                                                if (result != null) {
+                                                  doctorIdNotifier.value =
+                                                      result;
+                                                }
+                                              },
+                                              child: DoctorCard(
+                                                doctor: Doctor.fromFireStore(
+                                                    snapshot.data!.data()!,
+                                                    snapshot.data!.id),
+                                                padding:
+                                                    const EdgeInsets.all(0),
+                                              ),
+                                            ),
+                                            const Divider(height: 50),
+                                            const Text(
+                                                'What services would you want to patronize?'),
+                                            const SizedBox(height: 10),
+                                            ValueListenableBuilder<String?>(
+                                              valueListenable:
+                                                  servicesGroupValue,
+                                              builder: (BuildContext context,
+                                                  String? serviceValue,
+                                                  Widget? child) {
+                                                return ListView.builder(
+                                                  shrinkWrap: true,
+                                                  physics:
+                                                      const NeverScrollableScrollPhysics(),
+                                                  itemCount:
+                                                      doctor.services!.length,
+                                                  itemBuilder:
+                                                      (BuildContext context,
+                                                          int index) {
+                                                    return RadioListTile<
+                                                        String?>(
+                                                      value: serviceValue,
+                                                      groupValue:
+                                                          servicesGroupValue
+                                                              .value,
+                                                      onChanged: (radioValue) {
+                                                        servicesGroupValue
+                                                                .value =
+                                                            serviceValue;
+                                                      },
+                                                      title: Text(doctor
+                                                          .services![index]),
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                            ),
+                                            const Divider(height: 50),
+                                            const Text(
+                                                'Where would you want to meet?'),
+                                            const SizedBox(height: 10),
+                                            Container(
+                                                color:
+                                                    Colors.pink.withOpacity(.1),
+                                                padding:
+                                                    const EdgeInsets.all(36),
+                                                child: const Text(
+                                                    'some implementation of google maps will go on here')),
+                                            const Divider(height: 50),
+                                            const Text(
+                                                'What symptoms are you experiencing?'),
+                                            const SizedBox(height: 10),
+                                            ValueListenableBuilder(
+                                              valueListenable: symptomsNotifier,
+                                              builder: (BuildContext context,
+                                                  List<String> value,
+                                                  Widget? child) {
+                                                return ListView.separated(
+                                                  shrinkWrap: true,
+                                                  primary: false,
+                                                  physics:
+                                                      const NeverScrollableScrollPhysics(),
+                                                  itemCount: value.length,
+                                                  separatorBuilder:
+                                                      (BuildContext context,
+                                                          int index) {
+                                                    return const SizedBox(
+                                                        height: 10);
+                                                  },
+                                                  itemBuilder:
+                                                      (BuildContext context,
+                                                          int index) {
+                                                    return Material(
+                                                      color: Colors.grey[100],
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              14),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .symmetric(
+                                                                horizontal: 36,
+                                                                vertical: 14),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Text(value[index]),
+                                                            InkWell(
+                                                              onTap: () {
+                                                                List<String>
+                                                                    temp =
+                                                                    value;
+                                                                temp.removeAt(
+                                                                    index);
+                                                                symptomsNotifier
+                                                                    .value = [
+                                                                  ...temp
+                                                                ];
+                                                              },
+                                                              child: const Icon(
+                                                                  Icons.clear),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                            ),
+                                            const SizedBox(height: 10),
+                                            CustomTextFormField(
+                                              hintText: 'Add symptom',
+                                              controller: symptomsController,
+                                              onFieldSubmitted: (value) {
+                                                if (!symptomsNotifier.value
+                                                        .contains(
+                                                            symptomsController
+                                                                .text
+                                                                .trim()) &&
+                                                    symptomsController.text
+                                                        .trim()
+                                                        .isNotEmpty) {
+                                                  List<String> temp =
+                                                      symptomsNotifier.value;
+                                                  temp.add(symptomsController
+                                                      .text
+                                                      .trim());
+                                                  symptomsNotifier.value = [
+                                                    ...temp
+                                                  ];
+                                                  symptomsController.clear();
+                                                } else {
+                                                  showAlertDialog(context,
+                                                      message: symptomsController
+                                                              .text
+                                                              .trim()
+                                                              .isEmpty
+                                                          ? 'Textfield is empty'
+                                                          : 'Symptom has already been added');
+                                                }
+                                              },
+                                            ),
+                                            const Divider(height: 50),
+                                            const Text(
+                                                'What underlying conditions do you have?'),
+                                            const SizedBox(height: 10),
+                                            ValueListenableBuilder(
+                                              valueListenable:
+                                                  conditionsNotifier,
+                                              builder: (BuildContext context,
+                                                  List<String> value,
+                                                  Widget? child) {
+                                                return ListView.separated(
+                                                  shrinkWrap: true,
+                                                  primary: false,
+                                                  physics:
+                                                      const NeverScrollableScrollPhysics(),
+                                                  itemCount: value.length,
+                                                  separatorBuilder:
+                                                      (BuildContext context,
+                                                          int index) {
+                                                    return const SizedBox(
+                                                        height: 10);
+                                                  },
+                                                  itemBuilder:
+                                                      (BuildContext context,
+                                                          int index) {
+                                                    return Material(
+                                                      color: Colors.grey[100],
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              14),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .symmetric(
+                                                                horizontal: 36,
+                                                                vertical: 14),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Text(value[index]),
+                                                            InkWell(
+                                                              onTap: () {
+                                                                List<String>
+                                                                    temp =
+                                                                    value;
+                                                                temp.removeAt(
+                                                                    index);
+                                                                conditionsNotifier
+                                                                    .value = [
+                                                                  ...temp
+                                                                ];
+                                                              },
+                                                              child: const Icon(
+                                                                  Icons.clear),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                            ),
+                                            const SizedBox(height: 10),
+                                            CustomTextFormField(
+                                              hintText: 'Add condition',
+                                              controller: conditionsController,
+                                              onFieldSubmitted: (value) {
+                                                if (!conditionsNotifier.value
+                                                        .contains(
+                                                            conditionsController
+                                                                .text
+                                                                .trim()) &&
+                                                    conditionsController.text
+                                                        .trim()
+                                                        .isNotEmpty) {
+                                                  List<String> temp =
+                                                      conditionsNotifier.value;
+                                                  temp.add(conditionsController
+                                                      .text
+                                                      .trim());
+                                                  conditionsNotifier.value = [
+                                                    ...temp
+                                                  ];
+                                                  conditionsController.clear();
+                                                } else {
+                                                  showAlertDialog(context,
+                                                      message: conditionsController
+                                                              .text
+                                                              .trim()
+                                                              .isEmpty
+                                                          ? 'Textfield is empty'
+                                                          : 'Symptom has already been added');
+                                                }
+                                              },
+                                            )
+                                          ],
+                                        );
+                                      }
+
+                                      return const Center(
+                                          child: CircularProgressIndicator
+                                              .adaptive());
+                                    },
+                                  ),
+                          ),
+                        ),
+                      );
+                    }),
                 CustomAppBar(
                   title: '',
                   actions: [
@@ -430,7 +557,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
   void dispose() {
     dateTimeNotifier.dispose();
 
-    selectedDoctorNotifier.dispose();
+    doctorIdNotifier.dispose();
 
     servicesGroupValue.dispose();
 
@@ -443,30 +570,6 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
     super.dispose();
   }
 }
-
-//SERVICES
-// ValueListenableBuilder<String?>(
-//                                   valueListenable: servicesGroupValue,
-//                                   builder: (BuildContext context,
-//                                       String? serviceValue, Widget? child) {
-//                                     return ListView.builder(
-//                                       itemCount: selectedDoctorNotifier
-//                                           .value!.services!.length,
-//                                       itemBuilder:
-//                                           (BuildContext context, int index) {
-//                                         return RadioListTile<String?>(
-//                                             value: serviceValue,
-//                                             groupValue:
-//                                                 servicesGroupValue.value,
-//                                             onChanged: (radioValue) {
-//                                               servicesGroupValue.value =
-//                                                   serviceValue;
-//                                             });
-//                                       },
-//                                     );
-//                                   },
-//                                 ),
-
 
 
 

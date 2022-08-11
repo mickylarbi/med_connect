@@ -25,8 +25,6 @@ class DoctorsListPage extends StatefulWidget {
 class _DoctorsListPageState extends State<DoctorsListPage> {
   final ScrollController _scrollController = ScrollController();
 
-  final FirestoreServices db = FirestoreServices();
-
   Doctor doctor = Doctor(
       bio:
           'This is the bioThis is the bioThis is the bioThis is the bioThis is the bio\nThis is the bioThis is the bioThis is the bio\nThis is the bioThis is the bio\nThis is the bioThis is the bioThis is the bioThis is the bioThis is the bio',
@@ -91,56 +89,7 @@ class _DoctorsListPageState extends State<DoctorsListPage> {
             physics: const BouncingScrollPhysics(),
             children: [
               const SizedBox(height: 138),
-              FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                  future: db.doctorsList,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Column(
-                          children: [
-                            const Text('Something went wrong. Tap to reload'),
-                            IconButton(
-                              onPressed: () {
-                                setState(() {});
-                              },
-                              icon: const Icon(Icons.refresh),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      return ListView.separated(
-                        shrinkWrap: true,
-                        primary: false,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) => InkWell(
-                          onTap: () {
-                            navigate(
-                              context,
-                              DoctorDetailsScreen(
-                                doctor: Doctor.fromFireStore(
-                                    snapshot.data!.docs[index].data(),
-                                    snapshot.data!.docs[index].id),
-                              ),
-                            );
-                          },
-                          child: DoctorCard(
-                              doctor: Doctor.fromFireStore(
-                                  snapshot.data!.docs[index].data(),
-                                  snapshot.data!.docs[index].id)),
-                        ),
-                        separatorBuilder: (context, index) => const Divider(
-                          indent: 176,
-                          endIndent: 36,
-                          height: 0,
-                        ),
-                        itemCount: snapshot.data!.docs.length,
-                      );
-                    }
-                    return const Center(
-                        child: CircularProgressIndicator.adaptive());
-                  }),
+              DoctorsListView(),
             ],
           ),
         ),
@@ -163,5 +112,72 @@ class _DoctorsListPageState extends State<DoctorsListPage> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+}
+
+class DoctorsListView extends StatefulWidget {
+  final bool isFromAppointment;
+  const DoctorsListView({Key? key, this.isFromAppointment = false})
+      : super(key: key);
+
+  @override
+  State<DoctorsListView> createState() => _DoctorsListViewState();
+}
+
+class _DoctorsListViewState extends State<DoctorsListView> {
+  final FirestoreServices db = FirestoreServices();
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        future: db.doctorsList,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Column(
+                children: [
+                  const Text('Something went wrong. Tap to reload'),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {});
+                    },
+                    icon: const Icon(Icons.refresh),
+                  ),
+                ],
+              ),
+            );
+          }
+          if (snapshot.connectionState == ConnectionState.done) {
+            return ListView.separated(
+              shrinkWrap: true,
+              primary: false,
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) => InkWell(
+                onTap: () {
+                  navigate(
+                    context,
+                    DoctorDetailsScreen(
+                      doctor: Doctor.fromFireStore(
+                          snapshot.data!.docs[index].data(),
+                          snapshot.data!.docs[index].id),
+                      isFromAppointment: widget.isFromAppointment,
+                    ),
+                  );
+                },
+                child: DoctorCard(
+                    doctor: Doctor.fromFireStore(
+                        snapshot.data!.docs[index].data(),
+                        snapshot.data!.docs[index].id)),
+              ),
+              separatorBuilder: (context, index) => const Divider(
+                indent: 176,
+                endIndent: 36,
+                height: 0,
+              ),
+              itemCount: snapshot.data!.docs.length,
+            );
+          }
+          return const Center(child: CircularProgressIndicator.adaptive());
+        });
   }
 }

@@ -25,11 +25,11 @@ class _TabViewState extends State<TabView> {
         child: PageView(
             controller: _pageController,
             physics: const NeverScrollableScrollPhysics(),
-            children: const [
-              HomePage(),
-              AppointmentsListPage(),
-              DoctorsListPage(),
-              ChatsListPage(),
+            children: [
+              const HomePage(),
+              const AppointmentsListPage(),
+              const DoctorsListPage(),
+              const ChatsListPage(),
               MorePage()
             ]),
       ),

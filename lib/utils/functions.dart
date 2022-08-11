@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:med_connect/models/review.dart';
 
 double calculateRating(List<Review>? reviewList) {
-  if (reviewList==null || reviewList.isEmpty) return 0.0;
+  if (reviewList == null || reviewList.isEmpty) return 0.0;
 
   double? sum = 0;
 
@@ -13,6 +13,5 @@ double calculateRating(List<Review>? reviewList) {
   return (sum! / reviewList.length);
 }
 
-void navigate(BuildContext context, Widget destination) {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => destination));
-}
+navigate(BuildContext context, Widget destination) => Navigator.push(
+    context, MaterialPageRoute(builder: (context) => destination));

@@ -6,7 +6,9 @@ import 'package:intl/intl.dart';
 import 'package:med_connect/firebase_services/storage_service.dart';
 import 'package:med_connect/models/doctor.dart';
 import 'package:med_connect/models/doctor.dart';
+import 'package:med_connect/models/doctor_appointment.dart';
 import 'package:med_connect/models/review.dart';
+import 'package:med_connect/screens/home/appointment/appointment_details_screen.dart';
 import 'package:med_connect/screens/home/appointment/edit_appointment_screen.dart';
 import 'package:med_connect/screens/home/doctor/doctor_card.dart';
 import 'package:med_connect/screens/home/doctor/review_card.dart';
@@ -20,7 +22,10 @@ import 'package:med_connect/utils/functions.dart';
 
 class DoctorDetailsScreen extends StatefulWidget {
   final Doctor doctor;
-  const DoctorDetailsScreen({Key? key, required this.doctor}) : super(key: key);
+  final bool isFromAppointment;
+  const DoctorDetailsScreen(
+      {Key? key, required this.doctor, this.isFromAppointment = false})
+      : super(key: key);
 
   @override
   State<DoctorDetailsScreen> createState() => _DoctorDetailsScreenState();
@@ -273,7 +278,19 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                       ],
                     ),
                     onPressed: () {
-                      navigate(context, EditAppointmentScreen());
+                      print(widget.isFromAppointment);
+
+                      if (widget.isFromAppointment) {
+                        Navigator.pop(context);
+                        Navigator.pop(context, widget.doctor.id);
+                      } else {
+                        navigate(
+                            context,
+                            AppointmentDetailsScreen(
+                              appointment:
+                                  DoctorAppointment(doctorId: widget.doctor.id),
+                            ));
+                      }
                     },
                   ),
                 ),
