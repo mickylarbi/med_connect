@@ -26,7 +26,7 @@ class AppointmentDetailsScreen extends StatefulWidget {
 
 class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
   ValueNotifier<String?> doctorIdNotifier = ValueNotifier<String?>(null);
-  ValueNotifier<DateTime?> dateTimeNotifier = ValueNotifier<DateTime?>(null);
+  ValueNotifier<DateTime> dateTimeNotifier = ValueNotifier<DateTime>(DateTime.now());
 
   ValueNotifier<String?> servicesGroupValue = ValueNotifier<String?>(null);
 
@@ -47,9 +47,9 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
   void initState() {
     super.initState();
 
-    if (widget.appointment.doctorId != null) {
+    if (widget.appointment.id != null) {
       doctorIdNotifier.value = widget.appointment.doctorId;
-      dateTimeNotifier.value = widget.appointment.dateTime;
+      dateTimeNotifier.value = widget.appointment.dateTime!;
       servicesGroupValue.value = widget.appointment.service;
       //TODO: add location
       symptomsNotifier.value = widget.appointment.symptoms!;
@@ -243,14 +243,12 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                                                               DateFormat
                                                                       .yMMMMEEEEd()
                                                                   .format(dateTimeNotifier
-                                                                          .value ??
-                                                                      DateTime
-                                                                          .now()),
+                                                                          .value),
                                                             ),
                                                             Text(
                                                               DateFormat.jm().format(
                                                                   dateTimeNotifier
-                                                                      .value!),
+                                                                      .value),
                                                             ),
                                                           ],
                                                         ),
