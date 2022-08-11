@@ -9,11 +9,13 @@ import 'package:med_connect/utils/functions.dart';
 class DoctorCard extends StatelessWidget {
   final Doctor doctor;
   final EdgeInsetsGeometry padding;
-  DoctorCard(
-      {Key? key,
-      required this.doctor,
-      this.padding = const EdgeInsets.symmetric(horizontal: 36)})
-      : super(key: key);
+  final bool showChevronRight;
+  DoctorCard({
+    Key? key,
+    required this.doctor,
+    this.padding = const EdgeInsets.symmetric(horizontal: 36),
+    this.showChevronRight = true,
+  }) : super(key: key);
 
   StorageService storage = StorageService();
 
@@ -23,52 +25,52 @@ class DoctorCard extends StatelessWidget {
       padding: padding,
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: Container(
-              height: 120,
-              width: 110,
-              alignment: Alignment.center,
-              color: Colors.grey.withOpacity(.1),
-              child: StatefulBuilder(builder: (context, setState) {
-                return FutureBuilder<String>(
-                  future: storage.profileImageUrl(doctor.id!),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return GestureDetector(
-                        onTap: () async {
-                          setState(() {});
-                        },
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: const [
-                            Text(
-                              'Tap to reload',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                            Icon(
-                              Icons.refresh,
-                              color: Colors.grey,
-                            )
-                          ],
-                        ),
-                      );
-                    }
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      return Image.network(
-                        snapshot.data!,
-                        height: 120,
-                        width: 110,
-                        fit: BoxFit.cover,
-                      );
-                      // return const FlutterLogo();
-                    }
-                    return const CircularProgressIndicator.adaptive();
-                  },
-                );
-              }),
-            ),
-          ),
+          // ClipRRect(
+          //   borderRadius: BorderRadius.circular(20),
+          //   child: Container(
+          //     height: 120,
+          //     width: 110,
+          //     alignment: Alignment.center,
+          //     color: Colors.grey.withOpacity(.1),
+          //     child: StatefulBuilder(builder: (context, setState) {
+          //       return FutureBuilder<String>(
+          //         future: storage.profileImageUrl(doctor.id!),
+          //         builder: (context, snapshot) {
+          //           if (snapshot.hasError) {
+          //             return GestureDetector(
+          //               onTap: () async {
+          //                 setState(() {});
+          //               },
+          //               child: Column(
+          //                 mainAxisSize: MainAxisSize.min,
+          //                 children: const [
+          //                   Text(
+          //                     'Tap to reload',
+          //                     style: TextStyle(color: Colors.grey),
+          //                   ),
+          //                   Icon(
+          //                     Icons.refresh,
+          //                     color: Colors.grey,
+          //                   )
+          //                 ],
+          //               ),
+          //             );
+          //           }
+          //           if (snapshot.connectionState == ConnectionState.done) {
+          //             return Image.network(
+          //               snapshot.data!,
+          //               height: 120,
+          //               width: 110,
+          //               fit: BoxFit.cover,
+          //             );
+          //             // return const FlutterLogo();
+          //           }
+          //           return const CircularProgressIndicator.adaptive();
+          //         },
+          //       );
+          //     }),
+          //   ),
+          // ),
           const SizedBox(width: 30),
           Container(
             height: 150,
@@ -111,12 +113,13 @@ class DoctorCard extends StatelessWidget {
               ],
             ),
           ),
-          const Spacer(),
-          Icon(
-            Icons.chevron_right_rounded,
-            color: Colors.grey.withOpacity(.5),
-            size: 40,
-          )
+          if (showChevronRight) const Spacer(),
+          if (showChevronRight)
+            Icon(
+              Icons.chevron_right_rounded,
+              color: Colors.grey.withOpacity(.5),
+              size: 40,
+            )
         ],
       ),
     );

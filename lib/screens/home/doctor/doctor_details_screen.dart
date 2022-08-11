@@ -7,6 +7,7 @@ import 'package:med_connect/firebase_services/storage_service.dart';
 import 'package:med_connect/models/doctor.dart';
 import 'package:med_connect/models/doctor.dart';
 import 'package:med_connect/models/review.dart';
+import 'package:med_connect/screens/home/appointment/edit_appointment_screen.dart';
 import 'package:med_connect/screens/home/doctor/doctor_card.dart';
 import 'package:med_connect/screens/home/doctor/review_card.dart';
 import 'package:med_connect/screens/home/doctor/reviews_list_screen.dart';
@@ -255,9 +256,30 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                 const SizedBox(height: 50),
               ],
             ),
-            // Align(align)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SizedBox(
+                height: 52 + 80,
+                child: Padding(
+                  padding: const EdgeInsets.all(36),
+                  child: CustomFlatButton(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: const [
+                        Text('Book an appointment'),
+                        SizedBox(width: 10),
+                        Icon(Icons.arrow_right)
+                      ],
+                    ),
+                    onPressed: () {
+                      navigate(context, EditAppointmentScreen());
+                    },
+                  ),
+                ),
+              ),
+            ),
             CustomAppBar(
-              leading: Icons.arrow_back,
               title: 'Doctor info',
               actions: [
                 OutlineIconButton(
@@ -271,4 +293,5 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       ),
     );
   }
+  //TODO: show upcoming appointments
 }

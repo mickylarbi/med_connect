@@ -28,7 +28,6 @@ class ReviewListScreen extends StatelessWidget {
               },
             ),
             CustomAppBar(
-              leading: Icons.arrow_back,
               title: 'Reviews',
               actions: [
                 OutlineIconButton(

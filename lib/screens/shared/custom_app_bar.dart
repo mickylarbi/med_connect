@@ -5,10 +5,16 @@ import 'package:med_connect/utils/constants.dart';
 
 class CustomAppBar extends StatelessWidget {
   final IconData? leading;
+  final void Function()? onPressedLeading;
   final String? title;
   final List<Widget>? actions;
-  const CustomAppBar({Key? key, this.leading, this.actions, this.title})
-      : super(key: key);
+  const CustomAppBar({
+    Key? key,
+    this.leading = Icons.arrow_back,
+    this.actions,
+    this.title,
+    this.onPressedLeading,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +29,10 @@ class CustomAppBar extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: OutlineIconButton(
               iconData: leading!,
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: onPressedLeading ??
+                  () {
+                    Navigator.pop(context);
+                  },
             ),
           ),
         if (title != null)
@@ -46,11 +53,8 @@ class CustomAppBar extends StatelessWidget {
   }
 }
 
-List<Widget> fancyAppBar(
-    BuildContext context,
-    ScrollController scrollController,
-    String title,
-    List<Widget> actions) {
+List<Widget> fancyAppBar(BuildContext context,
+    ScrollController scrollController, String title, List<Widget> actions) {
   return [
     AnimatedBuilder(
       animation: scrollController,

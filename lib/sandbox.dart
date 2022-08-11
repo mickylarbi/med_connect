@@ -3,7 +3,7 @@ import 'dart:math';
 // import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:med_connect/models/appointment.dart';
+import 'package:med_connect/models/doctor_appointment.dart';
 import 'package:med_connect/models/experience.dart';
 import 'package:med_connect/models/review.dart';
 import 'package:med_connect/utils/constants.dart';
@@ -28,7 +28,9 @@ class _SandBoxState extends State<SandBox> {
             FirebaseFirestore db = FirebaseFirestore.instance;
 
             for (int i = 0; i < 50; i++) {
-              await db.collection('appointments').add(Appointment().toMap());//TODO:
+              await db
+                  .collection('appointments')
+                  .add(DoctorAppointment().toMap()); //TODO:
             }
           },
         ),
