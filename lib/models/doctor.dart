@@ -16,6 +16,7 @@ class Doctor {
   List<String>? services;
   List<DateTimeRange>? availablehours;
   bool? isAvailableForHomeCalls;
+  String? phone;
 
   Doctor({
     this.id,
@@ -30,6 +31,7 @@ class Doctor {
     this.availablehours,
     this.reviews,
     this.isAvailableForHomeCalls,
+    this.phone,
   });
 
   Doctor.fromFireStore(Map<String, dynamic> map, String dId) {
@@ -75,6 +77,7 @@ class Doctor {
     }
 
     isAvailableForHomeCalls = map['isAvailableForHomeCalls'] as bool?;
+    phone = map['phone'] as String?;
   }
 
   Map<String, dynamic> toMap() {
@@ -94,6 +97,7 @@ class Doctor {
             .toList(),
       'reviews': reviews,
       'isAvailableForHomeCalls': isAvailableForHomeCalls,
+      'phone': phone,
     };
   }
 
@@ -109,7 +113,8 @@ class Doctor {
       experiences == other.experiences &&
       services == other.services &&
       currentLocation == other.currentLocation &&
-      isAvailableForHomeCalls == other.isAvailableForHomeCalls;
+      isAvailableForHomeCalls == other.isAvailableForHomeCalls &&
+      phone == other.phone;
 
   @override
   int get hashCode => hashValues(
@@ -121,5 +126,6 @@ class Doctor {
         hashList(services),
         currentLocation,
         isAvailableForHomeCalls,
+        phone,
       );
 }

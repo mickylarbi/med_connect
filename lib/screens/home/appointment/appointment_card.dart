@@ -36,12 +36,12 @@ class AppointmentCard extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      DateFormat.d().format(DateTime.now()),
+                      DateFormat.d().format(appointment.dateTime!),
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 24),
                     ),
                     Text(
-                      DateFormat.MMM().format(DateTime.now()),
+                      DateFormat.MMM().format(appointment.dateTime!),
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     )
                   ],

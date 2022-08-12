@@ -1,18 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:med_connect/firebase_services/auth_service.dart';
 import 'package:med_connect/firebase_services/firestore_services.dart';
 import 'package:med_connect/models/doctor.dart';
 import 'package:med_connect/models/doctor_appointment.dart';
 import 'package:med_connect/screens/home/appointment/choose_doctor_screen.dart';
+import 'package:med_connect/screens/home/appointment/map_screen.dart';
 import 'package:med_connect/screens/home/doctor/doctor_card.dart';
+import 'package:med_connect/screens/home/doctor/doctor_details_screen.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
+import 'package:med_connect/screens/shared/custom_buttons.dart';
 import 'package:med_connect/screens/shared/custom_textformfield.dart';
 import 'package:med_connect/screens/shared/header_text.dart';
-import 'package:med_connect/screens/shared/outline_icon_button.dart';
+import 'package:med_connect/screens/shared/custom_icon_buttons.dart';
 import 'package:med_connect/utils/dialogs.dart';
 import 'package:med_connect/utils/functions.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AppointmentDetailsScreen extends StatefulWidget {
   final DoctorAppointment appointment;
@@ -26,7 +31,8 @@ class AppointmentDetailsScreen extends StatefulWidget {
 
 class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
   ValueNotifier<String?> doctorIdNotifier = ValueNotifier<String?>(null);
-  ValueNotifier<DateTime> dateTimeNotifier = ValueNotifier<DateTime>(DateTime.now());
+  ValueNotifier<DateTime> dateTimeNotifier =
+      ValueNotifier<DateTime>(DateTime.now());
 
   ValueNotifier<String?> servicesGroupValue = ValueNotifier<String?>(null);
 
@@ -47,8 +53,9 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
   void initState() {
     super.initState();
 
+    doctorIdNotifier.value = widget.appointment.doctorId;
+
     if (widget.appointment.id != null) {
-      doctorIdNotifier.value = widget.appointment.doctorId;
       dateTimeNotifier.value = widget.appointment.dateTime!;
       servicesGroupValue.value = widget.appointment.service;
       //TODO: add location
@@ -75,7 +82,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
       },
       child: GestureDetector(
         onTap: () {
-          FocusScope.of(context).unfocus();
+          SystemChannels.textInput.invokeMethod('TextInput.hide');
         },
         child: Scaffold(
           body: SafeArea(
@@ -88,7 +95,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                         padding: const EdgeInsets.only(top: 88),
                         child: Center(
                           child: SingleChildScrollView(
-                            padding: const EdgeInsets.fromLTRB(36, 20, 36, 36),
+                            padding: const EdgeInsets.fromLTRB(36, 20, 36, 150),
                             child: value == null
                                 ? Material(
                                     borderRadius: BorderRadius.circular(14),
@@ -166,6 +173,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                                                               onTap: () async {
                                                                 Navigator.pop(
                                                                     context);
+
                                                                 DateTime? result = await showDatePicker(
                                                                     context:
                                                                         context,
@@ -199,6 +207,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                                                               onTap: () async {
                                                                 Navigator.pop(
                                                                     context);
+
                                                                 TimeOfDay? result = await showTimePicker(
                                                                     context:
                                                                         context,
@@ -233,7 +242,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                                                             const EdgeInsets
                                                                     .symmetric(
                                                                 horizontal: 24,
-                                                                vertical: 16),
+                                                                vertical: 20),
                                                         child: Row(
                                                           mainAxisAlignment:
                                                               MainAxisAlignment
@@ -242,7 +251,8 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                                                             Text(
                                                               DateFormat
                                                                       .yMMMMEEEEd()
-                                                                  .format(dateTimeNotifier
+                                                                  .format(
+                                                                      dateTimeNotifier
                                                                           .value),
                                                             ),
                                                             Text(
@@ -258,17 +268,13 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                                                 }),
                                             const Divider(height: 50),
                                             InkWell(
-                                              onTap: () async {
-                                                String? result = await navigate(
+                                              onTap: () {
+                                                navigate(
                                                     context,
-                                                    const ChooseDoctorScreen(
-                                                      isFromAppointment: true,
+                                                    DoctorDetailsScreen(
+                                                      doctor: doctor,
+                                                      showButton: false,
                                                     ));
-
-                                                if (result != null) {
-                                                  doctorIdNotifier.value =
-                                                      result;
-                                                }
                                               },
                                               child: DoctorCard(
                                                 doctor: Doctor.fromFireStore(
@@ -276,6 +282,133 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                                                     snapshot.data!.id),
                                                 padding:
                                                     const EdgeInsets.all(0),
+                                              ),
+                                            ),
+                                            Row(
+                                              children: [
+                                                if (doctor.phone != null)
+                                                  Expanded(
+                                                    child: CustomFlatButton(
+                                                      backgroundColor:
+                                                          Colors.black87,
+                                                      child:
+                                                          const Text('Contact'),
+                                                      onPressed: () {
+                                                        showCustomBottomSheet(
+                                                          context,
+                                                          [
+                                                            ListTile(
+                                                              leading: const Icon(
+                                                                  Icons.email),
+                                                              title: const Text(
+                                                                  'Send an sms'),
+                                                              onTap: () async {
+                                                                Navigator.pop(
+                                                                    context);
+
+                                                                Uri smsUri =
+                                                                    Uri(
+                                                                  scheme: 'sms',
+                                                                  path: doctor
+                                                                      .phone!,
+                                                                  queryParameters: <
+                                                                      String,
+                                                                      String>{
+                                                                    'body': Uri
+                                                                        .encodeComponent(
+                                                                            'From MedConnect App\n'),
+                                                                  },
+                                                                );
+
+                                                                try {
+                                                                  if (await canLaunchUrl(
+                                                                      smsUri)) {
+                                                                    await launchUrl(
+                                                                        smsUri);
+                                                                  } else {
+                                                                    showAlertDialog(
+                                                                        context);
+                                                                  }
+                                                                } catch (e) {
+                                                                  showAlertDialog(
+                                                                      context);
+                                                                }
+                                                              },
+                                                            ),
+                                                            ListTile(
+                                                              leading:
+                                                                  const Icon(
+                                                                      Icons
+                                                                          .call),
+                                                              title: const Text(
+                                                                  'Call phone'),
+                                                              onTap: () async {
+                                                                Navigator.pop(
+                                                                    context);
+
+                                                                Uri phoneUri = Uri(
+                                                                    scheme:
+                                                                        'tel',
+                                                                    path: doctor
+                                                                        .phone!);
+
+                                                                try {
+                                                                  if (await canLaunchUrl(
+                                                                      phoneUri)) {
+                                                                    await launchUrl(
+                                                                        phoneUri);
+                                                                  } else {
+                                                                    showAlertDialog(
+                                                                        context);
+                                                                  }
+                                                                } catch (e) {
+                                                                  showAlertDialog(
+                                                                      context);
+                                                                }
+                                                              },
+                                                            )
+                                                          ],
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
+                                                if (doctor.phone != null)
+                                                  const SizedBox(width: 10),
+                                                OutlineIconButton(
+                                                  iconData: Icons.chat_bubble,
+                                                  onPressed: () {
+                                                    //TODO: navigate to chat screen
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 14),
+                                            Align(
+                                              child: Center(
+                                                child: TextButton(
+                                                  onPressed: () async {
+                                                    String? result = await navigate(
+                                                        context,
+                                                        const ChooseDoctorScreen(
+                                                          isFromAppointment:
+                                                              true,
+                                                        ));
+
+                                                    if (result != null) {
+                                                      doctorIdNotifier.value =
+                                                          result;
+                                                    }
+                                                  },
+                                                  child: const Text(
+                                                    'Choose different doctor',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        decoration:
+                                                            TextDecoration
+                                                                .underline),
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                             const Divider(height: 50),
@@ -299,14 +432,14 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                                                           int index) {
                                                     return RadioListTile<
                                                         String?>(
-                                                      value: serviceValue,
-                                                      groupValue:
-                                                          servicesGroupValue
-                                                              .value,
+                                                      value: doctor
+                                                          .services![index],
+                                                      groupValue: serviceValue,
                                                       onChanged: (radioValue) {
                                                         servicesGroupValue
                                                                 .value =
-                                                            serviceValue;
+                                                            doctor.services![
+                                                                index];
                                                       },
                                                       title: Text(doctor
                                                           .services![index]),
@@ -319,13 +452,12 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                                             const Text(
                                                 'Where would you want to meet?'),
                                             const SizedBox(height: 10),
-                                            Container(
-                                                color:
-                                                    Colors.pink.withOpacity(.1),
-                                                padding:
-                                                    const EdgeInsets.all(36),
-                                                child: const Text(
-                                                    'some implementation of google maps will go on here')),
+                                            CustomFlatButton(
+                                                child: Text('Go to map'),
+                                                onPressed: () {
+                                                  navigate(
+                                                      context, MapScreen());
+                                                }),
                                             const Divider(height: 50),
                                             const Text(
                                                 'What symptoms are you experiencing?'),
@@ -569,67 +701,64 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
   }
 }
 
-
-
-
 //CONTACT
-  // Row(
-  //                               mainAxisAlignment: MainAxisAlignment.center,
-  //                               children: [
-                              //     Material(
-                              //       color: Colors.blueGrey.withOpacity(.1),
-                              //       borderRadius: BorderRadius.circular(20),
-                              //       child: InkWell(
-                              //         onTap: () {
-                              //           db.addAppointment(
-                              //               context,
-                              //               DoctorAppointment(
-                              //                   conditions: [
-                              //                     'Multiple sclerosis'
-                              //                   ],
-                              //                   dateTime: DateTime.now(),
-                              //                   doctorId:
-                              //                       '6Y6tq6WafEgPEldbrcehbxEm4203',
-                              //                   location: 'Tech Hospital',
-                              //                   patientId: auth.uid,
-                              //                   service: 'Consult',
-                              //                   symptoms: [
-                              //                     'Headache',
-                              //                     'Nausea'
-                              //                   ]));
-                              //         },
-                              //         child: Padding(
-                              //           padding: const EdgeInsets.symmetric(
-                              //               horizontal: 24, vertical: 14),
-                              //           child: Row(
-                              //             mainAxisAlignment:
-                              //                 MainAxisAlignment.center,
-                              //             children: const [
-                              //               Icon(Icons.call),
-                              //               SizedBox(width: 5),
-                              //               Text('Call'),
-                              //             ],
-                              //           ),
-                              //         ),
-                              //       ),
-                              //     ),
-                              //     const SizedBox(width: 10),
-                              //     Material(
-                              //       color: Colors.blueGrey.withOpacity(.1),
-                              //       borderRadius: BorderRadius.circular(20),
-                              //       child: Padding(
-                              //         padding: const EdgeInsets.symmetric(
-                              //             horizontal: 24, vertical: 14),
-                              //         child: Row(
-                              //           mainAxisAlignment:
-                              //               MainAxisAlignment.center,
-                              //           children: const [
-                              //             Icon(Icons.chat_bubble),
-                              //             SizedBox(width: 5),
-                              //             Text('Message'),
-                              //           ],
-                              //         ),
-                              //       ),
-                              //     ),
-                              //   ],
-                              // ),
+// Row(
+//                               mainAxisAlignment: MainAxisAlignment.center,
+//                               children: [
+//     Material(
+//       color: Colors.blueGrey.withOpacity(.1),
+//       borderRadius: BorderRadius.circular(20),
+//       child: InkWell(
+//         onTap: () {
+//           db.addAppointment(
+//               context,
+//               DoctorAppointment(
+//                   conditions: [
+//                     'Multiple sclerosis'
+//                   ],
+//                   dateTime: DateTime.now(),
+//                   doctorId:
+//                       '6Y6tq6WafEgPEldbrcehbxEm4203',
+//                   location: 'Tech Hospital',
+//                   patientId: auth.uid,
+//                   service: 'Consult',
+//                   symptoms: [
+//                     'Headache',
+//                     'Nausea'
+//                   ]));
+//         },
+//         child: Padding(
+//           padding: const EdgeInsets.symmetric(
+//               horizontal: 24, vertical: 14),
+//           child: Row(
+//             mainAxisAlignment:
+//                 MainAxisAlignment.center,
+//             children: const [
+//               Icon(Icons.call),
+//               SizedBox(width: 5),
+//               Text('Call'),
+//             ],
+//           ),
+//         ),
+//       ),
+//     ),
+//     const SizedBox(width: 10),
+//     Material(
+//       color: Colors.blueGrey.withOpacity(.1),
+//       borderRadius: BorderRadius.circular(20),
+//       child: Padding(
+//         padding: const EdgeInsets.symmetric(
+//             horizontal: 24, vertical: 14),
+//         child: Row(
+//           mainAxisAlignment:
+//               MainAxisAlignment.center,
+//           children: const [
+//             Icon(Icons.chat_bubble),
+//             SizedBox(width: 5),
+//             Text('Message'),
+//           ],
+//         ),
+//       ),
+//     ),
+//   ],
+// ),

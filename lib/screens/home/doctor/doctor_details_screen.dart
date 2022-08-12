@@ -16,16 +16,20 @@ import 'package:med_connect/screens/home/doctor/reviews_list_screen.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
 import 'package:med_connect/screens/shared/custom_buttons.dart';
 import 'package:med_connect/screens/shared/header_text.dart';
-import 'package:med_connect/screens/shared/outline_icon_button.dart';
+import 'package:med_connect/screens/shared/custom_icon_buttons.dart';
 import 'package:med_connect/utils/constants.dart';
 import 'package:med_connect/utils/functions.dart';
 
 class DoctorDetailsScreen extends StatefulWidget {
   final Doctor doctor;
   final bool isFromAppointment;
-  const DoctorDetailsScreen(
-      {Key? key, required this.doctor, this.isFromAppointment = false})
-      : super(key: key);
+  final bool showButton;
+  const DoctorDetailsScreen({
+    Key? key,
+    required this.doctor,
+    this.isFromAppointment = false,
+    this.showButton = true,
+  }) : super(key: key);
 
   @override
   State<DoctorDetailsScreen> createState() => _DoctorDetailsScreenState();
@@ -261,41 +265,43 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                 const SizedBox(height: 50),
               ],
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: SizedBox(
-                height: 52 + 80,
-                child: Padding(
-                  padding: const EdgeInsets.all(36),
-                  child: CustomFlatButton(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: const [
-                        Text('Book an appointment'),
-                        SizedBox(width: 10),
-                        Icon(Icons.arrow_right)
-                      ],
-                    ),
-                    onPressed: () {
-                      print(widget.isFromAppointment);
+            if (widget.showButton)
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: SizedBox(
+                  height: 52 + 80,
+                  child: Padding(
+                    padding: const EdgeInsets.all(36),
+                    child: CustomFlatButton(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: const [
+                          Text('Book an appointment'),
+                          SizedBox(width: 10),
+                          Icon(Icons.arrow_right)
+                        ],
+                      ),
+                      onPressed: () {
+                        print(widget.isFromAppointment);
 
-                      if (widget.isFromAppointment) {
-                        Navigator.pop(context);
-                        Navigator.pop(context, widget.doctor.id);
-                      } else {
-                        navigate(
+                        if (widget.isFromAppointment) {
+                          Navigator.pop(context);
+                          Navigator.pop(context, widget.doctor.id);
+                        } else {
+                          navigate(
                             context,
                             AppointmentDetailsScreen(
                               appointment:
                                   DoctorAppointment(doctorId: widget.doctor.id),
-                            ));
-                      }
-                    },
+                            ),
+                          );
+                        }
+                      },
+                    ),
                   ),
                 ),
               ),
-            ),
             CustomAppBar(
               title: 'Doctor info',
               actions: [

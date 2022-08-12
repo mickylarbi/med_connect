@@ -19,15 +19,12 @@ class DefaultFirebaseOptions {
     if (kIsWeb) {
       throw UnsupportedError(
         'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
+        'you can reconfigure thais by running the FlutterFire CLI again.',
       );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for android - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return android;
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
@@ -58,8 +55,18 @@ class DefaultFirebaseOptions {
     messagingSenderId: '224473311778',
     projectId: 'medconnect-85d3b',
     storageBucket: 'medconnect-85d3b.appspot.com',
-    androidClientId: '224473311778-b03oef3gaq2gnno9clmtv496re7m4asu.apps.googleusercontent.com',
-    iosClientId: '224473311778-e3sq402icp2fl7m5i9liitnngf4ic9uf.apps.googleusercontent.com',
+    androidClientId:
+        '224473311778-b03oef3gaq2gnno9clmtv496re7m4asu.apps.googleusercontent.com',
+    iosClientId:
+        '224473311778-e3sq402icp2fl7m5i9liitnngf4ic9uf.apps.googleusercontent.com',
     iosBundleId: 'com.example.medConnect',
+  );
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyD_bCzLENPZxixTROIVZ4rvT0ZRr_pAgC0',
+    appId: '1:224473311778:android:ede4794c6f4c4244b2387b',
+    messagingSenderId: '224473311778',
+    projectId: 'medconnect-85d3b',
+    storageBucket: 'medconnect-85d3b.appspot.com',
   );
 }
