@@ -20,6 +20,7 @@ class CustomAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 88,
+      color: Theme.of(context).scaffoldBackgroundColor,
       width: kScreenWidth(context),
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 36),
@@ -115,12 +116,7 @@ List<Widget> fancyAppBar(BuildContext context,
         alignment: Alignment.center,
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          children: [
-            OutlineIconButton(
-              iconData: Icons.filter_list_alt,
-              onPressed: () {},
-            )
-          ],
+          children: actions,
         ),
       ),
     )

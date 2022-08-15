@@ -1,5 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:med_connect/firebase_services/auth_service.dart';
+import 'package:med_connect/firebase_services/firestore_services.dart';
+import 'package:med_connect/firebase_services/storage_service.dart';
+import 'package:med_connect/models/patient.dart';
+import 'package:med_connect/screens/home/homepage/patient_profile.screen.dart';
+import 'package:med_connect/screens/shared/custom_app_bar.dart';
 import 'package:med_connect/screens/shared/header_text.dart';
+import 'package:med_connect/utils/dialogs.dart';
+import 'package:med_connect/utils/functions.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -9,23 +18,25 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  ScrollController scrollController = ScrollController();
+  StorageService storage = StorageService();
+  AuthService auth = AuthService();
+  FirestoreServices db = FirestoreServices();
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: <Widget>[
-          SliverAppBar(
-            title: const Text('Welcome'),
-            actions: [
-              Container(
-                color: Colors.green,
-                height: 30,
-                width: 30,
+    return Stack(
+      children: [
+        RefreshIndicator(
+          onRefresh: () async {
+            setState(() {});
+          },
+          child: ListView(
+            controller: scrollController,
+            children: [
+              const SizedBox(
+                height: 138,
               ),
-            ],
-          ),
-          SliverList(
-            delegate: SliverChildListDelegate([
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Row(
@@ -219,11 +230,68 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
               ),
-            ]),
+            ],
           ),
-        ],
-      ),
+        ),
+        ...fancyAppBar(context, scrollController, 'Hello', [
+          InkWell(
+            onTap: (() async {
+              showLoadingDialog(context);
+              try {
+                DocumentSnapshot<Map<String, dynamic>> result =
+                    await db.patient;
+                Patient patient =
+                    Patient.fromFirestore(result.data()!, result.id);
+
+                navigate(
+                    context,
+                    PatientProfileScreen(
+                      patient: patient,
+                    ));
+              } catch (e) {
+                Navigator.pop(context);
+                showAlertDialog(context, message: 'Couldn\'t get profile info');
+              }
+            }),
+            borderRadius: BorderRadius.circular(10),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                height: 44,
+                width: 44,
+                alignment: Alignment.center,
+                color: Colors.grey.withOpacity(.1),
+                child: FutureBuilder<String>(
+                  future: storage.profileImageUrl(auth.uid),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return const Icon(
+                        Icons.person,
+                        color: Colors.grey,
+                      );
+                    }
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      return Image.network(
+                        snapshot.data!,
+                        fit: BoxFit.cover,
+                      );
+                    }
+                    return const Center(
+                        child: CircularProgressIndicator.adaptive());
+                  },
+                ),
+              ),
+            ),
+          ),
+        ])
+      ],
     );
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose;
+    super.dispose();
   }
 }
 

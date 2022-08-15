@@ -46,7 +46,7 @@ void showAlertDialog(BuildContext context,
           ));
 }
 
-void showConfirmationDialog(BuildContext context,
+void showConfirmationDialog(BuildContext context,//TODO: correct styles
     {String? message, required Function confirmFunction}) {
   showDialog(
     context: context,
