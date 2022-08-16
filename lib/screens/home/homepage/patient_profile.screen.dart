@@ -811,14 +811,17 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                   CustomFlatButton(
                     child: const Text('Save changes'),
                     onPressed: () {
-                      if (firstNameController.text.trim().isNotEmpty &&
-                          surnameController.text.trim().isNotEmpty &&
-                          phoneController.text.trim().isNotEmpty &&
+                      if ((firstNameController.text.trim().isNotEmpty &&
+                              surnameController.text.trim().isNotEmpty &&
+                              phoneController.text.trim().isNotEmpty) ||
                           widget.patient != newPatient) {
-                        showConfirmationDialog(context,message: 'Save changes to profile?', confirmFunction: () {
+                        showConfirmationDialog(context,
+                            message: 'Save changes to profile?',
+                            confirmFunction: () {
                           db.updatePatient(context, newPatient);
                         });
                       }
+                      print(widget.patient == newPatient);
                     },
                   )
                 ],
@@ -826,7 +829,14 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
               CustomAppBar(
                 title: 'My Profile',
                 onPressedLeading: () {
-                  // if()
+                  if (widget.patient != newPatient) {
+                    showConfirmationDialog(context, message: 'Discard changes',
+                        confirmFunction: () {
+                      Navigator.pop(context);
+                    });
+                  } else {
+                    Navigator.pop(context);
+                  }
                 },
                 actions: [
                   OutlineIconButton(

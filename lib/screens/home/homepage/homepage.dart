@@ -243,6 +243,7 @@ class _HomePageState extends State<HomePage> {
                 Patient patient =
                     Patient.fromFirestore(result.data()!, result.id);
 
+                Navigator.pop(context);
                 navigate(
                     context,
                     PatientProfileScreen(

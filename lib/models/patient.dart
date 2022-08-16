@@ -118,6 +118,8 @@ class Patient {
           'surgeries': surgeries!.map((e) => e.toFirestore()).toList(),
       };
 
+  String get name => '$firstName $surname';
+
   @override
   bool operator ==(other) =>
       other is Patient &&

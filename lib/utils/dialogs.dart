@@ -46,8 +46,9 @@ void showAlertDialog(BuildContext context,
           ));
 }
 
-void showConfirmationDialog(BuildContext context,//TODO: correct styles
-    {String? message, required Function confirmFunction}) {
+void showConfirmationDialog(BuildContext context, //TODO: correct styles
+    {String? message,
+    required Function confirmFunction}) {
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
@@ -66,15 +67,15 @@ void showConfirmationDialog(BuildContext context,//TODO: correct styles
           child: const Text(
             'NO',
             style: TextStyle(
-                color: Colors.white,
+                color: Colors.blueGrey,
                 fontWeight: FontWeight.bold,
                 letterSpacing: .5),
           ),
           style: ButtonStyle(
             backgroundColor:
-                MaterialStateProperty.all(Theme.of(context).primaryColor),
+                MaterialStateProperty.all(Colors.blueGrey.withOpacity(.15)),
             shape: MaterialStateProperty.all(
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
           ),
         ),
@@ -86,20 +87,19 @@ void showConfirmationDialog(BuildContext context,//TODO: correct styles
           child: const Text(
             'YES',
             style: TextStyle(
-                // color: Colors.white,
+                color: Colors.white,
                 fontWeight: FontWeight.bold,
                 letterSpacing: .5),
           ),
           style: ButtonStyle(
-            backgroundColor:
-                MaterialStateProperty.all(Theme.of(context).backgroundColor),
+            backgroundColor: MaterialStateProperty.all(Colors.blueGrey),
             shape: MaterialStateProperty.all(
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
           ),
         ),
       ],
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       actionsPadding: const EdgeInsets.symmetric(horizontal: 14),
     ),
   );

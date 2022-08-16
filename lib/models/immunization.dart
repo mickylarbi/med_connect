@@ -21,7 +21,7 @@ class Immunization {
 
   @override
   String toString() {
-    return '$immunization (${DateFormat.yMMMMd().format(date!)})';
+    return '$immunization (${DateFormat.yMMMM().format(date!)})';
   }
 
   @override

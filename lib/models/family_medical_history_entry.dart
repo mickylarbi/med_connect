@@ -17,7 +17,7 @@ class FamilyMedicalHistoryEntry {
 
   @override
   String toString() {
-    return '$relation ($condition)';
+    return '$condition ($relation)';
   }
 
   @override
