@@ -23,7 +23,8 @@ class _MapScreenState extends State<MapScreen> {
           GoogleMap(
             mapType: MapType.normal,
             myLocationEnabled: true,
-            
+            myLocationButtonEnabled: true,
+            // padding: EdgeInsets.all(36),
             initialCameraPosition: const CameraPosition(
               target: LatLng(6.6745, -1.5716),
               zoom: 14.4746,
