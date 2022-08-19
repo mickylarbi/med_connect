@@ -190,9 +190,19 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
 
                                                                 if (result !=
                                                                     null) {
-                                                                  dateTimeNotifier
-                                                                          .value =
-                                                                      result;
+                                                                  DateTime
+                                                                      temp =
+                                                                      dateTimeNotifier
+                                                                          .value;
+                                                                  dateTimeNotifier.value = DateTime(
+                                                                      result
+                                                                          .year,
+                                                                      result
+                                                                          .month,
+                                                                      result
+                                                                          .day,
+                                                                      temp.hour,
+                                                                      temp.minute);
                                                                 }
                                                               },
                                                             ),
@@ -284,12 +294,11 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                                                     const EdgeInsets.all(0),
                                               ),
                                             ),
-                                            if (doctor.phone != null)//TODO: remove this
+                                            if (doctor.phone !=
+                                                null) //TODO: remove this
                                               CustomFlatButton(
-                                                backgroundColor:
-                                                    Colors.black87,
-                                                child:
-                                                    const Text('Contact'),
+                                                backgroundColor: Colors.black87,
+                                                child: const Text('Contact'),
                                                 onPressed: () {
                                                   showCustomBottomSheet(
                                                     context,
@@ -303,14 +312,11 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                                                           Navigator.pop(
                                                               context);
 
-                                                          Uri smsUri =
-                                                              Uri(
+                                                          Uri smsUri = Uri(
                                                             scheme: 'sms',
-                                                            path: doctor
-                                                                .phone!,
+                                                            path: doctor.phone!,
                                                             queryParameters: <
-                                                                String,
-                                                                String>{
+                                                                String, String>{
                                                               'body': Uri
                                                                   .encodeComponent(
                                                                       'From MedConnect App\n'),
@@ -333,10 +339,8 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                                                         },
                                                       ),
                                                       ListTile(
-                                                        leading:
-                                                            const Icon(
-                                                                Icons
-                                                                    .call),
+                                                        leading: const Icon(
+                                                            Icons.call),
                                                         title: const Text(
                                                             'Call phone'),
                                                         onTap: () async {
@@ -344,8 +348,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                                                               context);
 
                                                           Uri phoneUri = Uri(
-                                                              scheme:
-                                                                  'tel',
+                                                              scheme: 'tel',
                                                               path: doctor
                                                                   .phone!);
 
@@ -368,14 +371,6 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                                                   );
                                                 },
                                               ),
-                                            if (doctor.phone != null)
-                                              const SizedBox(width: 10),
-                                            OutlineIconButton(
-                                              iconData: Icons.chat_bubble,
-                                              onPressed: () {
-                                                //TODO: navigate to chat screen
-                                              },
-                                            ),
                                             const SizedBox(height: 14),
                                             Align(
                                               child: Center(

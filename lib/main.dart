@@ -5,13 +5,7 @@ import 'package:med_connect/src.dart';
 
 void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const Src());
 //TODO: change font color to blue grey
-
-  'AIzaSyB0A7Aytdk8Si52D78Z8UdmIAgOL_Bg2B4';
 }
-
-//TODO: change font color to blue grey

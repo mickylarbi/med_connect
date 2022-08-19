@@ -95,7 +95,7 @@ class Doctor {
         'availableHours': availablehours!
             .map((e) => {'startDate': e.start, 'endDate': e.end})
             .toList(),
-      'reviews': reviews,
+      if (reviews != null) 'reviews': reviews!.map((e) => e.toMap()).toList(),
       'isAvailableForHomeCalls': isAvailableForHomeCalls,
       'phone': phone,
     };
