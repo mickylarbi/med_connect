@@ -40,9 +40,14 @@ class SolidIconButton extends StatelessWidget {
       height: 40,
       width: 40,
       decoration: BoxDecoration(
-        color: Colors.blueGrey,
-        borderRadius: BorderRadius.circular(14),
-      ),
+          color: Colors.blueGrey,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withOpacity(.3),
+                blurRadius: 30,
+                offset: Offset(0, 10))
+          ]),
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
         onTap: onPressed,
