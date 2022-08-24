@@ -1,24 +1,37 @@
 import 'package:flutter/material.dart';
 
 class CustomElevatedButton extends StatelessWidget {
-  final void Function()? _onPressed;
-  final String labelText;
-  const CustomElevatedButton(
-      {Key? key, required void Function()? onPressed, required this.labelText})
-      : _onPressed = onPressed,
-        super(key: key);
+  final void Function()? onPressed;
+  final Widget? child;
+  final Color? backgroundColor;
+  final AlignmentGeometry alignment;
+  const CustomElevatedButton({
+    Key? key,
+    required this.child,
+    this.backgroundColor = Colors.blueGrey,
+    required this.onPressed,
+    this.alignment = Alignment.center,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48,
-      width: double.infinity,
-      child: ElevatedButton(
-        child: Text(labelText),
-        onPressed: _onPressed,
-        style: ElevatedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+    return Material(
+      elevation: 10,
+      textStyle: TextStyle(
+        color: onPressed != null ? Colors.white : Colors.grey,
+        letterSpacing: .5,
+      ),
+      borderRadius: BorderRadius.circular(14),
+      color: onPressed != null ? backgroundColor : Colors.grey[200],
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onPressed,
+        child: IconTheme(
+          data: IconThemeData(
+              color: onPressed != null ? Colors.white : Colors.grey),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24),
+            child: Align(alignment: alignment, child: child),
           ),
         ),
       ),

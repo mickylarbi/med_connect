@@ -88,6 +88,8 @@ class AuthService {
               MaterialPageRoute(builder: (context) => const WelcomeScreen()),
               (route) => false);
         } else {
+          kpatientName =
+              '${value.data()!['firstName']} ${value.data()!['surname']}';
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => const TabView()),

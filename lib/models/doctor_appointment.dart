@@ -1,9 +1,11 @@
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:med_connect/utils/constants.dart';
 
 class DoctorAppointment {
   String? id;
-  String? location;
   String? doctorId;
   String? doctorName;
   String? patientId;
@@ -13,23 +15,26 @@ class DoctorAppointment {
   List<String>? symptoms;
   List<String>? conditions;
   bool? isConfirmed;
+  String? venueString;
+  LatLng? venueGeo;
 
-  DoctorAppointment(
-      {this.id,
-      this.location,
-      this.doctorId,
-      this.doctorName,
-      this.patientId,
-      this.patientName,
-      this.dateTime,
-      this.service,
-      this.conditions,
-      this.symptoms,
-      this.isConfirmed});
+  DoctorAppointment({
+    this.id,
+    this.doctorId,
+    this.doctorName,
+    this.patientId,
+    this.patientName,
+    this.dateTime,
+    this.service,
+    this.conditions,
+    this.symptoms,
+    this.isConfirmed,
+    this.venueString,
+    this.venueGeo,
+  });
 
   DoctorAppointment.fromFirestore(Map<String, dynamic> map, String aId) {
     id = aId;
-    location = map['location'] as String?;
     doctorId = map['doctorId'] as String?;
     doctorName = map['doctorName'] as String?;
     patientId = map['patientId'] as String?;
@@ -47,20 +52,25 @@ class DoctorAppointment {
         .toList();
 
     isConfirmed = map['isConfirmed'] as bool?;
+
+    venueString = map['venueString'] as String?;
+
+    venueGeo = map['venueGeo'];
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'location': location,
       'doctorId': doctorId,
       'doctorName': doctorName,
-      'patientId': patientId,
-      'patientName': patientName,
+      'patientId': FirebaseAuth.instance.currentUser!.uid,
+      'patientName': kpatientName,
       'service': service,
       'dateTime': dateTime,
       'symptoms': symptoms,
       'conditions': conditions,
-      'isConfirmed': isConfirmed,
+      'venueString': venueString,
+      'venueGeo': venueGeo,
+      'isConfirmed':false,
     };
   }
 
@@ -74,8 +84,9 @@ class DoctorAppointment {
       service == other.service &&
       symptoms == other.symptoms &&
       conditions == other.conditions &&
-      other.location == other.location &&
-      other.isConfirmed == isConfirmed;
+      other.isConfirmed == isConfirmed &&
+      other.venueString == venueString &&
+      other.venueGeo == venueGeo;
 
   @override
   int get hashCode => hashValues(
@@ -86,7 +97,8 @@ class DoctorAppointment {
         service,
         hashList(symptoms),
         hashList(conditions),
-        location,
         isConfirmed,
+        venueString,
+        venueGeo,
       );
 }

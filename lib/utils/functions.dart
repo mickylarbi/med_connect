@@ -13,5 +13,7 @@ double calculateRating(List<Review>? reviewList) {
   return (sum! / reviewList.length);
 }
 
-navigate(BuildContext context, Widget destination) => Navigator.push(
-    context, MaterialPageRoute(builder: (context) => destination));
+Future<T?> navigate<T extends Object?>(
+        BuildContext context, Widget destination) =>
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => destination));

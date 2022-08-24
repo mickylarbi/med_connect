@@ -85,6 +85,7 @@ class DoctorCard extends StatelessWidget {
             children: [
               Text(
                 doctor.name,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(

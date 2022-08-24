@@ -10,9 +10,7 @@ import 'package:med_connect/screens/shared/custom_icon_buttons.dart';
 import 'package:med_connect/utils/functions.dart';
 
 class ChooseDoctorScreen extends StatefulWidget {
-  final bool isFromAppointment;
-  const ChooseDoctorScreen({Key? key, this.isFromAppointment = false})
-      : super(key: key);
+  const ChooseDoctorScreen({Key? key}) : super(key: key);
 
   @override
   State<ChooseDoctorScreen> createState() => _ChooseDoctorScreenState();
@@ -28,7 +26,7 @@ class _ChooseDoctorScreenState extends State<ChooseDoctorScreen> {
         children: [
           const Padding(
             padding: EdgeInsets.only(top: 88),
-            child: DoctorsListView(isFromAppointment: true),
+            child: DoctorsListView(),
           ),
           CustomAppBar(
             title: 'Choose doctor',

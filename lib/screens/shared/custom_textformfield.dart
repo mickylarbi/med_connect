@@ -8,6 +8,8 @@ class CustomTextFormField extends StatelessWidget {
   final TextCapitalization textCapitalization;
   final int? minLines;
   final void Function(String)? onFieldSubmitted;
+  final String? initialValue;
+  final void Function(String)? onChanged;
   const CustomTextFormField({
     Key? key,
     required this.hintText,
@@ -17,11 +19,15 @@ class CustomTextFormField extends StatelessWidget {
     this.textInputAction,
     this.minLines = 1,
     this.onFieldSubmitted,
+    this.initialValue,
+    this.onChanged,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      initialValue: initialValue,
+      onChanged: onChanged,
       controller: controller,
       keyboardType: keyboardType,
       textCapitalization: textCapitalization,

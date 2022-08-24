@@ -28,7 +28,6 @@ class _TabViewState extends State<TabView> {
             children: [
               const HomePage(),
               const AppointmentsListPage(),
-              const DoctorsListPage(),
               const ChatsListPage(),
               MorePage()
             ]),
@@ -49,8 +48,8 @@ class _TabViewState extends State<TabView> {
                 BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
                 BottomNavigationBarItem(
                     icon: Icon(Icons.calendar_month), label: ''),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.person_search), label: ''),
+                // BottomNavigationBarItem(
+                //     icon: Icon(Icons.person_search), label: ''),
                 BottomNavigationBarItem(
                     icon: Icon(Icons.chat_bubble_rounded), label: ''),
                 BottomNavigationBarItem(

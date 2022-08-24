@@ -23,12 +23,10 @@ import 'package:med_connect/utils/functions.dart';
 
 class DoctorDetailsScreen extends StatefulWidget {
   final Doctor doctor;
-  final bool isFromAppointment;
   final bool showButton;
   const DoctorDetailsScreen({
     Key? key,
     required this.doctor,
-    this.isFromAppointment = false,
     this.showButton = true,
   }) : super(key: key);
 
@@ -297,20 +295,10 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                         ],
                       ),
                       onPressed: () {
-                        print(widget.isFromAppointment);
 
-                        if (widget.isFromAppointment) {
                           Navigator.pop(context);
                           Navigator.pop(context, widget.doctor.id);
-                        } else {
-                          navigate(
-                            context,
-                            AppointmentDetailsScreen(
-                              appointment:
-                                  DoctorAppointment(doctorId: widget.doctor.id),
-                            ),
-                          );
-                        }
+                       
                       },
                     ),
                   ),

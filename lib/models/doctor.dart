@@ -14,8 +14,6 @@ class Doctor {
   String? bio;
   Experience? currentLocation;
   List<String>? services;
-  List<DateTimeRange>? availablehours;
-  bool? isAvailableForHomeCalls;
   String? phone;
 
   Doctor({
@@ -28,9 +26,7 @@ class Doctor {
     this.experiences,
     this.services,
     this.currentLocation,
-    this.availablehours,
     this.reviews,
-    this.isAvailableForHomeCalls,
     this.phone,
   });
 
@@ -60,14 +56,6 @@ class Doctor {
     currentLocation = Experience.fromFirestore(
         map['currentLocation'] as Map<String, dynamic>);
 
-    List<Map>? al = map['availableHours'] as List<Map>?;
-    if (al != null) {
-      for (Map element in al) {
-        availablehours!.add(DateTimeRange(
-            start: element['startDate'], end: element['endDate']));
-      }
-    }
-
     tempList = map['reviews'] as List<Map<String, dynamic>>?;
     if (tempList != null) {
       reviews = [];
@@ -76,29 +64,7 @@ class Doctor {
       }
     }
 
-    isAvailableForHomeCalls = map['isAvailableForHomeCalls'] as bool?;
     phone = map['phone'] as String?;
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'firstName': firstName,
-      'surname': surname,
-      'bio': bio,
-      'mainSpecialty': mainSpecialty,
-      'otherSpecialties': otherSpecialties,
-      if (experiences != null)
-        'experiences': experiences!.map((e) => e.toMap()).toList(),
-      'services': services,
-      if (currentLocation != null) 'currentLocation': currentLocation!.toMap(),
-      if (availablehours != null)
-        'availableHours': availablehours!
-            .map((e) => {'startDate': e.start, 'endDate': e.end})
-            .toList(),
-      if (reviews != null) 'reviews': reviews!.map((e) => e.toMap()).toList(),
-      'isAvailableForHomeCalls': isAvailableForHomeCalls,
-      'phone': phone,
-    };
   }
 
   String get name => '$firstName $surname';
@@ -113,7 +79,6 @@ class Doctor {
       experiences == other.experiences &&
       services == other.services &&
       currentLocation == other.currentLocation &&
-      isAvailableForHomeCalls == other.isAvailableForHomeCalls &&
       phone == other.phone;
 
   @override
@@ -125,7 +90,6 @@ class Doctor {
         hashList(experiences),
         hashList(services),
         currentLocation,
-        isAvailableForHomeCalls,
         phone,
       );
 }

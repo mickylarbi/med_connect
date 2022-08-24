@@ -43,7 +43,7 @@ class FirestoreService {
   // APPOINTMENT
 
   CollectionReference<Map<String, dynamic>> get appointmentsCollection =>
-      instance.collection('doctorAppointments');
+      instance.collection('doctor_appointments');
 
   Query<Map<String, dynamic>> get appointmentsList => appointmentsCollection
       .where('patientId', isEqualTo: auth.currentUser!.uid);
@@ -54,4 +54,7 @@ class FirestoreService {
 
   Future<void> updateAppointment(DoctorAppointment appointment) =>
       appointmentsCollection.doc(appointment.id).update(appointment.toMap());
+
+  Future<void> deleteAppointment(String appointmentId) =>
+      appointmentsCollection.doc(appointmentId).delete();
 }

@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:med_connect/firebase_services/auth_service.dart';
 import 'package:med_connect/firebase_services/firestore_service.dart';
@@ -15,739 +18,738 @@ import 'package:med_connect/screens/shared/custom_buttons.dart';
 import 'package:med_connect/screens/shared/custom_textformfield.dart';
 import 'package:med_connect/screens/shared/header_text.dart';
 import 'package:med_connect/screens/shared/custom_icon_buttons.dart';
+import 'package:med_connect/utils/constants.dart';
 import 'package:med_connect/utils/dialogs.dart';
 import 'package:med_connect/utils/functions.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class AppointmentDetailsScreen extends StatefulWidget {
+class AppointmentDetailsScreen extends StatelessWidget {
   final DoctorAppointment appointment;
-  const AppointmentDetailsScreen({Key? key, required this.appointment})
+  AppointmentDetailsScreen({Key? key, required this.appointment})
       : super(key: key);
 
-  @override
-  State<AppointmentDetailsScreen> createState() =>
-      _AppointmentDetailsScreenState();
-}
-
-class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
-  ValueNotifier<String?> doctorIdNotifier = ValueNotifier<String?>(null);
-  ValueNotifier<DateTime> dateTimeNotifier =
-      ValueNotifier<DateTime>(DateTime.now());
-
-  ValueNotifier<String?> servicesGroupValue = ValueNotifier<String?>(null);
-
-  ValueNotifier<List<String>> symptomsNotifier =
-      ValueNotifier<List<String>>([]);
-  TextEditingController symptomsController = TextEditingController();
-
-  ValueNotifier<List<String>> conditionsNotifier =
-      ValueNotifier<List<String>>([]);
-  TextEditingController conditionsController = TextEditingController();
+  String? doctorIdNotifier;
 
   FirestoreService db = FirestoreService();
   AuthService auth = AuthService();
 
-  DoctorAppointment newAppointment = DoctorAppointment();
-
-  @override
-  void initState() {
-    super.initState();
-
-    doctorIdNotifier.value = widget.appointment.doctorId;
-
-    if (widget.appointment.id != null) {
-      dateTimeNotifier.value = widget.appointment.dateTime!;
-      servicesGroupValue.value = widget.appointment.service;
-      //TODO: add location
-      symptomsNotifier.value = widget.appointment.symptoms!;
-      conditionsNotifier.value = widget.appointment.conditions!;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        // if (widget.appointment == newAppointment) return true;
+    doctorIdNotifier = appointment.doctorId;
 
-        // showConfirmationDialog(
-        //   context,
-        //   message: 'Save changes to appointment?',
-        //   confirmFunction: () async {
-        //     await db.updateAppointment(context, newAppointment);
-        //   },
-        // );
-
-        return false;
+    return GestureDetector(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
       },
-      child: GestureDetector(
-        onTap: () {
-          SystemChannels.textInput.invokeMethod('TextInput.hide');
-        },
-        child: Scaffold(
-          body: SafeArea(
-            child: Stack(
-              children: [
-                ValueListenableBuilder<String?>(
-                    valueListenable: doctorIdNotifier,
-                    builder: (context, value, child) {
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 88),
-                        child: Center(
-                          child: SingleChildScrollView(
-                            padding: const EdgeInsets.fromLTRB(36, 20, 36, 150),
-                            child: value == null
-                                ? Material(
-                                    borderRadius: BorderRadius.circular(14),
-                                    color: Colors.blueGrey.withOpacity(.1),
-                                    child: InkWell(
-                                      borderRadius: BorderRadius.circular(14),
-                                      onTap: () async {
-                                        String? result = await navigate(
-                                            context,
-                                            const ChooseDoctorScreen(
-                                              isFromAppointment: true,
-                                            ));
+      child: Scaffold(
+        body: SafeArea(
+          child: Stack(
+            children: [
+              StatefulBuilder(
+                builder: (context, setState) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 88),
+                    child: Center(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.fromLTRB(36, 20, 36, 150),
+                        child: doctorIdNotifier == null
+                            ? Material(
+                                borderRadius: BorderRadius.circular(14),
+                                color: Colors.blueGrey.withOpacity(.1),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(14),
+                                  onTap: () async {
+                                    String? result = await navigate(
+                                        context, const ChooseDoctorScreen());
 
-                                        if (result != null) {
-                                          doctorIdNotifier.value = result;
-                                        }
-                                      },
-                                      child: const Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 24, vertical: 14),
-                                        child: Text('Choose doctor'),
-                                      ),
-                                    ),
-                                  )
-                                : FutureBuilder<
-                                    DocumentSnapshot<Map<String, dynamic>>>(
-                                    future: db.doctor(value),
-                                    builder: (BuildContext context,
-                                        AsyncSnapshot<
-                                                DocumentSnapshot<
-                                                    Map<String, dynamic>>>
-                                            snapshot) {
-                                      if (snapshot.hasError) {
-                                        return const Text(
-                                            'Couldn\'t get doctor info');
-                                      }
-
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.done) {
-                                        Doctor doctor = Doctor.fromFireStore(
-                                            snapshot.data!.data()!,
-                                            snapshot.data!.id);
-
-                                        return Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            ValueListenableBuilder<DateTime?>(
-                                                valueListenable:
-                                                    dateTimeNotifier,
-                                                builder: (context, doctorValue,
-                                                    child) {
-                                                  return Material(
-                                                    color: Colors.blueGrey
-                                                        .withOpacity(.1),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            14),
-                                                    textStyle: const TextStyle(
-                                                        color: Colors.blueGrey),
-                                                    child: InkWell(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              14),
-                                                      onTap: () {
-                                                        showCustomBottomSheet(
-                                                          context,
-                                                          [
-                                                            ListTile(
-                                                              leading: const Icon(
-                                                                  Icons
-                                                                      .calendar_today_rounded),
-                                                              title: const Text(
-                                                                  'Change date'),
-                                                              onTap: () async {
-                                                                Navigator.pop(
-                                                                    context);
-
-                                                                DateTime? result = await showDatePicker(
-                                                                    context:
-                                                                        context,
-                                                                    initialDate:
-                                                                        doctorValue ??
-                                                                            DateTime
-                                                                                .now(),
-                                                                    firstDate:
-                                                                        DateTime(
-                                                                            1950),
-                                                                    lastDate:
-                                                                        DateTime(
-                                                                            2100));
-
-                                                                if (result !=
-                                                                    null) {
-                                                                  DateTime
-                                                                      temp =
-                                                                      dateTimeNotifier
-                                                                          .value;
-                                                                  dateTimeNotifier.value = DateTime(
-                                                                      result
-                                                                          .year,
-                                                                      result
-                                                                          .month,
-                                                                      result
-                                                                          .day,
-                                                                      temp.hour,
-                                                                      temp.minute);
-                                                                }
-                                                              },
-                                                            ),
-                                                            const Divider(
-                                                                height: 10),
-                                                            ListTile(
-                                                              leading: const Icon(
-                                                                  Icons
-                                                                      .timer_outlined),
-                                                              title: const Text(
-                                                                  'Change time'),
-                                                              onTap: () async {
-                                                                Navigator.pop(
-                                                                    context);
-
-                                                                TimeOfDay? result = await showTimePicker(
-                                                                    context:
-                                                                        context,
-                                                                    initialTime:
-                                                                        TimeOfDay.fromDateTime(doctorValue ??
-                                                                            DateTime.now()));
-
-                                                                if (result !=
-                                                                    null) {
-                                                                  DateTime
-                                                                      temp =
-                                                                      doctorValue ??
-                                                                          DateTime
-                                                                              .now();
-                                                                  dateTimeNotifier.value = DateTime(
-                                                                      temp.year,
-                                                                      temp
-                                                                          .month,
-                                                                      temp.day,
-                                                                      result
-                                                                          .hour,
-                                                                      result
-                                                                          .minute);
-                                                                }
-                                                              },
-                                                            ),
-                                                          ],
-                                                        );
-                                                      },
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .symmetric(
-                                                                horizontal: 24,
-                                                                vertical: 20),
-                                                        child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
-                                                            Text(
-                                                              DateFormat
-                                                                      .yMMMMEEEEd()
-                                                                  .format(
-                                                                      dateTimeNotifier
-                                                                          .value),
-                                                            ),
-                                                            Text(
-                                                              DateFormat.jm().format(
-                                                                  dateTimeNotifier
-                                                                      .value),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  );
-                                                }),
-                                            const Divider(height: 50),
-                                            InkWell(
-                                              onTap: () {
-                                                navigate(
-                                                    context,
-                                                    DoctorDetailsScreen(
-                                                      doctor: doctor,
-                                                      showButton: false,
-                                                    ));
-                                              },
-                                              child: DoctorCard(
-                                                doctor: Doctor.fromFireStore(
-                                                    snapshot.data!.data()!,
-                                                    snapshot.data!.id),
-                                                padding:
-                                                    const EdgeInsets.all(0),
-                                              ),
-                                            ),
-                                            if (doctor.phone !=
-                                                null) //TODO: remove this
-                                              CustomFlatButton(
-                                                backgroundColor: Colors.black87,
-                                                child: const Text('Contact'),
-                                                onPressed: () {
-                                                  showCustomBottomSheet(
-                                                    context,
-                                                    [
-                                                      ListTile(
-                                                        leading: const Icon(
-                                                            Icons.sms),
-                                                        title: const Text(
-                                                            'Send an SMS'),
-                                                        onTap: () async {
-                                                          Navigator.pop(
-                                                              context);
-
-                                                          Uri smsUri = Uri(
-                                                            scheme: 'sms',
-                                                            path: doctor.phone!,
-                                                            queryParameters: <
-                                                                String, String>{
-                                                              'body': Uri
-                                                                  .encodeComponent(
-                                                                      'From MedConnect App\n'),
-                                                            },
-                                                          );
-
-                                                          try {
-                                                            if (await canLaunchUrl(
-                                                                smsUri)) {
-                                                              await launchUrl(
-                                                                  smsUri);
-                                                            } else {
-                                                              showAlertDialog(
-                                                                  context);
-                                                            }
-                                                          } catch (e) {
-                                                            showAlertDialog(
-                                                                context);
-                                                          }
-                                                        },
-                                                      ),
-                                                      ListTile(
-                                                        leading: const Icon(
-                                                            Icons.call),
-                                                        title: const Text(
-                                                            'Call phone'),
-                                                        onTap: () async {
-                                                          Navigator.pop(
-                                                              context);
-
-                                                          Uri phoneUri = Uri(
-                                                              scheme: 'tel',
-                                                              path: doctor
-                                                                  .phone!);
-
-                                                          try {
-                                                            if (await canLaunchUrl(
-                                                                phoneUri)) {
-                                                              await launchUrl(
-                                                                  phoneUri);
-                                                            } else {
-                                                              showAlertDialog(
-                                                                  context);
-                                                            }
-                                                          } catch (e) {
-                                                            showAlertDialog(
-                                                                context);
-                                                          }
-                                                        },
-                                                      )
-                                                    ],
-                                                  );
-                                                },
-                                              ),
-                                            const SizedBox(height: 14),
-                                            Align(
-                                              child: Center(
-                                                child: TextButton(
-                                                  onPressed: () async {
-                                                    String? result = await navigate(
-                                                        context,
-                                                        const ChooseDoctorScreen(
-                                                          isFromAppointment:
-                                                              true,
-                                                        ));
-
-                                                    if (result != null) {
-                                                      doctorIdNotifier.value =
-                                                          result;
-                                                    }
-                                                  },
-                                                  child: const Text(
-                                                    'Choose different doctor',
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        decoration:
-                                                            TextDecoration
-                                                                .underline),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            const Divider(height: 50),
-                                            const Text(
-                                                'What services would you want to patronize?'),
-                                            const SizedBox(height: 10),
-                                            ValueListenableBuilder<String?>(
-                                              valueListenable:
-                                                  servicesGroupValue,
-                                              builder: (BuildContext context,
-                                                  String? serviceValue,
-                                                  Widget? child) {
-                                                return ListView.builder(
-                                                  shrinkWrap: true,
-                                                  physics:
-                                                      const NeverScrollableScrollPhysics(),
-                                                  itemCount:
-                                                      doctor.services!.length,
-                                                  itemBuilder:
-                                                      (BuildContext context,
-                                                          int index) {
-                                                    return RadioListTile<
-                                                        String?>(
-                                                      value: doctor
-                                                          .services![index],
-                                                      groupValue: serviceValue,
-                                                      onChanged: (radioValue) {
-                                                        servicesGroupValue
-                                                                .value =
-                                                            doctor.services![
-                                                                index];
-                                                      },
-                                                      title: Text(doctor
-                                                          .services![index]),
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                            ),
-                                            const Divider(height: 50),
-                                            const Text(
-                                                'Where would you want to meet?'),
-                                            const SizedBox(height: 10),
-                                            CustomFlatButton(
-                                                child: Text('Go to map'),
-                                                onPressed: () {
-                                                  navigate(
-                                                      context, MapScreen());
-                                                }),
-                                            const Divider(height: 50),
-                                            const Text(
-                                                'What symptoms are you experiencing?'),
-                                            const SizedBox(height: 10),
-                                            ValueListenableBuilder(
-                                              valueListenable: symptomsNotifier,
-                                              builder: (BuildContext context,
-                                                  List<String> value,
-                                                  Widget? child) {
-                                                return ListView.separated(
-                                                  shrinkWrap: true,
-                                                  primary: false,
-                                                  physics:
-                                                      const NeverScrollableScrollPhysics(),
-                                                  itemCount: value.length,
-                                                  separatorBuilder:
-                                                      (BuildContext context,
-                                                          int index) {
-                                                    return const SizedBox(
-                                                        height: 10);
-                                                  },
-                                                  itemBuilder:
-                                                      (BuildContext context,
-                                                          int index) {
-                                                    return Material(
-                                                      color: Colors.grey[100],
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              14),
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .symmetric(
-                                                                horizontal: 36,
-                                                                vertical: 14),
-                                                        child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
-                                                            Text(value[index]),
-                                                            InkWell(
-                                                              onTap: () {
-                                                                List<String>
-                                                                    temp =
-                                                                    value;
-                                                                temp.removeAt(
-                                                                    index);
-                                                                symptomsNotifier
-                                                                    .value = [
-                                                                  ...temp
-                                                                ];
-                                                              },
-                                                              child: const Icon(
-                                                                  Icons.clear),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                            ),
-                                            const SizedBox(height: 10),
-                                            CustomTextFormField(
-                                              hintText: 'Add symptom',
-                                              controller: symptomsController,
-                                              onFieldSubmitted: (value) {
-                                                if (!symptomsNotifier.value
-                                                        .contains(
-                                                            symptomsController
-                                                                .text
-                                                                .trim()) &&
-                                                    symptomsController.text
-                                                        .trim()
-                                                        .isNotEmpty) {
-                                                  List<String> temp =
-                                                      symptomsNotifier.value;
-                                                  temp.add(symptomsController
-                                                      .text
-                                                      .trim());
-                                                  symptomsNotifier.value = [
-                                                    ...temp
-                                                  ];
-                                                  symptomsController.clear();
-                                                } else {
-                                                  showAlertDialog(context,
-                                                      message: symptomsController
-                                                              .text
-                                                              .trim()
-                                                              .isEmpty
-                                                          ? 'Textfield is empty'
-                                                          : 'Symptom has already been added');
-                                                }
-                                              },
-                                            ),
-                                            const Divider(height: 50),
-                                            const Text(
-                                                'What underlying conditions do you have?'),
-                                            const SizedBox(height: 10),
-                                            ValueListenableBuilder(
-                                              valueListenable:
-                                                  conditionsNotifier,
-                                              builder: (BuildContext context,
-                                                  List<String> value,
-                                                  Widget? child) {
-                                                return ListView.separated(
-                                                  shrinkWrap: true,
-                                                  primary: false,
-                                                  physics:
-                                                      const NeverScrollableScrollPhysics(),
-                                                  itemCount: value.length,
-                                                  separatorBuilder:
-                                                      (BuildContext context,
-                                                          int index) {
-                                                    return const SizedBox(
-                                                        height: 10);
-                                                  },
-                                                  itemBuilder:
-                                                      (BuildContext context,
-                                                          int index) {
-                                                    return Material(
-                                                      color: Colors.grey[100],
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              14),
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .symmetric(
-                                                                horizontal: 36,
-                                                                vertical: 14),
-                                                        child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
-                                                            Text(value[index]),
-                                                            InkWell(
-                                                              onTap: () {
-                                                                List<String>
-                                                                    temp =
-                                                                    value;
-                                                                temp.removeAt(
-                                                                    index);
-                                                                conditionsNotifier
-                                                                    .value = [
-                                                                  ...temp
-                                                                ];
-                                                              },
-                                                              child: const Icon(
-                                                                  Icons.clear),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                            ),
-                                            const SizedBox(height: 10),
-                                            CustomTextFormField(
-                                              hintText: 'Add condition',
-                                              controller: conditionsController,
-                                              onFieldSubmitted: (value) {
-                                                if (!conditionsNotifier.value
-                                                        .contains(
-                                                            conditionsController
-                                                                .text
-                                                                .trim()) &&
-                                                    conditionsController.text
-                                                        .trim()
-                                                        .isNotEmpty) {
-                                                  List<String> temp =
-                                                      conditionsNotifier.value;
-                                                  temp.add(conditionsController
-                                                      .text
-                                                      .trim());
-                                                  conditionsNotifier.value = [
-                                                    ...temp
-                                                  ];
-                                                  conditionsController.clear();
-                                                } else {
-                                                  showAlertDialog(context,
-                                                      message: conditionsController
-                                                              .text
-                                                              .trim()
-                                                              .isEmpty
-                                                          ? 'Textfield is empty'
-                                                          : 'Symptom has already been added');
-                                                }
-                                              },
-                                            )
-                                          ],
-                                        );
-                                      }
-
-                                      return const Center(
-                                          child: CircularProgressIndicator
-                                              .adaptive());
-                                    },
+                                    if (result != null) {
+                                      doctorIdNotifier = result;
+                                      setState(() {});
+                                    }
+                                  },
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 24, vertical: 14),
+                                    child: Text('Choose doctor'),
                                   ),
-                          ),
-                        ),
-                      );
-                    }),
-                CustomAppBar(
-                  title: '',
-                  actions: [
+                                ),
+                              )
+                            : AppointmentsDetailsWidget(
+                                doctorIdNotifier: doctorIdNotifier,
+                                appointment: appointment,
+                              ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              CustomAppBar(
+                // title: 'Appointment',
+                actions: [
+                  if (appointment.isConfirmed != null &&
+                      appointment.isConfirmed!)
+                    const CircleAvatar(
+                      backgroundColor: Colors.green,
+                      radius: 14,
+                      child: Icon(
+                        Icons.done,
+                        color: Colors.white,
+                      ),
+                    ),
+                  const SizedBox(width: 20),
+                  if (appointment.id != null)
                     OutlineIconButton(
                       iconData: Icons.more_horiz,
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                      onPressed: () {
+                        showCustomBottomSheet(
+                          context,
+                          [
+                            ListTile(
+                              leading: const Icon(Icons.delete),
+                              title: const Text('Delete appointment'),
+                              onTap: () {
+                                Navigator.pop(context);
+                                showConfirmationDialog(
+                                  context,
+                                  message: 'Delete appointment',
+                                  confirmFunction: () {
+                                    showLoadingDialog(context);
+                                    db
+                                        .deleteAppointment(appointment.id!)
+                                        .timeout(ktimeout)
+                                        .then((value) {
+                                      Navigator.pop(context);
+                                      Navigator.pop(context);
+                                    }).onError((error, stackTrace) {
+                                      Navigator.pop(context);
+                                      showAlertDialog(context,
+                                          message:
+                                              'Error deleting appointment');
+                                    });
+                                  },
+                                );
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    )
+                ],
+              ),
+            ],
           ),
         ),
       ),
     );
   }
+}
+
+class AppointmentsDetailsWidget extends StatefulWidget {
+  final String? doctorIdNotifier;
+  final DoctorAppointment appointment;
+
+  AppointmentsDetailsWidget({
+    Key? key,
+    required this.doctorIdNotifier,
+    required this.appointment,
+  }) : super(key: key);
+
+  @override
+  State<AppointmentsDetailsWidget> createState() =>
+      _AppointmentsDetailsWidgetState();
+}
+
+class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
+  String? doctorId;
+
+  DateTime? dateTime;
+
+  String? service;
+
+  String? venueString;
+
+  LatLng? venueGeo;
+
+  List<String>? symptoms;
+  TextEditingController symptomsController = TextEditingController();
+
+  List<String>? conditions;
+  TextEditingController conditionsController = TextEditingController();
+
+  FirestoreService db = FirestoreService();
+
+  @override
+  Widget build(BuildContext context) {
+    doctorId = widget.doctorIdNotifier;
+    dateTime = widget.appointment.dateTime;
+    service = widget.appointment.service;
+    venueString = widget.appointment.venueString;
+    venueGeo = widget.appointment.venueGeo;
+    symptoms = widget.appointment.symptoms;
+    conditions = widget.appointment.conditions;
+
+    return StatefulBuilder(builder: (context, setState) {
+      return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+        future: db.doctor(doctorId!),
+        builder: (BuildContext context,
+            AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+          if (snapshot.hasError) {
+            return const Text('Couldn\'t get doctor info');
+          }
+
+          if (snapshot.connectionState == ConnectionState.done) {
+            Doctor doctor =
+                Doctor.fromFireStore(snapshot.data!.data()!, snapshot.data!.id);
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                StatefulBuilder(builder: (context, setState) {
+                  return Center(
+                    child: Material(
+                      color: Colors.blueGrey.withOpacity(.1),
+                      borderRadius: BorderRadius.circular(14),
+                      textStyle: const TextStyle(color: Colors.blueGrey),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(14),
+                        onTap: () {
+                          showCustomBottomSheet(
+                            context,
+                            [
+                              ListTile(
+                                leading:
+                                    const Icon(Icons.calendar_today_rounded),
+                                title: const Text('Change date'),
+                                onTap: () async {
+                                  Navigator.pop(context);
+
+                                  DateTime? result = await showDatePicker(
+                                      context: context,
+                                      initialDate: dateTime ?? DateTime.now(),
+                                      firstDate: DateTime.now(),
+                                      lastDate: DateTime(2100));
+
+                                  if (result != null) {
+                                    DateTime temp = dateTime ?? DateTime.now();
+                                    dateTime = DateTime(
+                                        result.year,
+                                        result.month,
+                                        result.day,
+                                        temp.hour,
+                                        temp.minute);
+                                    setState(() {});
+                                  }
+                                },
+                              ),
+                              const Divider(height: 10),
+                              ListTile(
+                                leading: const Icon(Icons.timer_outlined),
+                                title: const Text('Change time'),
+                                onTap: () async {
+                                  Navigator.pop(context);
+
+                                  TimeOfDay? result = await showTimePicker(
+                                      context: context,
+                                      initialTime: TimeOfDay.fromDateTime(
+                                          dateTime ?? DateTime.now()));
+
+                                  if (result != null) {
+                                    DateTime? temp = dateTime ?? DateTime.now();
+                                    dateTime = DateTime(temp.year, temp.month,
+                                        temp.day, result.hour, result.minute);
+                                    setState(() {});
+                                  }
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 20),
+                          child: dateTime == null
+                              ? const Text('Choose date and time')
+                              : Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      DateFormat.yMMMMEEEEd().format(dateTime!),
+                                    ),
+                                    Text(
+                                      DateFormat.jm().format(dateTime!),
+                                    ),
+                                  ],
+                                ),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+                const Divider(height: 50),
+                InkWell(
+                  onTap: () {
+                    navigate(
+                        context,
+                        DoctorDetailsScreen(
+                          doctor: doctor,
+                          showButton: false,
+                        ));
+                  },
+                  child: DoctorCard(
+                    doctor: Doctor.fromFireStore(
+                        snapshot.data!.data()!, snapshot.data!.id),
+                    padding: const EdgeInsets.all(0),
+                  ),
+                ),
+                if (doctor.phone != null)
+                  CustomFlatButton(
+                    backgroundColor: Colors.black87,
+                    child: const Text('Contact'),
+                    onPressed: () {
+                      showCustomBottomSheet(
+                        context,
+                        [
+                          ListTile(
+                            leading: const Icon(Icons.sms),
+                            title: const Text('Send an SMS'),
+                            onTap: () async {
+                              Navigator.pop(context);
+
+                              Uri smsUri = Uri(
+                                scheme: 'sms',
+                                path: doctor.phone!,
+                                queryParameters: <String, String>{
+                                  'body': Uri.encodeComponent(
+                                      'From MedConnect App\n'),
+                                },
+                              );
+
+                              try {
+                                if (await canLaunchUrl(smsUri)) {
+                                  await launchUrl(smsUri);
+                                } else {
+                                  showAlertDialog(context);
+                                }
+                              } catch (e) {
+                                showAlertDialog(context);
+                              }
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.call),
+                            title: const Text('Call phone'),
+                            onTap: () async {
+                              Navigator.pop(context);
+
+                              Uri phoneUri =
+                                  Uri(scheme: 'tel', path: doctor.phone!);
+
+                              try {
+                                if (await canLaunchUrl(phoneUri)) {
+                                  await launchUrl(phoneUri);
+                                } else {
+                                  showAlertDialog(context);
+                                }
+                              } catch (e) {
+                                showAlertDialog(context);
+                              }
+                            },
+                          )
+                        ],
+                      );
+                    },
+                  ),
+                const SizedBox(height: 14),
+                Align(
+                  child: Center(
+                    child: TextButton(
+                      onPressed: () async {
+                        String? result =
+                            await navigate(context, const ChooseDoctorScreen());
+
+                        if (result != null) {
+                          doctorId = result;
+                          setState(() {});
+                        }
+                      },
+                      child: const Text(
+                        'Choose different doctor',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline),
+                      ),
+                    ),
+                  ),
+                ),
+                const Divider(height: 50),
+                const Text('What services would you want to patronize?'),
+                const SizedBox(height: 10),
+                StatefulBuilder(
+                  builder: (context, setState) {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: doctor.services!.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return RadioListTile<String?>(
+                          value: doctor.services![index],
+                          groupValue: service,
+                          onChanged: (radioValue) {
+                            service = doctor.services![index];
+                            setState(() {});
+                          },
+                          title: Text(doctor.services![index]),
+                        );
+                      },
+                    );
+                  },
+                ),
+                const Divider(height: 50),
+                const Text('Where would you want to meet?'),
+                const SizedBox(height: 20),
+                CustomTextFormField(
+                  hintText: 'Venue',
+                  initialValue: venueString,
+                  onChanged: (value) {
+                    venueString = value;
+                  },
+                ),
+                const SizedBox(height: 10),
+                StatefulBuilder(builder: (context, setState) {
+                  return Center(
+                    child: Column(
+                      children: [
+                        TextButton(
+                          child: Text(
+                            venueGeo == null ? 'Choose on map' : 'View on map',
+                            style: venueGeo == null
+                                ? null
+                                : const TextStyle(color: Colors.pink),
+                          ),
+                          style: TextButton.styleFrom(
+                              fixedSize: venueGeo == null
+                                  ? null
+                                  : Size(kScreenWidth(context) - 72, 48),
+                              backgroundColor: venueGeo == null
+                                  ? null
+                                  : Colors.pink.withOpacity(.1),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14))),
+                          onPressed: () async {
+                            LatLng? result = await navigate(context,
+                                MapScreen(initialSelectedPostion: venueGeo));
+
+                            if (result != null) {
+                              venueGeo = result;
+                              setState(() {});
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        if (venueGeo != null)
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () {
+                                venueGeo = null;
+                                setState(() {});
+                              },
+                              child: const Text(
+                                'Clear geolocation',
+                                style: TextStyle(
+                                    decoration: TextDecoration.underline),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                }),
+                const Divider(height: 50),
+                const Text('What symptoms are you experiencing?'),
+                const SizedBox(height: 10),
+                StatefulBuilder(
+                  builder: (context, setState) {
+                    return Column(
+                      children: [
+                        ListView.separated(
+                          shrinkWrap: true,
+                          primary: false,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: symptoms == null ? 0 : symptoms!.length,
+                          separatorBuilder: (BuildContext context, int index) {
+                            return const SizedBox(height: 10);
+                          },
+                          itemBuilder: (BuildContext context, int index) {
+                            return Material(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(14),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 36, vertical: 14),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      symptoms![index],
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        List<String> temp = symptoms!;
+                                        temp.removeAt(index);
+                                        symptoms = [...temp];
+                                        setState(() {});
+                                      },
+                                      child: const Icon(Icons.clear),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CustomTextFormField(
+                                hintText: 'Add symptom',
+                                controller: symptomsController,
+                                onFieldSubmitted: (value) {
+                                  onSymptomsFieldSubmitted(setState, context);
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            TextButton(
+                              onPressed: () {
+                                onSymptomsFieldSubmitted(setState, context);
+                              },
+                              style: TextButton.styleFrom(
+                                backgroundColor:
+                                    Colors.blueGrey.withOpacity(.2),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14)),
+                              ),
+                              child: const Text('Add'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                const Divider(height: 50),
+                const Text('What underlying conditions do you have?'),
+                const SizedBox(height: 10),
+                StatefulBuilder(
+                  builder: (context, setState) {
+                    return Column(
+                      children: [
+                        ListView.separated(
+                          shrinkWrap: true,
+                          primary: false,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount:
+                              conditions == null ? 0 : conditions!.length,
+                          separatorBuilder: (BuildContext context, int index) {
+                            return const SizedBox(height: 10);
+                          },
+                          itemBuilder: (BuildContext context, int index) {
+                            return Material(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(14),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 36, vertical: 14),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      conditions![index],
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        List<String> temp = conditions!;
+                                        temp.removeAt(index);
+                                        conditions = [...temp];
+                                        setState(() {});
+                                      },
+                                      child: const Icon(Icons.clear),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CustomTextFormField(
+                                hintText: 'Add condition',
+                                controller: conditionsController,
+                                onFieldSubmitted: (value) {
+                                  onConditionsFieldSubmitted(setState, context);
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            TextButton(
+                              onPressed: () {
+                                onConditionsFieldSubmitted(setState, context);
+                              },
+                              style: TextButton.styleFrom(
+                                backgroundColor:
+                                    Colors.blueGrey.withOpacity(.2),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14)),
+                              ),
+                              child: const Text('Add'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                const SizedBox(height: 50),
+                CustomFlatButton(
+                  child: Text(widget.appointment.id == null
+                      ? 'Add appointment'
+                      : 'Update appointment'),
+                  onPressed: () {
+                    if (dateTime != null &&
+                        venueString != null &&
+                        venueGeo != null &&
+                        service != null) {
+                      showLoadingDialog(context);
+
+                      if (widget.appointment.id == null) {
+                        db
+                            .addAppointment(DoctorAppointment(
+                                doctorId: doctorId,
+                                dateTime: dateTime,
+                                service: service,
+                                venueGeo: venueGeo,
+                                venueString: venueString,
+                                symptoms: symptoms,
+                                conditions: conditions))
+                            .timeout(ktimeout)
+                            .then((value) {
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                        }).onError((error, stackTrace) {
+                          Navigator.pop(context);
+                          showAlertDialog(context,
+                              message: 'Error adding appointment');
+                        });
+                      } else {
+                        db
+                            .updateAppointment(DoctorAppointment(
+                                doctorId: doctorId,
+                                dateTime: dateTime,
+                                service: service,
+                                venueGeo: venueGeo,
+                                venueString: venueString,
+                                symptoms: symptoms,
+                                conditions: conditions))
+                            .timeout(ktimeout)
+                            .then((value) {
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                        }).onError((error, stackTrace) {
+                          Navigator.pop(context);
+                          showAlertDialog(context,
+                              message: 'Error adding appointment');
+                        });
+                      }
+                    } else {
+                      if (dateTime == null) {
+                        showAlertDialog(context,
+                            message: 'Please choose a date and a time');
+                      } else if (venueString == null) {
+                        showAlertDialog(context,
+                            message: 'Please type a venue');
+                      } else if (venueGeo == null) {
+                        showAlertDialog(context,
+                            message: 'Please choose a venue on map');
+                      } else if (service == null) {
+                        showAlertDialog(context,
+                            message: 'Please choose a service');
+                      }
+                    }
+                  },
+                )
+              ],
+            );
+          }
+
+          return const Center(child: CircularProgressIndicator.adaptive());
+        },
+      );
+    });
+  }
+
+  void onConditionsFieldSubmitted(StateSetter setState, BuildContext context) {
+    if (conditionsController.text.trim().isNotEmpty) {
+      if (conditions == null) {
+        conditions = [conditionsController.text.trim()];
+        conditionsController.clear();
+        setState(() {});
+      } else if (!conditions!.contains(conditionsController.text.trim())) {
+        List<String> temp = conditions!;
+        temp.add(conditionsController.text.trim());
+        conditions = [...temp];
+        conditionsController.clear();
+        setState(() {});
+      } else {
+        conditionsController.clear();
+        showAlertDialog(context, message: 'Symptom has already been added');
+      }
+    } else {
+      showAlertDialog(context, message: 'Textfield is empty');
+    }
+  }
+
+  void onSymptomsFieldSubmitted(StateSetter setState, BuildContext context) {
+    if (symptomsController.text.trim().isNotEmpty) {
+      if (symptoms == null) {
+        symptoms = [symptomsController.text.trim()];
+        symptomsController.clear();
+        setState(() {});
+      } else if (!symptoms!.contains(symptomsController.text.trim())) {
+        List<String> temp = symptoms!;
+        temp.add(symptomsController.text.trim());
+        symptoms = [...temp];
+        symptomsController.clear();
+        setState(() {});
+      } else {
+        symptomsController.clear();
+        showAlertDialog(context, message: 'Symptom has already been added');
+      }
+    } else {
+      showAlertDialog(context, message: 'Textfield is empty');
+    }
+  }
 
   @override
   void dispose() {
-    dateTimeNotifier.dispose();
-
-    doctorIdNotifier.dispose();
-
-    servicesGroupValue.dispose();
-
-    symptomsNotifier.dispose();
     symptomsController.dispose();
-
-    conditionsNotifier.dispose();
     conditionsController.dispose();
 
     super.dispose();
   }
 }
-
-//CONTACT
-// Row(
-//                               mainAxisAlignment: MainAxisAlignment.center,
-//                               children: [
-//     Material(
-//       color: Colors.blueGrey.withOpacity(.1),
-//       borderRadius: BorderRadius.circular(20),
-//       child: InkWell(
-//         onTap: () {
-//           db.addAppointment(
-//               context,
-//               DoctorAppointment(
-//                   conditions: [
-//                     'Multiple sclerosis'
-//                   ],
-//                   dateTime: DateTime.now(),
-//                   doctorId:
-//                       '6Y6tq6WafEgPEldbrcehbxEm4203',
-//                   location: 'Tech Hospital',
-//                   patientId: auth.uid,
-//                   service: 'Consult',
-//                   symptoms: [
-//                     'Headache',
-//                     'Nausea'
-//                   ]));
-//         },
-//         child: Padding(
-//           padding: const EdgeInsets.symmetric(
-//               horizontal: 24, vertical: 14),
-//           child: Row(
-//             mainAxisAlignment:
-//                 MainAxisAlignment.center,
-//             children: const [
-//               Icon(Icons.call),
-//               SizedBox(width: 5),
-//               Text('Call'),
-//             ],
-//           ),
-//         ),
-//       ),
-//     ),
-//     const SizedBox(width: 10),
-//     Material(
-//       color: Colors.blueGrey.withOpacity(.1),
-//       borderRadius: BorderRadius.circular(20),
-//       child: Padding(
-//         padding: const EdgeInsets.symmetric(
-//             horizontal: 24, vertical: 14),
-//         child: Row(
-//           mainAxisAlignment:
-//               MainAxisAlignment.center,
-//           children: const [
-//             Icon(Icons.chat_bubble),
-//             SizedBox(width: 5),
-//             Text('Message'),
-//           ],
-//         ),
-//       ),
-//     ),
-//   ],
-// ),

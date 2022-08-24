@@ -74,9 +74,7 @@ class _DoctorsListPageState extends State<DoctorsListPage> {
 }
 
 class DoctorsListView extends StatefulWidget {
-  final bool isFromAppointment;
-  const DoctorsListView({Key? key, this.isFromAppointment = false})
-      : super(key: key);
+  const DoctorsListView({Key? key}) : super(key: key);
 
   @override
   State<DoctorsListView> createState() => _DoctorsListViewState();
@@ -118,7 +116,6 @@ class _DoctorsListViewState extends State<DoctorsListView> {
                       doctor: Doctor.fromFireStore(
                           snapshot.data!.docs[index].data(),
                           snapshot.data!.docs[index].id),
-                      isFromAppointment: widget.isFromAppointment,
                     ),
                   );
                 },

@@ -37,43 +37,43 @@ class _AppointmentsListPageState extends State<AppointmentsListPage> {
             physics: const BouncingScrollPhysics(),
             children: <Widget>[
               const SizedBox(height: 138),
-              FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                future: db.appointmentsList.get(),
+              StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: db.appointmentsList.snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return const Center(
                       child: Text('Something went wrong'),
                     );
                   }
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    List<DoctorAppointment> appointmentsList = snapshot
-                        .data!.docs
-                        .map(
-                          (e) =>
-                              DoctorAppointment.fromFirestore(e.data(), e.id),
-                        )
-                        .toList();
-                    return ListView.separated(
-                      shrinkWrap: true,
-                      primary: false,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: appointmentsList.length,
-                      separatorBuilder: (BuildContext context, int index) {
-                        return const Divider(
-                          height: 0,
-                          indent: 126,
-                          endIndent: 36,
-                        );
-                      },
-                      itemBuilder: (BuildContext context, int index) {
-                        return AppointmentCard(
-                            appointment: appointmentsList[index]);
-                      },
+
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator.adaptive(),
                     );
                   }
 
-                  return const Center(
-                    child: CircularProgressIndicator.adaptive(),
+                  List<DoctorAppointment> appointmentsList = snapshot.data!.docs
+                      .map(
+                        (e) => DoctorAppointment.fromFirestore(e.data(), e.id),
+                      )
+                      .toList();
+
+                  return ListView.separated(
+                    shrinkWrap: true,
+                    primary: false,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: appointmentsList.length,
+                    separatorBuilder: (BuildContext context, int index) {
+                      return const Divider(
+                        height: 0,
+                        indent: 126,
+                        endIndent: 36,
+                      );
+                    },
+                    itemBuilder: (BuildContext context, int index) {
+                      return AppointmentCard(
+                          appointment: appointmentsList[index]);
+                    },
                   );
                 },
               ),

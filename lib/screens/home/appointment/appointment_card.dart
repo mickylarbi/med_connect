@@ -57,7 +57,7 @@ class AppointmentCard extends StatelessWidget {
                   children: [
                     HeaderText(text: appointment.service!),
                     Text(appointment.doctorName!),
-                    Text(appointment.location!)
+                    Text(appointment.venueString!)
                   ],
                 ),
               ),
