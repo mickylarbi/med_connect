@@ -62,8 +62,11 @@ onCameraIdle() {
 }
 
 onCameraMove(CameraPosition pos) {
-  lifter.forward();
   selectedPosition = pos.target;
+}
+
+onCameraMoveStarted() {
+  lifter.forward();
 }
 
 disposeMapController() {

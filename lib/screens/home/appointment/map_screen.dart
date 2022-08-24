@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -47,7 +46,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
           Center(
             child: FadeTransition(
               opacity: lifter,
-              child: CircleAvatar(
+              child: const CircleAvatar(
                 radius: 2,
                 backgroundColor: Colors.grey,
               ),
@@ -100,6 +99,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
       onMapCreated: onMapCreated,
       onCameraIdle: onCameraIdle,
       onCameraMove: onCameraMove,
+      onCameraMoveStarted: onCameraMoveStarted,
     );
   }
 
