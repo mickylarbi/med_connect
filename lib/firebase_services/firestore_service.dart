@@ -16,16 +16,13 @@ class FirestoreService {
 
   DocumentReference<Map<String, dynamic>> get patientDocument =>
       instance.collection('patients').doc(auth.currentUser!.uid);
-  Future<DocumentSnapshot<Map<String, dynamic>>> get patient =>
-      patientDocument.get();
 
   addPatient(Patient patient) async {
     await patientDocument.set(patient.toFirestore());
   }
 
   Future<void> updatePatient(BuildContext context, Patient patient) =>
-    patientDocument.update(patient.toFirestore());
-  
+      patientDocument.update(patient.toFirestore());
 
   deletePatient() async {
     //TODO: implement this

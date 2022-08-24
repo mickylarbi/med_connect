@@ -35,71 +35,76 @@ class _EditFamilyMedicalHistoryScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(36),
-                child: Column(
-                  children: [
-                    CustomTextFormField(
-                      hintText: 'Condition',
-                      controller: conditionController,
-                    ),
-                    const SizedBox(height: 20),
-                    CustomTextFormField(
-                      hintText: 'Relation',
-                      controller: relationController,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            CustomAppBar(
-              title: 'Family Medical History',
-              actions: [
-                if (widget.entry != null)
-                  OutlineIconButton(
-                    iconData: Icons.delete,
-                    onPressed: () {
-                      showConfirmationDialog(context, message: 'Delete entry?',
-                          confirmFunction: () {
-                        Navigator.pop(
-                            context, EditObject(action: EditAction.delete));
-                      });
-                    },
-                  ),
-              ],
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: SizedBox(
-                height: 48 + 72,
-                child: Padding(
+    return GestureDetector(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Center(
+                child: SingleChildScrollView(
                   padding: const EdgeInsets.all(36),
-                  child: CustomFlatButton(
-                    child: Text(widget.entry == null ? 'Add' : 'Save'),
-                    onPressed: () {
-                      if (conditionController.text.trim().isNotEmpty &&
-                          relationController.text.trim().isNotEmpty) {
-                        Navigator.pop(
-                          context,
-                          EditObject(
-                            action: EditAction.edit,
-                            object: FamilyMedicalHistoryEntry(
-                                condition: conditionController.text.trim(),
-                                relation: relationController.text.trim()),
-                          ),
-                        );
-                      }
-                    },
+                  child: Column(
+                    children: [
+                      CustomTextFormField(
+                        hintText: 'Condition',
+                        controller: conditionController,
+                      ),
+                      const SizedBox(height: 20),
+                      CustomTextFormField(
+                        hintText: 'Relation',
+                        controller: relationController,
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ),
-          ],
+              CustomAppBar(
+                title: 'Family Medical History',
+                actions: [
+                  if (widget.entry != null)
+                    OutlineIconButton(
+                      iconData: Icons.delete,
+                      onPressed: () {
+                        showConfirmationDialog(context,
+                            message: 'Delete entry?', confirmFunction: () {
+                          Navigator.pop(
+                              context, EditObject(action: EditAction.delete));
+                        });
+                      },
+                    ),
+                ],
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: SizedBox(
+                  height: 48 + 72,
+                  child: Padding(
+                    padding: const EdgeInsets.all(36),
+                    child: CustomFlatButton(
+                      child: Text(widget.entry == null ? 'Add' : 'Save'),
+                      onPressed: () {
+                        if (conditionController.text.trim().isNotEmpty &&
+                            relationController.text.trim().isNotEmpty) {
+                          Navigator.pop(
+                            context,
+                            EditObject(
+                              action: EditAction.edit,
+                              object: FamilyMedicalHistoryEntry(
+                                  condition: conditionController.text.trim(),
+                                  relation: relationController.text.trim()),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

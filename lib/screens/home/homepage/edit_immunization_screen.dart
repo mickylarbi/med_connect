@@ -33,116 +33,121 @@ class _EditImmunizationScreenState extends State<EditImmunizationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(36),
-                child: Column(
-                  children: [
-                    CustomTextFormField(
-                        hintText: 'Immunization',
-                        controller: immunizationController),
-                    const SizedBox(height: 20),
-                    ValueListenableBuilder<DateTime?>(
-                      valueListenable: dateNotifier,
-                      builder: (context, value, child) {
-                        return Material(
-                          color: Colors.blueGrey.withOpacity(.2),
-                          borderRadius: BorderRadius.circular(14),
-                          child: InkWell(
-                            onTap: () async {
-                              var result = await showDatePicker(
-                                  context: context,
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime(1950),
-                                  lastDate: DateTime.now());
-
-                              if (result != null) {
-                                dateNotifier.value = result;
-                              }
-                            },
+    return GestureDetector(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(36),
+                  child: Column(
+                    children: [
+                      CustomTextFormField(
+                          hintText: 'Immunization',
+                          controller: immunizationController),
+                      const SizedBox(height: 20),
+                      ValueListenableBuilder<DateTime?>(
+                        valueListenable: dateNotifier,
+                        builder: (context, value, child) {
+                          return Material(
+                            color: Colors.blueGrey.withOpacity(.2),
                             borderRadius: BorderRadius.circular(14),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 24, vertical: 16),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  const Text(
-                                    'Date',
-                                    style: TextStyle(
-                                      decoration: TextDecoration.underline,
+                            child: InkWell(
+                              onTap: () async {
+                                var result = await showDatePicker(
+                                    context: context,
+                                    initialDate: DateTime.now(),
+                                    firstDate: DateTime(1950),
+                                    lastDate: DateTime.now());
+
+                                if (result != null) {
+                                  dateNotifier.value = result;
+                                }
+                              },
+                              borderRadius: BorderRadius.circular(14),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 24, vertical: 16),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const Text(
+                                      'Date',
+                                      style: TextStyle(
+                                        decoration: TextDecoration.underline,
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    value == null
-                                        ? '-'
-                                        : DateFormat.yMMMMd().format(value),
-                                    style: const TextStyle(
-                                      color: Colors.grey,
-                                      fontWeight: FontWeight.bold,
+                                    Text(
+                                      value == null
+                                          ? '-'
+                                          : DateFormat.yMMMMd().format(value),
+                                      style: const TextStyle(
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              CustomAppBar(
+                title: 'Immunization',
+                actions: [
+                  if (widget.immunization != null)
+                    OutlineIconButton(
+                      iconData: Icons.delete,
+                      onPressed: () {
+                        showConfirmationDialog(context,
+                            message: 'Delete entry?', confirmFunction: () {
+                          Navigator.pop(
+                              context, EditObject(action: EditAction.delete));
+                        });
                       },
                     ),
-                  ],
-                ),
+                ],
               ),
-            ),
-            CustomAppBar(
-              title: 'Immunization',
-              actions: [
-                if (widget.immunization != null)
-                  OutlineIconButton(
-                    iconData: Icons.delete,
-                    onPressed: () {
-                      showConfirmationDialog(context, message: 'Delete entry?',
-                          confirmFunction: () {
-                        Navigator.pop(
-                            context, EditObject(action: EditAction.delete));
-                      });
-                    },
-                  ),
-              ],
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: SizedBox(
-                height: 48 + 72,
-                child: Padding(
-                  padding: const EdgeInsets.all(36),
-                  child: CustomFlatButton(
-                    child: Text(widget.immunization == null ? 'Add' : 'Save'),
-                    onPressed: () {
-                      if (immunizationController.text.trim().isNotEmpty &&
-                          dateNotifier.value != null) {
-                        Navigator.pop(
-                          context,
-                          EditObject(
-                            action: EditAction.edit,
-                            object: Immunization(
-                                immunization:
-                                    immunizationController.text.trim(),
-                                date: dateNotifier.value),
-                          ),
-                        );
-                      }
-                    },
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: SizedBox(
+                  height: 48 + 72,
+                  child: Padding(
+                    padding: const EdgeInsets.all(36),
+                    child: CustomFlatButton(
+                      child: Text(widget.immunization == null ? 'Add' : 'Save'),
+                      onPressed: () {
+                        if (immunizationController.text.trim().isNotEmpty &&
+                            dateNotifier.value != null) {
+                          Navigator.pop(
+                            context,
+                            EditObject(
+                              action: EditAction.edit,
+                              object: Immunization(
+                                  immunization:
+                                      immunizationController.text.trim(),
+                                  date: dateNotifier.value),
+                            ),
+                          );
+                        }
+                      },
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

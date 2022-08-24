@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:med_connect/firebase_services/auth_service.dart';
@@ -42,249 +43,96 @@ class _HomePageState extends State<HomePage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const HeaderText(text: 'Upcoming appointments'),
+                    const HeaderText(text: 'Today\'s appointments'),
                     TextButton(
-                        onPressed: () {},
-                        child: const Text(
-                          'View all',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              decoration: TextDecoration.underline),
-                        ))
-                  ],
-                ),
-              ),
-              // const SizedBox(height: 10),
-              const HomePageAppointmentCard(),
-
-              const SizedBox(height: 50),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const HeaderText(text: 'Top doctors'),
-                    TextButton(
-                        onPressed: () {},
-                        child: const Text(
-                          'View all',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              decoration: TextDecoration.underline),
-                        ))
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 240,
-                width: 200,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  shrinkWrap: true,
-                  primary: false,
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  clipBehavior: Clip.none,
-                  separatorBuilder: (BuildContext context, int index) =>
-                      SizedBox(width: 10),
-                  itemCount: 10,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Container(
-                      margin: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          image: DecorationImage(
-                            image: AssetImage(
-                                'assets/images/bruno-rodrigues-279xIHymPYY-unsplash.jpg'),
-                            fit: BoxFit.cover,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              blurRadius: 30,
-                              color: Colors.black.withOpacity(.15),
-                              offset: const Offset(0, 10),
-                            ),
-                          ]),
-                      child: Container(
-                        alignment: Alignment.bottomCenter,
-                        // height: 200,
-                        // width: (kScreenWidth(context) / 2) - 34,
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.black.withOpacity(0),
-                              Colors.black.withOpacity(.1),
-                              Colors.black.withOpacity(.2),
-                              Colors.black.withOpacity(.39),
-                              Colors.black.withOpacity(.49),
-                              Colors.black.withOpacity(.59),
-                            ],
-                          ),
-                        ),
-                        child: IconTheme(
-                          data: const IconThemeData(size: 14),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Text(
-                                'Dr Kwadwo Nkansah',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const Text(
-                                'Cardiologist',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: const [
-                                  Icon(Icons.star, color: Colors.yellow),
-                                  Flexible(
-                                    child: Text(
-                                      '4.5',
-                                      style: TextStyle(color: Colors.white),
-                                      overflow: TextOverflow.fade,
-                                      // maxLines: 3,
-                                      // softWrap: true,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: const [
-                                  Icon(Icons.location_pin, color: Colors.blue),
-                                  Flexible(
-                                    child: Text(
-                                      'Tech Hospital, Kumasi',
-                                      style: TextStyle(color: Colors.white),
-                                      overflow: TextOverflow.ellipsis,
-                                      // maxLines: 3,
-                                      softWrap: true,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+                      onPressed: () {},
+                      child: const Text(
+                        'View all',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.underline),
                       ),
-                    );
-                  },
-                ),
-              ),
-
-              const SizedBox(height: 50),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const HeaderText(text: 'New messages'),
-                    TextButton(
-                        onPressed: () {},
-                        child: const Text(
-                          'View all',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              decoration: TextDecoration.underline),
-                        ))
+                    )
                   ],
                 ),
               ),
-              ListView.separated(
-                shrinkWrap: true,
-                primary: false,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: 3,
-                separatorBuilder: (BuildContext context, int index) {
-                  return const Divider(indent: 50);
-                },
-                itemBuilder: (BuildContext context, int index) {
-                  return ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-                    leading: Container(
-                      height: 40,
-                      width: 40,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage(
-                              'assets/images/humberto-chavez-FVh_yqLR9eA-unsplash.jpg'),
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    title: Text('Dr Amanda Arthur'),
-                    subtitle: Text('Great!'),
-                    trailing: const CircleAvatar(
-                      radius: 5,
-                      backgroundColor: Colors.blue,
-                    ),
-                  );
-                },
-              ),
+              const SizedBox(height: 50),
             ],
           ),
         ),
-        ...fancyAppBar(context, scrollController, 'Hello', [
-          InkWell(
-            onTap: (() async {
-              showLoadingDialog(context);
-              try {
-                DocumentSnapshot<Map<String, dynamic>> result =
-                    await db.patient;
-                Patient patient =
-                    Patient.fromFirestore(result.data()!, result.id);
+        StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+          stream: db.patientDocument.snapshots(),
+          builder: (context, snapshot) {
+            return SizedBox(
+              height: 138,
+              child: Stack(
+                children: fancyAppBar(
+                  context,
+                  scrollController,
+                  snapshot.hasError ||
+                          snapshot.data == null ||
+                          snapshot.data!.data() == null ||
+                          snapshot.connectionState == ConnectionState.waiting
+                      ? 'Hi'
+                      : 'Hi ${snapshot.data!.data()!['firstName']}',
+                  [
+                    StatefulBuilder(
+                      builder: (context, setState) {
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: InkWell(
+                            onTap: () async {
+                              if (snapshot.data!.data() != null) {
+                                await navigate(
+                                    context,
+                                    PatientProfileScreen(
+                                        patient: Patient.fromFirestore(
+                                            snapshot.data!.data()!,
+                                            snapshot.data!.id)));
 
-                Navigator.pop(context);
-                navigate(
-                    context,
-                    PatientProfileScreen(
-                      patient: patient,
-                    ));
-              } catch (e) {
-                Navigator.pop(context);
-                showAlertDialog(context, message: 'Couldn\'t get profile info');
-              }
-            }),
-            borderRadius: BorderRadius.circular(10),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Container(
-                height: 44,
-                width: 44,
-                alignment: Alignment.center,
-                color: Colors.grey.withOpacity(.1),
-                child: FutureBuilder<String>(
-                  future: storage.profileImageDownloadUrl(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return const Icon(
-                        Icons.person,
-                        color: Colors.grey,
-                      );
-                    }
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      return Image.network(
-                        snapshot.data!,
-                        fit: BoxFit.cover,
-                      );
-                    }
-                    return const Center(
-                        child: CircularProgressIndicator.adaptive());
-                  },
+                                setState(() {});
+                              }
+                            },
+                            child: FutureBuilder<String>(
+                              future: storage.profileImageDownloadUrl(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot snapshot) {
+                                if (snapshot.hasError) {
+                                  return const Center(
+                                      child: Icon(Icons.person));
+                                }
+
+                                if (snapshot.connectionState ==
+                                    ConnectionState.done) {
+                                  return CachedNetworkImage(
+                                    imageUrl: snapshot.data,
+                                    height: 44,
+                                    width: 44,
+                                    fit: BoxFit.cover,
+                                    progressIndicatorBuilder: (context, url,
+                                            downloadProgress) =>
+                                        CircularProgressIndicator.adaptive(
+                                            value: downloadProgress.progress),
+                                    errorWidget: (context, url, error) =>
+                                        const Center(child: Icon(Icons.person)),
+                                  );
+                                }
+
+                                return const Center(
+                                    child:
+                                        CircularProgressIndicator.adaptive());
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ),
-        ])
+            );
+          },
+        ),
       ],
     );
   }

@@ -35,121 +35,124 @@ class _EditAllergyScreenState extends State<EditAllergyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(36),
-                child: Column(
-                  children: [
-                    CustomTextFormField(
-                        hintText: 'Allergy',
-                        controller: allergyController),
-                    const SizedBox(height: 20),
-                    CustomTextFormField(
-                        hintText: 'Reaction',
-                        controller: reactionController),
-                    const SizedBox(height: 20),
-                    ValueListenableBuilder<DateTime?>(
-                      valueListenable: dateNotifier,
-                      builder: (context, value, child) {
-                        return Material(
-                          color: Colors.blueGrey.withOpacity(.2),
-                          borderRadius: BorderRadius.circular(14),
-                          child: InkWell(
-                            onTap: () async {
-                              var result = await showDatePicker(
-                                  context: context,
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime(1950),
-                                  lastDate: DateTime.now());
-
-                              if (result != null) {
-                                dateNotifier.value = result;
-                              }
-                            },
+    return GestureDetector(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(36),
+                  child: Column(
+                    children: [
+                      CustomTextFormField(
+                          hintText: 'Allergy', controller: allergyController),
+                      const SizedBox(height: 20),
+                      CustomTextFormField(
+                          hintText: 'Reaction', controller: reactionController),
+                      const SizedBox(height: 20),
+                      ValueListenableBuilder<DateTime?>(
+                        valueListenable: dateNotifier,
+                        builder: (context, value, child) {
+                          return Material(
+                            color: Colors.blueGrey.withOpacity(.2),
                             borderRadius: BorderRadius.circular(14),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 24, vertical: 16),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  const Text(
-                                    'Date of last occurence',
-                                    style: TextStyle(
-                                      decoration: TextDecoration.underline,
+                            child: InkWell(
+                              onTap: () async {
+                                var result = await showDatePicker(
+                                    context: context,
+                                    initialDate: DateTime.now(),
+                                    firstDate: DateTime(1950),
+                                    lastDate: DateTime.now());
+
+                                if (result != null) {
+                                  dateNotifier.value = result;
+                                }
+                              },
+                              borderRadius: BorderRadius.circular(14),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 24, vertical: 16),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const Text(
+                                      'Date of last occurence',
+                                      style: TextStyle(
+                                        decoration: TextDecoration.underline,
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    value == null
-                                        ? '-'
-                                        : DateFormat.yMMMMd().format(value),
-                                    style: const TextStyle(
-                                      color: Colors.grey,
-                                      fontWeight: FontWeight.bold,
+                                    Text(
+                                      value == null
+                                          ? '-'
+                                          : DateFormat.yMMMMd().format(value),
+                                      style: const TextStyle(
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              CustomAppBar(
+                title: 'Allergy',
+                actions: [
+                  if (widget.allergy != null)
+                    OutlineIconButton(
+                      iconData: Icons.delete,
+                      onPressed: () {
+                        showConfirmationDialog(context,
+                            message: 'Delete entry?', confirmFunction: () {
+                          Navigator.pop(
+                              context, EditObject(action: EditAction.delete));
+                        });
                       },
                     ),
-                  ],
-                ),
+                ],
               ),
-            ),
-            CustomAppBar(
-              title: 'Allergy',
-              actions: [
-                if (widget.allergy != null)
-                  OutlineIconButton(
-                    iconData: Icons.delete,
-                    onPressed: () {
-                      showConfirmationDialog(context, message: 'Delete entry?',
-                          confirmFunction: () {
-                        Navigator.pop(
-                            context, EditObject(action: EditAction.delete));
-                      });
-                    },
-                  ),
-              ],
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: SizedBox(
-                height: 48 + 72,
-                child: Padding(
-                  padding: const EdgeInsets.all(36),
-                  child: CustomFlatButton(
-                    child: Text(widget.allergy == null ? 'Add' : 'Save'),
-                    onPressed: () {
-                      if (allergyController.text.trim().isNotEmpty &&
-                          reactionController.text.trim().isNotEmpty &&
-                          dateNotifier.value != null) {
-                        Navigator.pop(
-                          context,
-                          EditObject(
-                            action: EditAction.edit,
-                            object: Allergy(
-                                allergy: allergyController.text.trim(),
-                                reaction: reactionController.text.trim(),
-                                dateOfLastOccurence: dateNotifier.value),
-                          ),
-                        );
-                      }
-                    },
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: SizedBox(
+                  height: 48 + 72,
+                  child: Padding(
+                    padding: const EdgeInsets.all(36),
+                    child: CustomFlatButton(
+                      child: Text(widget.allergy == null ? 'Add' : 'Save'),
+                      onPressed: () {
+                        if (allergyController.text.trim().isNotEmpty &&
+                            reactionController.text.trim().isNotEmpty &&
+                            dateNotifier.value != null) {
+                          Navigator.pop(
+                            context,
+                            EditObject(
+                              action: EditAction.edit,
+                              object: Allergy(
+                                  allergy: allergyController.text.trim(),
+                                  reaction: reactionController.text.trim(),
+                                  dateOfLastOccurence: dateNotifier.value),
+                            ),
+                          );
+                        }
+                      },
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

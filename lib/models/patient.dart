@@ -46,8 +46,10 @@ class Patient {
     surname = map['surname'] as String?;
     phone = map['phone'] as String?;
 
-    dateOfBirth = DateTime.fromMillisecondsSinceEpoch(
+    if(map['dateOfBirth']!=null) {
+      dateOfBirth = DateTime.fromMillisecondsSinceEpoch(
         (map['dateOfBirth'] as Timestamp).millisecondsSinceEpoch);
+    }
 
     gender = map['gender'] as String?;
     height = map['height'] as double?;

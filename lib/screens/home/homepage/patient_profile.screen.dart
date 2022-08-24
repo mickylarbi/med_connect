@@ -46,17 +46,16 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
   TextEditingController heightController = TextEditingController();
   TextEditingController weightController = TextEditingController();
   ValueNotifier<String?> bloodTypeNotifier = ValueNotifier<String?>(null);
-  ValueNotifier<List<MedicalHistoryEntry>> medicalHistoryNotifier =
-      ValueNotifier<List<MedicalHistoryEntry>>([]);
-  ValueNotifier<List<Immunization>> immunizationsNotifier =
-      ValueNotifier<List<Immunization>>([]);
-  ValueNotifier<List<Allergy>> allergiesNotifier =
-      ValueNotifier<List<Allergy>>([]);
-  ValueNotifier<List<FamilyMedicalHistoryEntry>> familyMedicalHistoryNotifier =
-      ValueNotifier<List<FamilyMedicalHistoryEntry>>([]);
-  ValueNotifier<List<Map>> lifestyleNotifier = ValueNotifier<List<Map>>([]);
-  ValueNotifier<List<Surgery>> surgeriesNotifier =
-      ValueNotifier<List<Surgery>>([]);
+  ValueNotifier<List<MedicalHistoryEntry>?> medicalHistoryNotifier =
+      ValueNotifier<List<MedicalHistoryEntry>?>([]);
+  ValueNotifier<List<Immunization>?> immunizationsNotifier =
+      ValueNotifier<List<Immunization>?>([]);
+  ValueNotifier<List<Allergy>?> allergiesNotifier =
+      ValueNotifier<List<Allergy>?>([]);
+  ValueNotifier<List<FamilyMedicalHistoryEntry>?> familyMedicalHistoryNotifier =
+      ValueNotifier<List<FamilyMedicalHistoryEntry>?>([]);
+  ValueNotifier<List<Surgery>?> surgeriesNotifier =
+      ValueNotifier<List<Surgery>?>([]);
 
   @override
   void initState() {
@@ -69,8 +68,14 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
       dateOfBirthNotifier.value = widget.patient!.dateOfBirth;
       genderNotifier.value = widget.patient!.gender;
       bloodTypeNotifier.value = widget.patient!.bloodType;
-      heightController.text = widget.patient!.height.toString();
-      weightController.text = widget.patient!.weight!.toString();
+
+      if (widget.patient!.height != null) {
+        heightController.text = widget.patient!.height.toString();
+      }
+
+      if (widget.patient!.weight != null) {
+        weightController.text = widget.patient!.weight!.toString();
+      }
 
       medicalHistoryNotifier.value = widget.patient!.medicalHistory ?? [];
       immunizationsNotifier.value = widget.patient!.immunizations ?? [];
@@ -98,7 +103,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 36, vertical: 88),
                 children: [
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 10), //TODO: keep alive
                   const ProfileImage(),
                   const SizedBox(height: 30),
                   const Text(
@@ -270,15 +275,15 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                     'Medical history',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
-                  ValueListenableBuilder<List<MedicalHistoryEntry>>(
+                  ValueListenableBuilder<List<MedicalHistoryEntry>?>(
                     valueListenable: medicalHistoryNotifier,
                     builder: (BuildContext context,
-                        List<MedicalHistoryEntry> value, Widget? child) {
+                        List<MedicalHistoryEntry>? value, Widget? child) {
                       return ListView.separated(
                         shrinkWrap: true,
                         primary: false,
                         physics: const NeverScrollableScrollPhysics(),
-                        itemCount: value.length,
+                        itemCount: value == null ? 0 : value.length,
                         separatorBuilder: (BuildContext context, int index) {
                           return const SizedBox(height: 10);
                         },
@@ -292,10 +297,10 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                                 EditObject? result = await navigate(
                                     context,
                                     EditMedicalHistoryScreen(
-                                        medicalHistoryEntry: value[index]));
+                                        medicalHistoryEntry: value![index]));
 
                                 if (result != null) {
-                                  List<MedicalHistoryEntry> temp = value;
+                                  List<MedicalHistoryEntry>? temp = value;
 
                                   if (result.action == EditAction.edit) {
                                     temp[index] = result.object;
@@ -314,7 +319,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      value[index].toString(),
+                                      value![index].toString(),
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
@@ -340,8 +345,8 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
 
                         if (result != null &&
                             result.action == EditAction.edit) {
-                          List<MedicalHistoryEntry> temp =
-                              medicalHistoryNotifier.value;
+                          List<MedicalHistoryEntry>? temp =
+                              medicalHistoryNotifier.value!;
                           temp.add(result.object);
                           medicalHistoryNotifier.value = [...temp];
                         }
@@ -371,15 +376,15 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                     'Immunizations',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
-                  ValueListenableBuilder<List<Immunization>>(
+                  ValueListenableBuilder<List<Immunization>?>(
                     valueListenable: immunizationsNotifier,
-                    builder: (BuildContext context, List<Immunization> value,
+                    builder: (BuildContext context, List<Immunization>? value,
                         Widget? child) {
                       return ListView.separated(
                         shrinkWrap: true,
                         primary: false,
                         physics: const NeverScrollableScrollPhysics(),
-                        itemCount: value.length,
+                        itemCount: value == null ? 0 : value.length,
                         separatorBuilder: (BuildContext context, int index) {
                           return const SizedBox(height: 10);
                         },
@@ -393,10 +398,10 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                                 EditObject? result = await navigate(
                                     context,
                                     EditImmunizationScreen(
-                                        immunization: value[index]));
+                                        immunization: value![index]));
 
                                 if (result != null) {
-                                  List<Immunization> temp = value;
+                                  List<Immunization>? temp = value;
 
                                   if (result.action == EditAction.edit) {
                                     temp[index] = result.object;
@@ -415,7 +420,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      value[index].toString(),
+                                      value![index].toString(),
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
@@ -437,11 +442,12 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                       borderRadius: BorderRadius.circular(14),
                       onTap: () async {
                         EditObject? result = await navigate(
-                            context, const EditMedicalHistoryScreen());
+                            context, const EditImmunizationScreen());
 
                         if (result != null &&
                             result.action == EditAction.edit) {
-                          List<Immunization> temp = immunizationsNotifier.value;
+                          List<Immunization>? temp =
+                              immunizationsNotifier.value!;
                           temp.add(result.object);
                           immunizationsNotifier.value = [...temp];
                         }
@@ -471,15 +477,15 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                     'Allergies',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
-                  ValueListenableBuilder<List<Allergy>>(
+                  ValueListenableBuilder<List<Allergy>?>(
                     valueListenable: allergiesNotifier,
-                    builder: (BuildContext context, List<Allergy> value,
+                    builder: (BuildContext context, List<Allergy>? value,
                         Widget? child) {
                       return ListView.separated(
                         shrinkWrap: true,
                         primary: false,
                         physics: const NeverScrollableScrollPhysics(),
-                        itemCount: value.length,
+                        itemCount: value == null ? 0 : value.length,
                         separatorBuilder: (BuildContext context, int index) {
                           return const SizedBox(height: 10);
                         },
@@ -491,10 +497,10 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                               borderRadius: BorderRadius.circular(14),
                               onTap: () async {
                                 EditObject? result = await navigate(context,
-                                    EditAllergyScreen(allergy: value[index]));
+                                    EditAllergyScreen(allergy: value![index]));
 
                                 if (result != null) {
-                                  List<Allergy> temp = value;
+                                  List<Allergy>? temp = value;
 
                                   if (result.action == EditAction.edit) {
                                     temp[index] = result.object;
@@ -513,7 +519,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      value[index].toString(),
+                                      value![index].allergy.toString(),
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
@@ -539,7 +545,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
 
                         if (result != null &&
                             result.action == EditAction.edit) {
-                          List<Allergy> temp = allergiesNotifier.value;
+                          List<Allergy>? temp = allergiesNotifier.value!;
                           temp.add(result.object);
                           allergiesNotifier.value = [...temp];
                         }
@@ -569,15 +575,15 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                     'Family Medical History',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
-                  ValueListenableBuilder<List<FamilyMedicalHistoryEntry>>(
+                  ValueListenableBuilder<List<FamilyMedicalHistoryEntry>?>(
                     valueListenable: familyMedicalHistoryNotifier,
                     builder: (BuildContext context,
-                        List<FamilyMedicalHistoryEntry> value, Widget? child) {
+                        List<FamilyMedicalHistoryEntry>? value, Widget? child) {
                       return ListView.separated(
                         shrinkWrap: true,
                         primary: false,
                         physics: const NeverScrollableScrollPhysics(),
-                        itemCount: value.length,
+                        itemCount: value!.length,
                         separatorBuilder: (BuildContext context, int index) {
                           return const SizedBox(height: 10);
                         },
@@ -594,7 +600,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                                         entry: value[index]));
 
                                 if (result != null) {
-                                  List<FamilyMedicalHistoryEntry> temp = value;
+                                  List<FamilyMedicalHistoryEntry>? temp = value;
 
                                   if (result.action == EditAction.edit) {
                                     temp[index] = result.object;
@@ -641,8 +647,8 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
 
                         if (result != null &&
                             result.action == EditAction.edit) {
-                          List<FamilyMedicalHistoryEntry> temp =
-                              familyMedicalHistoryNotifier.value;
+                          List<FamilyMedicalHistoryEntry>? temp =
+                              familyMedicalHistoryNotifier.value!;
                           temp.add(result.object);
                           familyMedicalHistoryNotifier.value = [...temp];
                         }
@@ -672,15 +678,15 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                     'Surgeries',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
-                  ValueListenableBuilder<List<Surgery>>(
+                  ValueListenableBuilder<List<Surgery>?>(
                     valueListenable: surgeriesNotifier,
-                    builder: (BuildContext context, List<Surgery> value,
+                    builder: (BuildContext context, List<Surgery>? value,
                         Widget? child) {
                       return ListView.separated(
                         shrinkWrap: true,
                         primary: false,
                         physics: const NeverScrollableScrollPhysics(),
-                        itemCount: value.length,
+                        itemCount: value == null ? 0 : value.length,
                         separatorBuilder: (BuildContext context, int index) {
                           return const SizedBox(height: 10);
                         },
@@ -692,10 +698,10 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                               borderRadius: BorderRadius.circular(14),
                               onTap: () async {
                                 EditObject? result = await navigate(context,
-                                    EditSurgeryScreen(surgery: value[index]));
+                                    EditSurgeryScreen(surgery: value![index]));
 
                                 if (result != null) {
-                                  List<Surgery> temp = value;
+                                  List<Surgery>? temp = value;
 
                                   if (result.action == EditAction.edit) {
                                     temp[index] = result.object;
@@ -714,7 +720,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      value[index].toString(),
+                                      value![index].toString(),
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
@@ -740,7 +746,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
 
                         if (result != null &&
                             result.action == EditAction.edit) {
-                          List<Surgery> temp = surgeriesNotifier.value;
+                          List<Surgery>? temp = surgeriesNotifier.value!;
                           temp.add(result.object);
                           surgeriesNotifier.value = [...temp];
                         }
@@ -775,8 +781,8 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                         phone: phoneController.text.trim(),
                         dateOfBirth: dateOfBirthNotifier.value,
                         gender: genderNotifier.value,
-                        height: double.parse(heightController.text.trim()),
-                        weight: double.parse(weightController.text.trim()),
+                        height: double.tryParse(heightController.text.trim()),
+                        weight: double.tryParse(weightController.text.trim()),
                         bloodType: bloodTypeNotifier.value,
                         medicalHistory: medicalHistoryNotifier.value,
                         immunizations: immunizationsNotifier.value,
@@ -792,26 +798,23 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                         showConfirmationDialog(context,
                             message: 'Save changes to profile?',
                             confirmFunction: () {
-                          db.updatePatient(context, newPatient);
+                          showLoadingDialog(context);
+                          db.updatePatient(context, newPatient).then((value) {
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          }).onError((error, stackTrace) {
+                            Navigator.pop(context);
+                            showAlertDialog(context,
+                                message: 'Error updating info');
+                          });
                         });
                       }
-                      print(widget.patient == newPatient);
                     },
                   )
                 ],
               ),
               CustomAppBar(
                 title: 'My Profile',
-                onPressedLeading: () {
-                  if (widget.patient != newPatient) {
-                    showConfirmationDialog(context, message: 'Discard changes',
-                        confirmFunction: () {
-                      Navigator.pop(context);
-                    });
-                  } else {
-                    Navigator.pop(context);
-                  }
-                },
                 actions: [
                   OutlineIconButton(
                     iconData: Icons.logout_rounded,
@@ -848,7 +851,6 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
     immunizationsNotifier.dispose();
     allergiesNotifier.dispose();
     familyMedicalHistoryNotifier.dispose();
-    lifestyleNotifier.dispose();
     surgeriesNotifier.dispose();
 
     super.dispose();
@@ -881,7 +883,8 @@ class _ProfileImageState extends State<ProfileImage> {
           return Stack(
             alignment: Alignment.center,
             children: [
-              if (snapshot.connectionState == ConnectionState.done)
+              if (snapshot.connectionState == ConnectionState.done &&
+                  snapshot.data != null)
                 ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: CachedNetworkImage(
