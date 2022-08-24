@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:med_connect/firebase_services/auth_service.dart';
 import 'package:med_connect/models/doctor.dart';
@@ -8,12 +9,13 @@ import 'package:med_connect/models/doctor_appointment.dart';
 import 'package:med_connect/models/patient.dart';
 import 'package:med_connect/utils/dialogs.dart';
 
-class FirestoreServices {
-  AuthService auth = AuthService();
+class FirestoreService {
+  FirebaseAuth auth = FirebaseAuth.instance;
+
   FirebaseFirestore instance = FirebaseFirestore.instance;
 
   DocumentReference<Map<String, dynamic>> get patientDocument =>
-      instance.collection('patients').doc(auth.uid);
+      instance.collection('patients').doc(auth.currentUser!.uid);
   Future<DocumentSnapshot<Map<String, dynamic>>> get patient =>
       patientDocument.get();
 
@@ -21,17 +23,9 @@ class FirestoreServices {
     await patientDocument.set(patient.toFirestore());
   }
 
-  updatePatient(BuildContext context, Patient patient) async {
-    //TODO:
-    showLoadingDialog(context);
-    patientDocument.update(patient.toFirestore()).then((value) {
-      Navigator.pop(context);
-      Navigator.pop(context);
-    }).onError((error, stackTrace) {
-      Navigator.pop(context);
-      showAlertDialog(context);
-    });
-  }
+  Future<void> updatePatient(BuildContext context, Patient patient) =>
+    patientDocument.update(patient.toFirestore());
+  
 
   deletePatient() async {
     //TODO: implement this
@@ -54,7 +48,9 @@ class FirestoreServices {
       instance.collection('appointments');
 
   Future<QuerySnapshot<Map<String, dynamic>>> get appointmentsList =>
-      appointmentsCollection.where('patientId', isEqualTo: auth.uid).get();
+      appointmentsCollection
+          .where('patientId', isEqualTo: auth.currentUser!.uid)
+          .get();
 
   void addAppointment(
       BuildContext context, DoctorAppointment appointment) async {

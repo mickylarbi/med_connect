@@ -45,12 +45,18 @@
 	<false/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>...</string>
+	<key>NSCameraUsageDescription</key>
+	<string>...</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>...</string>
 	<key>LSApplicationQueriesSchemes</key>
-		<array>
-			<string>sms</string>
-			<string>tel</string>
-			<string>mailto</string>
-		</array>
+	<array>
+		<string>sms</string>
+		<string>tel</string>
+		<string>mailto</string>
+	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app needs access to location when open.</string>
 	<key>NSLocationAlwaysUsageDescription</key>

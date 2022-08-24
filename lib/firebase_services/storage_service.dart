@@ -1,37 +1,21 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:med_connect/firebase_services/auth_service.dart';
 
 class StorageService {
-  FirebaseStorage storage = FirebaseStorage.instance;
+  FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<String> profileImageUrl(String doctorId) =>
-      storage.ref().child('profile_pictures/$doctorId').getDownloadURL();
-}
+  Reference profilePicturesRef =
+      FirebaseStorage.instance.ref('profile_pictures/');
 
-class ProfileImageBloc {
-  File? profileImageFIle;
-  StorageService storage = StorageService();
-  AuthService auth = AuthService();
+  Future<String> profileImageDownloadUrl([String? id]) =>
+      profilePicturesRef.child(id ?? _auth.currentUser!.uid).getDownloadURL();
 
-  final StreamController _eventStreamController = StreamController();
-  final StreamController _stateStreamController = StreamController();
-
-  StreamSink get eventSink => _eventStreamController.sink;
-  Stream get stateStream => _stateStreamController.stream;
-
-  createInstance() {
-    _eventStreamController.stream.listen(getProfileImageFIle);
-  }
-
-  getProfileImageFIle(dynamic event)async {
-    
-  }
-
-  void dispose() {
-    _eventStreamController.close();
-    _stateStreamController.close();
-  }
+  UploadTask uploadProfileImage(XFile picture) => profilePicturesRef
+      .child(_auth.currentUser!.uid)
+      .putFile(File(picture.path));
 }

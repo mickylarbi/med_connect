@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:med_connect/firebase_services/auth_service.dart';
-import 'package:med_connect/firebase_services/firestore_services.dart';
+import 'package:med_connect/firebase_services/firestore_service.dart';
 import 'package:med_connect/models/doctor.dart';
 import 'package:med_connect/models/doctor_appointment.dart';
 import 'package:med_connect/screens/home/appointment/choose_doctor_screen.dart';
@@ -44,7 +44,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
       ValueNotifier<List<String>>([]);
   TextEditingController conditionsController = TextEditingController();
 
-  FirestoreServices db = FirestoreServices();
+  FirestoreService db = FirestoreService();
   AuthService auth = AuthService();
 
   DoctorAppointment newAppointment = DoctorAppointment();

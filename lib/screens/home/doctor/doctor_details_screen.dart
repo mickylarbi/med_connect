@@ -58,7 +58,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                         alignment: Alignment.center,
                         color: Colors.grey.withOpacity(.1),
                         child: FutureBuilder<String>(
-                          future: storage.profileImageUrl(widget.doctor.id!),
+                          future: storage.profileImageDownloadUrl(widget.doctor.id!),
                           builder: (context, snapshot) {
                             if (snapshot.hasError) {
                               return GestureDetector(

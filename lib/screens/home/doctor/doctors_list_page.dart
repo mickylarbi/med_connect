@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:med_connect/firebase_services/firestore_services.dart';
+import 'package:med_connect/firebase_services/firestore_service.dart';
 import 'package:med_connect/models/doctor.dart';
 import 'package:med_connect/models/experience.dart';
 import 'package:med_connect/models/review.dart';
@@ -125,7 +125,7 @@ class DoctorsListView extends StatefulWidget {
 }
 
 class _DoctorsListViewState extends State<DoctorsListView> {
-  final FirestoreServices db = FirestoreServices();
+  final FirestoreService db = FirestoreService();
 
   @override
   Widget build(BuildContext context) {

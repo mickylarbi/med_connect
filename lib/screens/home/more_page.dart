@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:med_connect/firebase_services/auth_service.dart';
-import 'package:med_connect/firebase_services/firestore_services.dart';
+import 'package:med_connect/firebase_services/firestore_service.dart';
 import 'package:med_connect/models/patient.dart';
 import 'package:med_connect/sandbox.dart';
 import 'package:med_connect/screens/shared/custom_buttons.dart';
@@ -10,7 +10,7 @@ class MorePage extends StatelessWidget {
   MorePage({Key? key}) : super(key: key);
 
   AuthService auth = AuthService();
-  FirestoreServices db = FirestoreServices();
+  FirestoreService db = FirestoreService();
 
   @override
   Widget build(BuildContext context) {

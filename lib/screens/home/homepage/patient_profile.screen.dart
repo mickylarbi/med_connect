@@ -1,7 +1,12 @@
+import 'dart:developer';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:med_connect/firebase_services/auth_service.dart';
-import 'package:med_connect/firebase_services/firestore_services.dart';
+import 'package:med_connect/firebase_services/firestore_service.dart';
+import 'package:med_connect/firebase_services/storage_service.dart';
 import 'package:med_connect/models/allergy.dart';
 import 'package:med_connect/models/family_medical_history_entry.dart';
 import 'package:med_connect/models/immunization.dart';
@@ -22,9 +27,8 @@ import 'package:med_connect/utils/dialogs.dart';
 import 'package:med_connect/utils/functions.dart';
 
 class PatientProfileScreen extends StatefulWidget {
-  final Patient patient;
-  const PatientProfileScreen({Key? key, required this.patient})
-      : super(key: key);
+  final Patient? patient;
+  const PatientProfileScreen({Key? key, this.patient}) : super(key: key);
 
   @override
   State<PatientProfileScreen> createState() => _PatientProfileScreenState();
@@ -32,7 +36,7 @@ class PatientProfileScreen extends StatefulWidget {
 
 class _PatientProfileScreenState extends State<PatientProfileScreen> {
   AuthService auth = AuthService();
-  FirestoreServices db = FirestoreServices();
+  FirestoreService db = FirestoreService();
 
   TextEditingController firstNameController = TextEditingController();
   TextEditingController surnameController = TextEditingController();
@@ -58,45 +62,33 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
   void initState() {
     super.initState();
 
-    firstNameController.text = widget.patient.firstName!;
-    surnameController.text = widget.patient.surname!;
-    phoneController.text = widget.patient.phone!;
-    dateOfBirthNotifier.value = widget.patient.dateOfBirth;
-    genderNotifier.value = widget.patient.gender;
-    bloodTypeNotifier.value = widget.patient.bloodType;
-    heightController.text = widget.patient.height.toString();
-    weightController.text = widget.patient.weight!.toString();
+    if (widget.patient != null) {
+      firstNameController.text = widget.patient!.firstName!;
+      surnameController.text = widget.patient!.surname!;
+      phoneController.text = widget.patient!.phone!;
+      dateOfBirthNotifier.value = widget.patient!.dateOfBirth;
+      genderNotifier.value = widget.patient!.gender;
+      bloodTypeNotifier.value = widget.patient!.bloodType;
+      heightController.text = widget.patient!.height.toString();
+      weightController.text = widget.patient!.weight!.toString();
 
-    medicalHistoryNotifier.value = widget.patient.medicalHistory ?? [];
-    immunizationsNotifier.value = widget.patient.immunizations ?? [];
-    allergiesNotifier.value = widget.patient.allergies ?? [];
-    familyMedicalHistoryNotifier.value =
-        widget.patient.familyMedicalHistory ?? [];
-    surgeriesNotifier.value = widget.patient.surgeries ?? [];
+      medicalHistoryNotifier.value = widget.patient!.medicalHistory ?? [];
+      immunizationsNotifier.value = widget.patient!.immunizations ?? [];
+      allergiesNotifier.value = widget.patient!.allergies ?? [];
+      familyMedicalHistoryNotifier.value =
+          widget.patient!.familyMedicalHistory ?? [];
+      surgeriesNotifier.value = widget.patient!.surgeries ?? [];
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     //TODO:
-    Patient newPatient = Patient(
-      firstName: firstNameController.text.trim(),
-      surname: surnameController.text.trim(),
-      phone: phoneController.text.trim(),
-      dateOfBirth: dateOfBirthNotifier.value,
-      gender: genderNotifier.value,
-      height: double.parse(heightController.text.trim()),
-      weight: double.parse(weightController.text.trim()),
-      bloodType: bloodTypeNotifier.value,
-      medicalHistory: medicalHistoryNotifier.value,
-      immunizations: immunizationsNotifier.value,
-      allergies: allergiesNotifier.value,
-      familyMedicalHistory: familyMedicalHistoryNotifier.value,
-      surgeries: surgeriesNotifier.value,
-    );
+    Patient newPatient = Patient();
 
     return GestureDetector(
       onTap: () {
-        FocusScope.of(context).unfocus();
+        FocusManager.instance.primaryFocus?.unfocus();
       },
       child: Scaffold(
         body: SafeArea(
@@ -107,41 +99,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                     const EdgeInsets.symmetric(horizontal: 36, vertical: 88),
                 children: [
                   const SizedBox(height: 10),
-                  Align(
-                    alignment: Alignment.center,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Stack(
-                        children: [
-                          Image.asset(
-                            'assets/images/usman-yousaf-pTrhfmj2jDA-unsplash.jpg',
-                            height: 100,
-                            width: 100,
-                            fit: BoxFit.cover,
-                            alignment: Alignment.topCenter,
-                          ),
-                          SizedBox(
-                            height: 100,
-                            width: 100,
-                            child: Material(
-                              color: Colors.black.withOpacity(.3),
-                              child: InkWell(
-                                onTap: () {
-                                  //TODO: bottom sheet things
-                                },
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.photo_camera,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  const ProfileImage(),
                   const SizedBox(height: 30),
                   const Text(
                     'Personal info',
@@ -811,6 +769,22 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                   CustomFlatButton(
                     child: const Text('Save changes'),
                     onPressed: () {
+                      newPatient = Patient(
+                        firstName: firstNameController.text.trim(),
+                        surname: surnameController.text.trim(),
+                        phone: phoneController.text.trim(),
+                        dateOfBirth: dateOfBirthNotifier.value,
+                        gender: genderNotifier.value,
+                        height: double.parse(heightController.text.trim()),
+                        weight: double.parse(weightController.text.trim()),
+                        bloodType: bloodTypeNotifier.value,
+                        medicalHistory: medicalHistoryNotifier.value,
+                        immunizations: immunizationsNotifier.value,
+                        allergies: allergiesNotifier.value,
+                        familyMedicalHistory:
+                            familyMedicalHistoryNotifier.value,
+                        surgeries: surgeriesNotifier.value,
+                      );
                       if ((firstNameController.text.trim().isNotEmpty &&
                               surnameController.text.trim().isNotEmpty &&
                               phoneController.text.trim().isNotEmpty) ||
@@ -877,6 +851,167 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
     lifestyleNotifier.dispose();
     surgeriesNotifier.dispose();
 
+    super.dispose();
+  }
+}
+
+class ProfileImage extends StatefulWidget {
+  const ProfileImage({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<ProfileImage> createState() => _ProfileImageState();
+}
+
+class _ProfileImageState extends State<ProfileImage> {
+  AuthService auth = AuthService();
+
+  StorageService storage = StorageService();
+
+  ValueNotifier<XFile?> pictureNotifier = ValueNotifier<XFile?>(null);
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.center,
+      child: FutureBuilder<String>(
+        future: storage.profileImageDownloadUrl(),
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          return Stack(
+            alignment: Alignment.center,
+            children: [
+              if (snapshot.connectionState == ConnectionState.done)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: CachedNetworkImage(
+                    imageUrl: snapshot.data!,
+                    progressIndicatorBuilder:
+                        (context, url, downloadProgress) => Center(
+                            child: CircularProgressIndicator.adaptive(
+                                value: downloadProgress.progress)),
+                    errorWidget: (context, _, __) {
+                      return const Center(
+                        child: Icon(Icons.person),
+                      );
+                    },
+                    height: 200,
+                    width: 200,
+                    fit: BoxFit.cover,
+                    alignment: Alignment.topCenter,
+                  ),
+                ),
+              if (snapshot.connectionState == ConnectionState.done)
+                SizedBox(
+                  height: 200,
+                  width: 200,
+                  child: Material(
+                    color: Colors.black.withOpacity(.3),
+                    borderRadius: BorderRadius.circular(20),
+                    child: InkWell(
+                      onTap: () {
+                        if (snapshot.data != null) {
+                          final ImagePicker picker = ImagePicker();
+
+                          showCustomBottomSheet(context, [
+                            ListTile(
+                              leading: const Icon(Icons.camera_alt),
+                              title: const Text('Take a photo'),
+                              onTap: () async {
+                                picker
+                                    .pickImage(source: ImageSource.camera)
+                                    .then((value) {
+                                  Navigator.pop(context);
+                                  if (value != null) {
+                                    showLoadingDialog(context);
+                                    storage
+                                        .uploadProfileImage(value)
+                                        .timeout(const Duration(minutes: 2))
+                                        .then((value) {
+                                      Navigator.pop(context);
+                                      setState(() {});
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  'Profile image changed!')));
+                                    }).onError((error, stackTrace) {
+                                      Navigator.pop(context);
+                                      log(error.toString());
+                                      showAlertDialog(context,
+                                          message: 'Couldn\'t upload image');
+                                    });
+                                  }
+                                }).onError((error, stackTrace) {
+                                  showAlertDialog(context);
+                                });
+                              },
+                            ),
+                            ListTile(
+                              leading: const Icon(Icons.photo),
+                              title: const Text('Choose from gallery'),
+                              onTap: () async {
+                                picker
+                                    .pickImage(source: ImageSource.gallery)
+                                    .then((value) {
+                                  Navigator.pop(context);
+                                  if (value != null) {
+                                    showLoadingDialog(context);
+                                    storage
+                                        .uploadProfileImage(value)
+                                        .timeout(const Duration(minutes: 5))
+                                        .then((value) {
+                                      Navigator.pop(context);
+                                      setState(() {});
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  'Profile image changed!')));
+                                    }).onError((error, stackTrace) {
+                                      Navigator.pop(context);
+                                      log(error.toString());
+                                      showAlertDialog(context,
+                                          message: 'Couldn\'t upload image');
+                                    });
+                                  }
+                                }).onError((error, stackTrace) {
+                                  showAlertDialog(context);
+                                });
+                              },
+                            ),
+                          ]);
+                        } else {
+                          setState(() {});
+                        }
+                      },
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                ),
+              if (snapshot.connectionState == ConnectionState.done &&
+                  snapshot.data != null)
+                const Center(
+                  child: Icon(
+                    Icons.photo_camera,
+                    color: Colors.white,
+                  ),
+                ),
+
+              ///
+
+              if (snapshot.connectionState == ConnectionState.waiting)
+                const Center(
+                  child: CircularProgressIndicator.adaptive(),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    pictureNotifier.dispose();
     super.dispose();
   }
 }

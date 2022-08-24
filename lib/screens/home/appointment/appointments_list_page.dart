@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:med_connect/firebase_services/auth_service.dart';
-import 'package:med_connect/firebase_services/firestore_services.dart';
+import 'package:med_connect/firebase_services/firestore_service.dart';
 import 'package:med_connect/models/doctor_appointment.dart';
 import 'package:med_connect/screens/home/appointment/appointment_card.dart';
 import 'package:med_connect/screens/home/appointment/appointment_details_screen.dart';
@@ -22,7 +22,7 @@ class _AppointmentsListPageState extends State<AppointmentsListPage> {
   ScrollController _scrollController = ScrollController();
 
   AuthService auth = AuthService();
-  FirestoreServices db = FirestoreServices();
+  FirestoreService db = FirestoreService();
 
   @override
   Widget build(BuildContext context) {

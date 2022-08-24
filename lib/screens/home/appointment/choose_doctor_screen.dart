@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:med_connect/firebase_services/firestore_services.dart';
+import 'package:med_connect/firebase_services/firestore_service.dart';
 import 'package:med_connect/models/doctor.dart';
 import 'package:med_connect/screens/home/doctor/doctor_card.dart';
 import 'package:med_connect/screens/home/doctor/doctor_details_screen.dart';
@@ -19,7 +19,7 @@ class ChooseDoctorScreen extends StatefulWidget {
 }
 
 class _ChooseDoctorScreenState extends State<ChooseDoctorScreen> {
-  FirestoreServices db = FirestoreServices();
+  FirestoreService db = FirestoreService();
   @override
   Widget build(BuildContext context) {
     return Scaffold(

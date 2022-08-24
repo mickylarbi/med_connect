@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:med_connect/firebase_services/auth_service.dart';
-import 'package:med_connect/firebase_services/firestore_services.dart';
+import 'package:med_connect/firebase_services/firestore_service.dart';
 import 'package:med_connect/firebase_services/storage_service.dart';
 import 'package:med_connect/models/patient.dart';
 import 'package:med_connect/screens/home/homepage/patient_profile.screen.dart';
@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
   ScrollController scrollController = ScrollController();
   StorageService storage = StorageService();
   AuthService auth = AuthService();
-  FirestoreServices db = FirestoreServices();
+  FirestoreService db = FirestoreService();
 
   @override
   Widget build(BuildContext context) {
@@ -263,7 +263,7 @@ class _HomePageState extends State<HomePage> {
                 alignment: Alignment.center,
                 color: Colors.grey.withOpacity(.1),
                 child: FutureBuilder<String>(
-                  future: storage.profileImageUrl(auth.uid),
+                  future: storage.profileImageDownloadUrl(),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
                       return const Icon(
