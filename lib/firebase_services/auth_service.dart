@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:med_connect/firebase_services/firestore_service.dart';
-import 'package:med_connect/onboarding/welcome_screen.dart';
+import 'package:med_connect/screens/onboarding/welcome_screen.dart';
 import 'package:med_connect/screens/auth/auth_screen.dart';
 import 'package:med_connect/screens/home/tab_view.dart';
 import 'package:med_connect/utils/constants.dart';

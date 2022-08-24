@@ -25,55 +25,9 @@ class DoctorsListPage extends StatefulWidget {
 class _DoctorsListPageState extends State<DoctorsListPage> {
   final ScrollController _scrollController = ScrollController();
 
-  Doctor doctor = Doctor(
-      bio:
-          'This is the bioThis is the bioThis is the bioThis is the bioThis is the bio\nThis is the bioThis is the bioThis is the bio\nThis is the bioThis is the bio\nThis is the bioThis is the bioThis is the bioThis is the bioThis is the bio',
-      currentLocation: Experience(
-          location: 'Cape Coast Teaching Hospital',
-          dateTimeRange:
-              DateTimeRange(start: DateTime.now(), end: DateTime.now())),
-      experiences: [
-        Experience(
-            location: 'UCC Hospital',
-            dateTimeRange:
-                DateTimeRange(start: DateTime.now(), end: DateTime.now())),
-      ],
-      mainSpecialty: 'Oncology',
-      firstName: 'Michael',
-      surname: 'Larbi',
-      reviews: List.generate(
-          5,
-          (index) => Review(
-                rating: Random().nextDouble() * 5,
-                dateTime: DateTime.now(),
-                userId: 'humberto-chavez-FVh_yqLR9eA-unsplash.jpg',
-                comment: 'Great doctor!\nPatient and attentive',
-              )),
-      otherSpecialties: [
-        '',
-        '',
-      ],
-      services: [
-        '',
-        '',
-        '',
-        '',
-        '',
-      ]);
-
   @override
   void initState() {
     super.initState();
-    // _scrollController.addListener(() {//TODO: come back to this
-    //   if (_scrollController.offset < 25 && _scrollController.offset > 0) {
-    //     _scrollController.animateTo(0,
-    //         duration: const Duration(seconds: 1), curve: Curves.easeOutQuint);
-    //   } else if (_scrollController.offset >= 25 &&
-    //       _scrollController.offset < 50) {
-    //     _scrollController.animateTo(50,
-    //         duration: const Duration(seconds: 1), curve: Curves.easeOutQuint);
-    //   }
-    // });
   }
 
   @override
@@ -84,12 +38,16 @@ class _DoctorsListPageState extends State<DoctorsListPage> {
           onRefresh: () async {
             setState(() {});
           },
-          child: ListView(
-            controller: _scrollController,
-            physics: const BouncingScrollPhysics(),
+          child: Column(
             children: [
               const SizedBox(height: 138),
-              DoctorsListView(),
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  physics: const BouncingScrollPhysics(),
+                  child: const DoctorsListView(),
+                ),
+              ),
             ],
           ),
         ),
@@ -130,7 +88,7 @@ class _DoctorsListViewState extends State<DoctorsListView> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        future: db.doctorsList,
+        future: db.doctorsCollection.get(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
@@ -172,7 +130,7 @@ class _DoctorsListViewState extends State<DoctorsListView> {
               separatorBuilder: (context, index) => const Divider(
                 indent: 176,
                 endIndent: 36,
-                height: 0,
+                height: 50,
               ),
               itemCount: snapshot.data!.docs.length,
             );

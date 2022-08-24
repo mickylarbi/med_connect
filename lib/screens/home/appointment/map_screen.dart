@@ -73,7 +73,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                 padding: const EdgeInsets.symmetric(horizontal: 36),
                 child: SolidIconButton(
                   onPressed: () {
-                    // Navigator.pop(context);
+                    Navigator.pop(context);
 
                     log(Colors.blueGrey.toString());
                   },

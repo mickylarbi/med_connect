@@ -14,66 +14,44 @@ class FirestoreService {
 
   FirebaseFirestore instance = FirebaseFirestore.instance;
 
+  // PATIENT
+
   DocumentReference<Map<String, dynamic>> get patientDocument =>
       instance.collection('patients').doc(auth.currentUser!.uid);
 
-  addPatient(Patient patient) async {
-    await patientDocument.set(patient.toFirestore());
-  }
+  Future<void> addPatient(Patient patient) =>
+      patientDocument.set(patient.toFirestore());
 
-  Future<void> updatePatient(BuildContext context, Patient patient) =>
+  Future<void> updatePatient(Patient patient) =>
       patientDocument.update(patient.toFirestore());
 
-  deletePatient() async {
-    //TODO: implement this
-    await patientDocument.delete();
-  }
+  Future<void> deletePatient() => patientDocument.delete();
 
-  CollectionReference<Map<String, dynamic>> get doctorsCollection =>
-      instance.collection('doctors');
+  // ADMIN
 
-  //TODO: with converter things
-  Future<QuerySnapshot<Map<String, dynamic>>> get doctorsList =>
-      doctorsCollection.get();
+  CollectionReference<Map<String, dynamic>> get adminsCollection =>
+      instance.collection('admins');
+
+  // DOCTOR
+
+  Query<Map<String, dynamic>> get doctorsCollection =>
+      instance.collection('admins').where('adminRole', isEqualTo: 'doctor');
 
   Future<DocumentSnapshot<Map<String, dynamic>>> doctor(String id) =>
-      doctorsCollection.doc(id).get();
+      adminsCollection.doc(id).get();
 
-  //APPOINTMENT
+  // APPOINTMENT
 
   CollectionReference<Map<String, dynamic>> get appointmentsCollection =>
-      instance.collection('appointments');
+      instance.collection('doctorAppointments');
 
-  Future<QuerySnapshot<Map<String, dynamic>>> get appointmentsList =>
-      appointmentsCollection
-          .where('patientId', isEqualTo: auth.currentUser!.uid)
-          .get();
+  Query<Map<String, dynamic>> get appointmentsList => appointmentsCollection
+      .where('patientId', isEqualTo: auth.currentUser!.uid);
 
-  void addAppointment(
-      BuildContext context, DoctorAppointment appointment) async {
-    showLoadingDialog(context);
+  Future<DocumentReference<Map<String, dynamic>>> addAppointment(
+          DoctorAppointment appointment) =>
+      appointmentsCollection.add(appointment.toMap());
 
-    appointmentsCollection.add(appointment.toMap()).then((value) {
-      Navigator.pop(context);
-      showAlertDialog(context, message: 'Appointment add successfully');
-    }).onError((error, stackTrace) {
-      Navigator.pop(context);
-      showAlertDialog(context, message: error.toString());
-    });
-  }
-
-  updateAppointment(BuildContext context, DoctorAppointment appointment) async {
-    showLoadingDialog(context);
-
-    await appointmentsCollection
-        .doc(appointment.id)
-        .update(appointment.toMap())
-        .then((value) {
-      Navigator.pop(context);
-      Navigator.pop(context, true);
-    }).onError((error, stackTrace) {
-      Navigator.pop(context);
-      showAlertDialog(context, message: 'Couldn\'t update appointment');
-    });
-  }
+  Future<void> updateAppointment(DoctorAppointment appointment) =>
+      appointmentsCollection.doc(appointment.id).update(appointment.toMap());
 }

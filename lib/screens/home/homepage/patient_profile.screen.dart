@@ -799,7 +799,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                             message: 'Save changes to profile?',
                             confirmFunction: () {
                           showLoadingDialog(context);
-                          db.updatePatient(context, newPatient).then((value) {
+                          db.updatePatient(newPatient).then((value) {
                             Navigator.pop(context);
                             Navigator.pop(context);
                           }).onError((error, stackTrace) {

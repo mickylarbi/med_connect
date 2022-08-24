@@ -149,8 +149,7 @@ class _PatientInfoScreenState extends State<PatientInfoScreen> {
                             .uploadProfileImage(pictureNotifier.value!)
                             .then((p0) {
                           db
-                              .updatePatient(
-                            context,
+                              .addPatient(
                             Patient(
                               firstName: firstNameController.text.trim(),
                               surname: surnameController.text.trim(),

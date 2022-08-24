@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -58,7 +59,8 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                         alignment: Alignment.center,
                         color: Colors.grey.withOpacity(.1),
                         child: FutureBuilder<String>(
-                          future: storage.profileImageDownloadUrl(widget.doctor.id!),
+                          future: storage
+                              .profileImageDownloadUrl(widget.doctor.id!),
                           builder: (context, snapshot) {
                             if (snapshot.hasError) {
                               return GestureDetector(
@@ -82,13 +84,18 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                             }
                             if (snapshot.connectionState ==
                                 ConnectionState.done) {
-                              return Image.network(
-                                snapshot.data!,
+                              return CachedNetworkImage(
+                                imageUrl: snapshot.data!,
                                 height: 120,
                                 width: 110,
                                 fit: BoxFit.cover,
+                                progressIndicatorBuilder:
+                                    (context, url, downloadProgress) =>
+                                        CircularProgressIndicator.adaptive(
+                                            value: downloadProgress.progress),
+                                errorWidget: (context, url, error) =>
+                                    const Center(child: Icon(Icons.person)),
                               );
-                              // return const FlutterLogo();
                             }
                             return const CircularProgressIndicator.adaptive();
                           },
@@ -143,10 +150,17 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                   ],
                 ),
 
-                if (widget.doctor.bio != null) const SizedBox(height: 30),
-                if (widget.doctor.bio != null) const HeaderText(text: 'Bio'),
-                if (widget.doctor.bio != null) const SizedBox(height: 2.5),
-                if (widget.doctor.bio != null) Text(widget.doctor.bio!),
+                if (widget.doctor.bio != null && widget.doctor.bio!.isNotEmpty)
+                  const SizedBox(height: 30),
+
+                if (widget.doctor.bio != null && widget.doctor.bio!.isNotEmpty)
+                  const HeaderText(text: 'Bio'),
+
+                if (widget.doctor.bio != null && widget.doctor.bio!.isNotEmpty)
+                  const SizedBox(height: 2.5),
+
+                if (widget.doctor.bio != null && widget.doctor.bio!.isNotEmpty)
+                  Text(widget.doctor.bio!),
                 const Divider(height: 50),
 
                 ///OTHER SPECIALTIES
