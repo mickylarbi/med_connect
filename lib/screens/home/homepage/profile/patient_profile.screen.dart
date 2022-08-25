@@ -13,11 +13,11 @@ import 'package:med_connect/models/immunization.dart';
 import 'package:med_connect/models/medical_history_entry.dart';
 import 'package:med_connect/models/patient.dart';
 import 'package:med_connect/models/surgery.dart';
-import 'package:med_connect/screens/home/homepage/edit_allergy_screen.dart';
-import 'package:med_connect/screens/home/homepage/edit_family_medical_history.dart';
-import 'package:med_connect/screens/home/homepage/edit_immunization_screen.dart';
-import 'package:med_connect/screens/home/homepage/edit_medical_history_screen.dart';
-import 'package:med_connect/screens/home/homepage/edit_surgery_screen.dart';
+import 'package:med_connect/screens/home/homepage/profile/edit_allergy_screen.dart';
+import 'package:med_connect/screens/home/homepage/profile/edit_family_medical_history.dart';
+import 'package:med_connect/screens/home/homepage/profile/edit_immunization_screen.dart';
+import 'package:med_connect/screens/home/homepage/profile/edit_medical_history_screen.dart';
+import 'package:med_connect/screens/home/homepage/profile/edit_surgery_screen.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
 import 'package:med_connect/screens/shared/custom_buttons.dart';
 import 'package:med_connect/screens/shared/custom_icon_buttons.dart';
@@ -57,6 +57,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
   ValueNotifier<List<Surgery>?> surgeriesNotifier =
       ValueNotifier<List<Surgery>?>([]);
 
+
   @override
   void initState() {
     super.initState();
@@ -88,7 +89,6 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //TODO:
     Patient newPatient = Patient();
 
     return GestureDetector(

@@ -1,8 +1,5 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:med_connect/firebase_services/auth_service.dart';
@@ -16,7 +13,6 @@ import 'package:med_connect/screens/home/doctor/doctor_details_screen.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
 import 'package:med_connect/screens/shared/custom_buttons.dart';
 import 'package:med_connect/screens/shared/custom_textformfield.dart';
-import 'package:med_connect/screens/shared/header_text.dart';
 import 'package:med_connect/screens/shared/custom_icon_buttons.dart';
 import 'package:med_connect/utils/constants.dart';
 import 'package:med_connect/utils/dialogs.dart';
@@ -88,12 +84,21 @@ class AppointmentDetailsScreen extends StatelessWidget {
                 actions: [
                   if (appointment.isConfirmed != null &&
                       appointment.isConfirmed!)
-                    const CircleAvatar(
-                      backgroundColor: Colors.green,
-                      radius: 14,
-                      child: Icon(
-                        Icons.done,
-                        color: Colors.white,
+                    GestureDetector(
+                      onTap: () {
+                        showAlertDialog(context,
+                            message:
+                                'This appointment has been confirmed by the doctor',
+                            icon: Icons.info_rounded,
+                            iconColor: Colors.blue);
+                      },
+                      child: const CircleAvatar(
+                        backgroundColor: Colors.green,
+                        radius: 14,
+                        child: Icon(
+                          Icons.done,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   const SizedBox(width: 20),
@@ -111,7 +116,8 @@ class AppointmentDetailsScreen extends StatelessWidget {
                                 Navigator.pop(context);
                                 showConfirmationDialog(
                                   context,
-                                  message: 'Delete appointment',
+                                  message:
+                                      'Delete appointment\nThis cannot be undone',
                                   confirmFunction: () {
                                     showLoadingDialog(context);
                                     db
@@ -148,7 +154,7 @@ class AppointmentsDetailsWidget extends StatefulWidget {
   final String? doctorIdNotifier;
   final DoctorAppointment appointment;
 
-  AppointmentsDetailsWidget({
+  const AppointmentsDetailsWidget({
     Key? key,
     required this.doctorIdNotifier,
     required this.appointment,
@@ -213,56 +219,39 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
                       child: InkWell(
                         borderRadius: BorderRadius.circular(14),
                         onTap: () {
-                          showCustomBottomSheet(
-                            context,
-                            [
-                              ListTile(
-                                leading:
-                                    const Icon(Icons.calendar_today_rounded),
-                                title: const Text('Change date'),
-                                onTap: () async {
-                                  Navigator.pop(context);
-
-                                  DateTime? result = await showDatePicker(
-                                      context: context,
-                                      initialDate: dateTime ?? DateTime.now(),
-                                      firstDate: DateTime.now(),
-                                      lastDate: DateTime(2100));
-
-                                  if (result != null) {
-                                    DateTime temp = dateTime ?? DateTime.now();
-                                    dateTime = DateTime(
-                                        result.year,
-                                        result.month,
-                                        result.day,
-                                        temp.hour,
-                                        temp.minute);
-                                    setState(() {});
-                                  }
-                                },
-                              ),
-                              const Divider(height: 10),
-                              ListTile(
-                                leading: const Icon(Icons.timer_outlined),
-                                title: const Text('Change time'),
-                                onTap: () async {
-                                  Navigator.pop(context);
-
-                                  TimeOfDay? result = await showTimePicker(
-                                      context: context,
-                                      initialTime: TimeOfDay.fromDateTime(
-                                          dateTime ?? DateTime.now()));
-
-                                  if (result != null) {
-                                    DateTime? temp = dateTime ?? DateTime.now();
-                                    dateTime = DateTime(temp.year, temp.month,
-                                        temp.day, result.hour, result.minute);
-                                    setState(() {});
-                                  }
-                                },
-                              ),
-                            ],
-                          );
+                          showDatePicker(
+                                  context: context,
+                                  initialDate: dateTime ?? DateTime.now(),
+                                  firstDate: DateTime.now(),
+                                  lastDate: DateTime(2100))
+                              .then((date) {
+                            showTimePicker(
+                                    context: context,
+                                    initialTime: TimeOfDay.fromDateTime(
+                                        dateTime ?? DateTime.now()))
+                                .then((time) {
+                              dateTime ??= DateTime.now();
+                              if (date != null && time != null) {
+                                dateTime = DateTime(date.year, date.month,
+                                    date.day, time.hour, time.minute);
+                              } else if (time != null) {
+                                dateTime = DateTime(
+                                    dateTime!.year,
+                                    dateTime!.month,
+                                    dateTime!.day,
+                                    time.hour,
+                                    time.minute);
+                              } else if (date != null) {
+                                dateTime = DateTime(date.year, date.month,
+                                    date.day, dateTime!.hour, dateTime!.minute);
+                              }
+                              setState(() {});
+                            }).onError((error, stackTrace) {
+                              showAlertDialog(context);
+                            });
+                          }).onError((error, stackTrace) {
+                            showAlertDialog(context);
+                          });
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
@@ -637,45 +626,57 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
                         service != null) {
                       showLoadingDialog(context);
 
-                      if (widget.appointment.id == null) {
-                        db
-                            .addAppointment(DoctorAppointment(
-                                doctorId: doctorId,
-                                dateTime: dateTime,
-                                service: service,
-                                venueGeo: venueGeo,
-                                venueString: venueString,
-                                symptoms: symptoms,
-                                conditions: conditions))
-                            .timeout(ktimeout)
-                            .then((value) {
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                        }).onError((error, stackTrace) {
-                          Navigator.pop(context);
-                          showAlertDialog(context,
-                              message: 'Error adding appointment');
-                        });
-                      } else {
-                        db
-                            .updateAppointment(DoctorAppointment(
-                                doctorId: doctorId,
-                                dateTime: dateTime,
-                                service: service,
-                                venueGeo: venueGeo,
-                                venueString: venueString,
-                                symptoms: symptoms,
-                                conditions: conditions))
-                            .timeout(ktimeout)
-                            .then((value) {
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                        }).onError((error, stackTrace) {
-                          Navigator.pop(context);
-                          showAlertDialog(context,
-                              message: 'Error adding appointment');
-                        });
-                      }
+                      showConfirmationDialog(
+                        context,
+                        message: widget.appointment.id == null
+                            ? 'Add appointment'
+                            : 'Update appointment?',
+                        confirmFunction: () {
+                          if (widget.appointment.id == null) {
+                            db
+                                .addAppointment(DoctorAppointment(
+                                    doctorId: doctorId,
+                                    doctorName: doctor.name,
+                                    dateTime: dateTime,
+                                    service: service,
+                                    venueGeo: venueGeo,
+                                    venueString: venueString,
+                                    symptoms: symptoms,
+                                    conditions: conditions))
+                                .timeout(ktimeout)
+                                .then((value) {
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            }).onError((error, stackTrace) {
+                              Navigator.pop(context);
+                              showAlertDialog(context,
+                                  message: 'Error adding appointment');
+                            });
+                          } else {
+                            db
+                                .updateAppointment(DoctorAppointment(
+                                    id: widget.appointment.id,
+                                    doctorId: doctorId,
+                                    doctorName: doctor.name,
+                                    dateTime: dateTime,
+                                    service: service,
+                                    venueGeo: venueGeo,
+                                    venueString: venueString,
+                                    symptoms: symptoms,
+                                    conditions: conditions))
+                                .timeout(ktimeout)
+                                .then((value) {
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            }).onError((error, stackTrace) {
+                              Navigator.pop(context);
+                              showAlertDialog(context,
+                                  message:
+                                      'Error updating appointment\n${error.toString()}');
+                            });
+                          }
+                        },
+                      );
                     } else {
                       if (dateTime == null) {
                         showAlertDialog(context,

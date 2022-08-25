@@ -263,7 +263,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                   ),
                 if (widget.doctor.reviews != null &&
                     widget.doctor.reviews!
-                        .isNotEmpty) //TODO: check if comment is empty
+                        .isNotEmpty) 
                   ReviewCard(
                     review: widget.doctor.reviews!
                         .where((element) =>
@@ -295,10 +295,8 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                         ],
                       ),
                       onPressed: () {
-
-                          Navigator.pop(context);
-                          Navigator.pop(context, widget.doctor.id);
-                       
+                        Navigator.pop(context);
+                        Navigator.pop(context, widget.doctor.id);
                       },
                     ),
                   ),
@@ -318,5 +316,4 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       ),
     );
   }
-  //TODO: show upcoming appointments
 }

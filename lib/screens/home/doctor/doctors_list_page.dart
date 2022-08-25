@@ -8,7 +8,7 @@ import 'package:med_connect/models/experience.dart';
 import 'package:med_connect/models/review.dart';
 import 'package:med_connect/screens/home/doctor/doctor_card.dart';
 import 'package:med_connect/screens/home/doctor/doctor_details_screen.dart';
-import 'package:med_connect/screens/home/homepage/homepage.dart';
+import 'package:med_connect/screens/home/homepage/home_page.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
 import 'package:med_connect/screens/shared/header_text.dart';
 import 'package:med_connect/screens/shared/custom_icon_buttons.dart';

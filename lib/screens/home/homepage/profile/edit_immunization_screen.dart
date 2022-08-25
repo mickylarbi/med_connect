@@ -22,7 +22,6 @@ class _EditImmunizationScreenState extends State<EditImmunizationScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     if (widget.immunization != null) {

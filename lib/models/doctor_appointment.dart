@@ -44,18 +44,23 @@ class DoctorAppointment {
     dateTime = DateTime.fromMillisecondsSinceEpoch(
         (map['dateTime'] as Timestamp).millisecondsSinceEpoch);
 
-    symptoms =
-        (map['symptoms'] as List<dynamic>?)!.map((e) => e.toString()).toList();
+    symptoms = map['symptoms'] == null
+        ? null
+        : (map['symptoms'] as List<dynamic>?)!
+            .map((e) => e.toString())
+            .toList();
 
-    conditions = (map['conditions'] as List<dynamic>?)!
-        .map((e) => e.toString())
-        .toList();
+    conditions = map['conditions'] == null
+        ? null
+        : (map['conditions'] as List<dynamic>?)!
+            .map((e) => e.toString())
+            .toList();
 
     isConfirmed = map['isConfirmed'] as bool?;
 
     venueString = map['venueString'] as String?;
 
-    venueGeo = map['venueGeo'];
+    venueGeo = LatLng(map['venueGeo']['lat'], map['venueGeo']['lng']);
   }
 
   Map<String, dynamic> toMap() {
@@ -66,11 +71,11 @@ class DoctorAppointment {
       'patientName': kpatientName,
       'service': service,
       'dateTime': dateTime,
-      'symptoms': symptoms,
-      'conditions': conditions,
+      'symptoms': symptoms ?? [],
+      'conditions': conditions ?? [],
       'venueString': venueString,
-      'venueGeo': venueGeo,
-      'isConfirmed':false,
+      'venueGeo': {'lat': venueGeo!.latitude, 'lng': venueGeo!.longitude},
+      'isConfirmed': false,
     };
   }
 

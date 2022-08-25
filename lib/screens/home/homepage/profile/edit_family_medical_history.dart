@@ -24,7 +24,6 @@ class _EditFamilyMedicalHistoryScreenState
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     if (widget.entry != null) {

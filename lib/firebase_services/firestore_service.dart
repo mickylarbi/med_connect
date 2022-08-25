@@ -47,6 +47,9 @@ class FirestoreService {
 
   Query<Map<String, dynamic>> get appointmentsList => appointmentsCollection
       .where('patientId', isEqualTo: auth.currentUser!.uid);
+      
+       Query<Map<String, dynamic>> get myAppointments => appointmentsCollection
+      .where('patientId', isEqualTo: auth.currentUser!.uid);
 
   Future<DocumentReference<Map<String, dynamic>>> addAppointment(
           DoctorAppointment appointment) =>

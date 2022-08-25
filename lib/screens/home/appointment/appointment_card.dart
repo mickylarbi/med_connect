@@ -1,9 +1,148 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:med_connect/firebase_services/storage_service.dart';
 import 'package:med_connect/models/doctor_appointment.dart';
 import 'package:med_connect/screens/home/appointment/appointment_details_screen.dart';
 import 'package:med_connect/screens/shared/header_text.dart';
 import 'package:med_connect/utils/functions.dart';
+
+class DoctorAppointmentTodayCard extends StatelessWidget {
+  DoctorAppointmentTodayCard({
+    Key? key,
+    required this.appointment,
+  }) : super(key: key);
+
+  final DoctorAppointment appointment;
+
+  StorageService storage = StorageService();
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        navigate(
+          context,
+          AppointmentDetailsScreen(
+            appointment: appointment,
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        height: 200,
+        width: 200,
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.blueGrey.withOpacity(.1),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    height: 40,
+                    width: 40,
+                    alignment: Alignment.center,
+                    color: Colors.grey.withOpacity(.1),
+                    child: StatefulBuilder(builder: (context, setState) {
+                      return FutureBuilder<String>(
+                        future: storage
+                            .profileImageDownloadUrl(appointment.doctorId),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return GestureDetector(
+                              onTap: () async {
+                                setState(() {});
+                              },
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Text(
+                                    'Tap to reload',
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                                  Icon(
+                                    Icons.refresh,
+                                    color: Colors.grey,
+                                  )
+                                ],
+                              ),
+                            );
+                          }
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            return CachedNetworkImage(
+                              imageUrl: snapshot.data!,
+                              height: 40,
+                              width: 40,
+                              fit: BoxFit.cover,
+                              progressIndicatorBuilder:
+                                  (context, url, downloadProgress) =>
+                                      CircularProgressIndicator.adaptive(
+                                          value: downloadProgress.progress),
+                              errorWidget: (context, url, error) =>
+                                  const Center(child: Icon(Icons.person)),
+                            );
+                          }
+                          return const Center(
+                              child: CircularProgressIndicator.adaptive());
+                        },
+                      );
+                    }),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      color: Colors.blueGrey.withOpacity(.15)),
+                  child: Text(
+                    DateFormat.jm().format(appointment.dateTime!),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            Text(
+              appointment.doctorName!,
+              style: const TextStyle(fontSize: 18),
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  appointment.service!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey,
+                  ),
+                ),
+                const Spacer(),
+                if (appointment.isConfirmed != null && appointment.isConfirmed!)
+                  const CircleAvatar(
+                    backgroundColor: Colors.green,
+                    radius: 10,
+                    child: Icon(
+                      Icons.done,
+                      size: 10,
+                      color: Colors.white,
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class AppointmentCard extends StatelessWidget {
   final DoctorAppointment appointment;

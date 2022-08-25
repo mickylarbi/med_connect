@@ -24,7 +24,6 @@ class _EditMedicalHistoryScreenState extends State<EditMedicalHistoryScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     if (widget.medicalHistoryEntry != null) {

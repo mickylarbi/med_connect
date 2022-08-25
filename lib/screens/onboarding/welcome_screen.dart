@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
 import 'package:med_connect/firebase_services/auth_service.dart';
 import 'package:med_connect/screens/onboarding/patient_info_screen.dart';
 import 'package:med_connect/screens/shared/custom_buttons.dart';

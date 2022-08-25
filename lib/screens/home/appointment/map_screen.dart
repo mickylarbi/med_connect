@@ -35,7 +35,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     lifter.addListener(() {
       setState(() {});
     });
-  }
+  } //TODO: test on live device
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +46,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
             mapType: MapType.normal,
             myLocationEnabled: true,
             myLocationButtonEnabled: false,
+            zoomControlsEnabled: false,
             initialCameraPosition: CameraPosition(
               target: selectedPosition,
               zoom: 14.4746,

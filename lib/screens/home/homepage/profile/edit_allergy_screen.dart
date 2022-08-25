@@ -23,7 +23,6 @@ class _EditAllergyScreenState extends State<EditAllergyScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     if (widget.allergy != null) {
