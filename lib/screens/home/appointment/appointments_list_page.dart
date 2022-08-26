@@ -19,7 +19,7 @@ class AppointmentsListPage extends StatefulWidget {
 }
 
 class _AppointmentsListPageState extends State<AppointmentsListPage> {
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   AuthService auth = AuthService();
   FirestoreService db = FirestoreService();
@@ -38,7 +38,7 @@ class _AppointmentsListPageState extends State<AppointmentsListPage> {
             children: <Widget>[
               const SizedBox(height: 138),
               StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: db.appointmentsList.snapshots(),
+                stream: db.myAppointments.snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return const Center(
