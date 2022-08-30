@@ -14,7 +14,7 @@ class AuthService {
   User? get currentUser => instance.currentUser;
   String get uid => currentUser!.uid;
 
-  void signUp(BuildContext context,
+  signUp(BuildContext context,
       {required String email, required String password}) async {
     showLoadingDialog(context, message: 'Creating account...');
 
@@ -25,7 +25,7 @@ class AuthService {
         )
         .timeout(ktimeout)
         .then((value) {
-      authFuction(context);
+      authFunction(context);
     }).onError((error, stackTrace) {
       Navigator.pop(context);
 
@@ -51,7 +51,7 @@ class AuthService {
         .signInWithEmailAndPassword(email: email, password: password)
         .timeout(ktimeout)
         .then((value) {
-      authFuction(context);
+      authFunction(context);
     }).onError((error, stackTrace) {
       Navigator.pop(context);
 
@@ -68,18 +68,18 @@ class AuthService {
     });
   }
 
-  void signOut(BuildContext context) async {
+  signOut(BuildContext context) async {
     showLoadingDialog(context, message: 'Signing out...');
 
     instance.signOut().timeout(ktimeout).then((value) {
-      authFuction(context);
+      authFunction(context);
     }).onError((error, stackTrace) {
       Navigator.pop(context);
       showAlertDialog(context, message: 'Error signing out');
     });
   }
 
-  authFuction(BuildContext context) {
+  authFunction(BuildContext context) {
     if (currentUser != null) {
       db.patientDocument.get().timeout(ktimeout).then((value) {
         if (value.data() == null) {
@@ -88,8 +88,7 @@ class AuthService {
               MaterialPageRoute(builder: (context) => const WelcomeScreen()),
               (route) => false);
         } else {
-          kpatientName =
-              '${value.data()!['firstName']} ${value.data()!['surname']}';
+          kpatientName = '${value.data()!['firstName']}';
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => const TabView()),
@@ -127,7 +126,7 @@ class ErrorScreen extends StatelessWidget {
             TextButton(
               onPressed: () {
                 showLoadingDialog(context);
-                auth.authFuction(context);
+                auth.authFunction(context);
               },
               child: const Text('Retry'),
             ),

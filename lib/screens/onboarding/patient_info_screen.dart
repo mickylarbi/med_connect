@@ -159,7 +159,7 @@ class _PatientInfoScreenState extends State<PatientInfoScreen> {
                               .then((value) {
                             AuthService auth = AuthService();
 
-                            auth.authFuction(context);
+                            auth.authFunction(context);
                           }).onError((error, stackTrace) {
                             Navigator.pop(context);
                             showAlertDialog(context,

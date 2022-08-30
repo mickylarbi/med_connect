@@ -21,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
       opacity = 1;
       setState(() {});
       Future.delayed(const Duration(seconds: 4), () {
-        auth.authFuction(context);
+        auth.authFunction(context);
       });
     });
   }
