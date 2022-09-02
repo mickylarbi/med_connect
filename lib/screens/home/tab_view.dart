@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:med_connect/screens/home/appointment/appointments_list_page.dart';
-import 'package:med_connect/screens/home/chat/chats_list_page.dart';
 import 'package:med_connect/screens/home/doctor/doctors_list_page.dart';
 import 'package:med_connect/screens/home/homepage/home_page.dart';
 import 'package:med_connect/screens/home/more_page.dart';
+import 'package:med_connect/screens/home/pharmacy/checkout_screen.dart';
+import 'package:med_connect/screens/home/pharmacy/pharmacy_page.dart';
 import 'package:med_connect/utils/constants.dart';
 
 class TabView extends StatefulWidget {
@@ -28,7 +29,7 @@ class _TabViewState extends State<TabView> {
             children: [
               const HomePage(),
               const AppointmentsListPage(),
-              const ChatsListPage(),
+              const PharmacyPage(),
               MorePage()
             ]),
       ),
@@ -51,7 +52,7 @@ class _TabViewState extends State<TabView> {
                 // BottomNavigationBarItem(
                 //     icon: Icon(Icons.person_search), label: ''),
                 BottomNavigationBarItem(
-                    icon: Icon(Icons.chat_bubble_rounded), label: ''),
+                    icon: Icon(Icons.medical_information), label: ''),
                 BottomNavigationBarItem(
                     icon: Icon(Icons.person_add_alt), label: ''),
               ],
@@ -63,8 +64,10 @@ class _TabViewState extends State<TabView> {
   @override
   void dispose() {
     _pageController.dispose();
-
     _currentIndex.dispose();
+
+    cart.dispose();
+
     super.dispose();
   }
 }

@@ -291,64 +291,6 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
                     padding: const EdgeInsets.all(0),
                   ),
                 ),
-                if (doctor.phone != null)
-                  CustomFlatButton(
-                    backgroundColor: Colors.black87,
-                    child: const Text('Contact'),
-                    onPressed: () {
-                      showCustomBottomSheet(
-                        context,
-                        [
-                          ListTile(
-                            leading: const Icon(Icons.sms),
-                            title: const Text('Send an SMS'),
-                            onTap: () async {
-                              Navigator.pop(context);
-
-                              Uri smsUri = Uri(
-                                scheme: 'sms',
-                                path: doctor.phone!,
-                                queryParameters: <String, String>{
-                                  'body': Uri.encodeComponent(
-                                      'From MedConnect App\n'),
-                                },
-                              );
-
-                              try {
-                                if (await canLaunchUrl(smsUri)) {
-                                  await launchUrl(smsUri);
-                                } else {
-                                  showAlertDialog(context);
-                                }
-                              } catch (e) {
-                                showAlertDialog(context);
-                              }
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.call),
-                            title: const Text('Call phone'),
-                            onTap: () async {
-                              Navigator.pop(context);
-
-                              Uri phoneUri =
-                                  Uri(scheme: 'tel', path: doctor.phone!);
-
-                              try {
-                                if (await canLaunchUrl(phoneUri)) {
-                                  await launchUrl(phoneUri);
-                                } else {
-                                  showAlertDialog(context);
-                                }
-                              } catch (e) {
-                                showAlertDialog(context);
-                              }
-                            },
-                          )
-                        ],
-                      );
-                    },
-                  ),
                 const SizedBox(height: 14),
                 Align(
                   child: Center(

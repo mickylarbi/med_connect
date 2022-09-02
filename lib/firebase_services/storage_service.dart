@@ -18,4 +18,11 @@ class StorageService {
   UploadTask uploadProfileImage(XFile picture) => profilePicturesRef
       .child(_auth.currentUser!.uid)
       .putFile(File(picture.path));
+
+  // PHARMACY
+
+  Reference drugsImagesRef = FirebaseStorage.instance.ref('drugs/');
+
+  Future<String> drugImageDownloadUrl(String id) =>
+      drugsImagesRef.child(id).getDownloadURL();
 }

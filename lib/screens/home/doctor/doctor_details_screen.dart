@@ -19,7 +19,9 @@ import 'package:med_connect/screens/shared/custom_buttons.dart';
 import 'package:med_connect/screens/shared/header_text.dart';
 import 'package:med_connect/screens/shared/custom_icon_buttons.dart';
 import 'package:med_connect/utils/constants.dart';
+import 'package:med_connect/utils/dialogs.dart';
 import 'package:med_connect/utils/functions.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DoctorDetailsScreen extends StatefulWidget {
   final Doctor doctor;
@@ -148,6 +150,45 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                   ],
                 ),
 
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SolidIconButton(
+                        iconData: Icons.call,
+                        onPressed: () async {
+                          final Uri phoneUri = Uri(
+                            scheme: 'tel',
+                            path: widget.doctor.phone,
+                          );
+
+                          if (await canLaunchUrl(phoneUri)) {
+                            launchUrl(phoneUri);
+                          } else {
+                            showAlertDialog(context);
+                          }
+                        }),
+                    const SizedBox(width: 14),
+                    SolidIconButton(
+                        iconData: Icons.sms_rounded,
+                        onPressed: () async {
+                          final Uri smsUri = Uri(
+                            scheme: 'sms',
+                            path: widget.doctor.phone,
+                            queryParameters: <String, String>{
+                              'body': Uri.encodeComponent('From MedConnect\n'),
+                            },
+                          );
+
+                          if (await canLaunchUrl(smsUri)) {
+                            launchUrl(smsUri);
+                          } else {
+                            showAlertDialog(context);
+                          }
+                        })
+                  ],
+                ),
+
                 if (widget.doctor.bio != null && widget.doctor.bio!.isNotEmpty)
                   const SizedBox(height: 30),
 
@@ -155,10 +196,8 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                   const HeaderText(text: 'Bio'),
 
                 if (widget.doctor.bio != null && widget.doctor.bio!.isNotEmpty)
-                  const SizedBox(height: 2.5),
-
-                if (widget.doctor.bio != null && widget.doctor.bio!.isNotEmpty)
                   Text(widget.doctor.bio!),
+
                 const Divider(height: 50),
 
                 ///OTHER SPECIALTIES
@@ -207,7 +246,12 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                                   radius: 2,
                                 ),
                                 const SizedBox(width: 10),
-                                Text(e.toString()),
+                                Expanded(
+                                  child: Text(
+                                    e.toString(),
+                                    softWrap: true,
+                                  ),
+                                ),
                               ],
                             ),
                           ))
@@ -262,8 +306,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                     ],
                   ),
                 if (widget.doctor.reviews != null &&
-                    widget.doctor.reviews!
-                        .isNotEmpty) 
+                    widget.doctor.reviews!.isNotEmpty)
                   ReviewCard(
                     review: widget.doctor.reviews!
                         .where((element) =>

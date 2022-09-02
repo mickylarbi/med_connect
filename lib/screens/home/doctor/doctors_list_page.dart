@@ -12,7 +12,6 @@ import 'package:med_connect/screens/home/homepage/home_page.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
 import 'package:med_connect/screens/shared/header_text.dart';
 import 'package:med_connect/screens/shared/custom_icon_buttons.dart';
-import 'package:med_connect/utils/constants.dart';
 import 'package:med_connect/utils/functions.dart';
 
 class DoctorsListPage extends StatefulWidget {

@@ -2,12 +2,9 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:med_connect/firebase_services/auth_service.dart';
-import 'package:med_connect/models/doctor.dart';
 import 'package:med_connect/models/doctor_appointment.dart';
+import 'package:med_connect/models/order.dart';
 import 'package:med_connect/models/patient.dart';
-import 'package:med_connect/utils/dialogs.dart';
 
 class FirestoreService {
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -57,4 +54,24 @@ class FirestoreService {
 
   Future<void> deleteAppointment(String appointmentId) =>
       appointmentsCollection.doc(appointmentId).delete();
+
+  // PHARMACY
+
+  CollectionReference<Map<String, dynamic>> get drugsCollection =>
+      instance.collection('drugs');
+
+  DocumentReference<Map<String, dynamic>> drugDocument(String id) =>
+      drugsCollection.doc(id);
+
+  CollectionReference<Map<String, dynamic>> get orderCollection =>
+      instance.collection('orders');
+
+  DocumentReference<Map<String, dynamic>> orderDocument(String id) =>
+      orderCollection.doc(id);
+
+  Query<Map<String, dynamic>> get myOrders => orderCollection.where('patientId',
+      isEqualTo: FirebaseAuth.instance.currentUser!.uid);
+
+  Future<DocumentReference<Map<String, dynamic>>> addOrder(Order order) =>
+      orderCollection.add(order.toMap());
 }

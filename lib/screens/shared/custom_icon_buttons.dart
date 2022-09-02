@@ -27,10 +27,10 @@ class OutlineIconButton extends StatelessWidget {
   }
 }
 
-class SolidIconButton extends StatelessWidget {
+class ElevatedIconButton extends StatelessWidget {
   final IconData iconData;
   final void Function()? onPressed;
-  const SolidIconButton(
+  const ElevatedIconButton(
       {Key? key, required this.iconData, required this.onPressed})
       : super(key: key);
 
@@ -53,6 +53,37 @@ class SolidIconButton extends StatelessWidget {
         onTap: onPressed,
         child: Center(
           child: Icon(iconData, color: Colors.white),
+        ),
+      ),
+    );
+  }
+}
+
+class SolidIconButton extends StatelessWidget {
+  final IconData iconData;
+  final Color? color;
+  final void Function()? onPressed;
+  const SolidIconButton(
+      {Key? key,
+      required this.iconData,
+      required this.onPressed,
+      this.color = Colors.blueGrey})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 40,
+      width: 40,
+      decoration: BoxDecoration(
+        color: color!.withOpacity(.2),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onPressed,
+        child: Center(
+          child: Icon(iconData, color: color),
         ),
       ),
     );

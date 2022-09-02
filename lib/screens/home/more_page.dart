@@ -18,25 +18,25 @@ class MorePage extends StatelessWidget {
       body: Center(
         child: CustomFlatButton(
           onPressed: () {
-            Patient patient = Patient(
-              firstName: 'Erin',
-              surname: 'Jackson',
-              phone: '0244079774',
-              dateOfBirth: DateTime.now(),
-              gender: 'Male',
-              height: 120,
-              weight: 70,
-              bloodType: 'A+',
-            );
+            // Patient patient = Patient(
+            //   firstName: 'Erin',
+            //   surname: 'Jackson',
+            //   phone: '0244079774',
+            //   dateOfBirth: DateTime.now(),
+            //   gender: 'Male',
+            //   height: 120,
+            //   weight: 70,
+            //   bloodType: 'A+',
+            // );
 
-            showLoadingDialog(context);
-            db.patientDocument.set(patient.toFirestore()).then((value) {
-              Navigator.pop(context);
-              showAlertDialog(context, message: 'Success');
-            }).onError((error, stackTrace) {
-              Navigator.pop(context);
-              showAlertDialog(context, message: 'Failed\n${error.toString()}');
-            });
+            // showLoadingDialog(context);
+            // db.patientDocument.set(patient.toFirestore()).then((value) {
+            //   Navigator.pop(context);
+            //   showAlertDialog(context, message: 'Success');
+            // }).onError((error, stackTrace) {
+            //   Navigator.pop(context);
+            //   showAlertDialog(context, message: 'Failed\n${error.toString()}');
+            // });
           },
           child: const Text('upload'),
         ),
