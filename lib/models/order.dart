@@ -13,10 +13,12 @@ class Order {
   OrderStatus? status;
   bool? confirmDelivery;
   DateTime? dateTime;
+  List<String>? pharmacyIds;
 
   Order({
     this.id,
     this.cart,
+    this.pharmacyIds,
     this.locationString,
     this.locationGeo,
     this.totalPrice,
@@ -41,6 +43,7 @@ class Order {
   Map<String, dynamic> toMap() => {
         'patientId': FirebaseAuth.instance.currentUser!.uid,
         'cart': cart,
+        'pharmacyIds': pharmacyIds,
         'locationString': locationString,
         'locationGeo': GeoPoint(locationGeo!.latitude, locationGeo!.longitude),
         'totalPrice': totalPrice,
@@ -53,6 +56,7 @@ class Order {
   bool operator ==(other) =>
       other is Order &&
       cart == other.cart &&
+      pharmacyIds == other.pharmacyIds &&
       locationString == other.locationString &&
       locationGeo == other.locationGeo &&
       totalPrice == other.totalPrice &&
@@ -63,6 +67,7 @@ class Order {
   @override
   int get hashCode => hashValues(
         cart,
+        hashList(pharmacyIds),
         locationString,
         locationGeo,
         totalPrice,

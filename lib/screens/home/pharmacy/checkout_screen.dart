@@ -169,6 +169,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           Order newOrder = Order(
                             cart: cart.value
                                 .map((key, value) => MapEntry(key.id!, value)),
+                            pharmacyIds: cart.value.keys
+                                .map((e) => e.pharmacyId!)
+                                .toList(),
                             locationGeo: locationGeo,
                             locationString:
                                 locationStringController.text.trim(),
