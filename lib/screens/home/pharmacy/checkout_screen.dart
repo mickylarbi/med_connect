@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:med_connect/firebase_services/firestore_service.dart';
-import 'package:med_connect/models/drug.dart';
-import 'package:med_connect/models/order.dart';
+import 'package:med_connect/models/pharmacy/drug.dart';
+import 'package:med_connect/models/pharmacy/order.dart';
 import 'package:med_connect/screens/home/appointment/map_screen.dart';
+import 'package:med_connect/screens/home/pharmacy/drug_details_screen.dart';
 import 'package:med_connect/screens/home/pharmacy/orders_list_screen.dart';
 import 'package:med_connect/screens/home/pharmacy/pharmacy_page.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
@@ -54,12 +55,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               children: [
                                 IconButton(
                                   onPressed: () {
-                                    removeFromCart(
-                                        cart.value.keys.toList()[index]);
+                                    showConfirmationDialog(
+                                      context,
+                                      message: 'Remove from cart?',
+                                      confirmFunction: () {
+                                        deleteFromCart(
+                                            cart.value.keys.toList()[index]);
 
-                                    if (cart.value.isEmpty) {
-                                      Navigator.pop(context);
-                                    }
+                                        if (cart.value.isEmpty) {
+                                          Navigator.pop(context);
+                                        }
+                                      },
+                                    );
                                   },
                                   icon: const Icon(
                                     Icons.delete,
@@ -267,7 +274,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 }
 
-final ValueNotifier<Map<Drug, int>> cart = ValueNotifier<Map<Drug, int>>({});
+ValueNotifier<Map<Drug, int>> cart = ValueNotifier<Map<Drug, int>>({});
 
 addToCart(Drug drug) {
   Map<Drug, int> temp = cart.value;
@@ -317,66 +324,78 @@ class CheckoutCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      margin: const EdgeInsets.symmetric(horizontal: 36),
-      decoration: BoxDecoration(
-          color: Colors.blueGrey.withOpacity(.2),
-          borderRadius: BorderRadius.circular(20)),
-      child: Row(
-        children: [
-          DrugImageWidget(
-            drugId: entry.key.id!,
-            height: 100,
-            width: 100,
-          ),
-          const SizedBox(width: 14),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                entry.key.genericName!,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+    return GestureDetector(
+      onTap: () {
+        navigate(context, DrugDetailsScreen(drug: entry.key));
+      },
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        margin: const EdgeInsets.symmetric(horizontal: 36),
+        decoration: BoxDecoration(
+            color: Colors.blueGrey.withOpacity(.2),
+            borderRadius: BorderRadius.circular(20)),
+        child: Row(
+          children: [
+            DrugImageWidget(
+              drugId: entry.key.id!,
+              height: 100,
+              width: 100,
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    entry.key.genericName!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    entry.key.brandName!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    'GH¢ ${entry.key.price!.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  ValueListenableBuilder<Map<Drug, int>>(
+                      valueListenable: cart,
+                      builder: (context, value, child) {
+                        return Row(
+                          children: [
+                            IconButton(
+                              onPressed: value[entry.key] == 1
+                                  ? null
+                                  : () {
+                                      removeFromCart(entry.key);
+                                    },
+                              icon: const Icon(Icons.remove_circle),
+                            ),
+                            Text(value[entry.key].toString()),
+                            IconButton(
+                              onPressed: value[entry.key]! >=
+                                      entry.key.quantityInStock!
+                                  ? null
+                                  : () {
+                                      addToCart(entry.key);
+                                    },
+                              icon: const Icon(Icons.add_circle),
+                            )
+                          ],
+                        );
+                      })
+                ],
               ),
-              const SizedBox(height: 5),
-              Text(
-                entry.key.brandName!,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 5),
-              Text(
-                'GH¢ ${entry.key.price!.toStringAsFixed(2)}',
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              ValueListenableBuilder<Map<Drug, int>>(
-                  valueListenable: cart,
-                  builder: (context, value, child) {
-                    return Row(
-                      children: [
-                        IconButton(
-                          onPressed: value[entry.key] == 1
-                              ? null
-                              : () {
-                                  removeFromCart(entry.key);
-                                },
-                          icon: const Icon(Icons.remove_circle),
-                        ),
-                        Text(value[entry.key].toString()),
-                        IconButton(
-                          onPressed: () {
-                            addToCart(entry.key);
-                          },
-                          icon: const Icon(Icons.add_circle),
-                        )
-                      ],
-                    );
-                  })
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

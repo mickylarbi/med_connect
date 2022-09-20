@@ -1,11 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:intl/intl.dart';
 import 'package:med_connect/firebase_services/firestore_service.dart';
-import 'package:med_connect/models/drug.dart';
-import 'package:med_connect/models/order.dart';
+import 'package:med_connect/models/pharmacy/drug.dart';
+import 'package:med_connect/models/pharmacy/order.dart';
 import 'package:med_connect/screens/home/pharmacy/drug_details_screen.dart';
 import 'package:med_connect/screens/home/pharmacy/pharmacy_page.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';

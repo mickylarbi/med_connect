@@ -2,10 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:med_connect/firebase_services/firestore_service.dart';
-import 'package:med_connect/models/order.dart';
+import 'package:med_connect/models/pharmacy/order.dart';
 import 'package:med_connect/screens/home/pharmacy/order_details_screen.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
-import 'package:med_connect/screens/shared/custom_icon_buttons.dart';
 import 'package:med_connect/utils/functions.dart';
 
 class OrderHistoryScreen extends StatelessWidget {
@@ -37,6 +36,11 @@ class OrderHistoryScreen extends StatelessWidget {
                           element.status == OrderStatus.canceled ||
                           element.status == OrderStatus.delivered)
                       .toList();
+
+                  ordersList.sort(
+                    (a, b) => '${a.dateTime}${a.status}'
+                        .compareTo('${b.dateTime}${b.status}'),
+                  );
 
                   return ListView.separated(
                     padding: const EdgeInsets.fromLTRB(36, 100, 36, 50),
@@ -83,9 +87,8 @@ class OrderHistoryScreen extends StatelessWidget {
                         const SizedBox(height: 20),
                   );
                 }),
-         const   CustomAppBar(
+            const CustomAppBar(
               title: 'History',
-             
             )
           ],
         ),

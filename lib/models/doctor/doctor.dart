@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:med_connect/models/experience.dart';
+import 'package:med_connect/models/patient/experience.dart';
 import 'package:med_connect/models/review.dart';
 import 'package:flutter/material.dart';
 

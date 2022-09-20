@@ -2,18 +2,18 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:med_connect/firebase_services/storage_service.dart';
-import 'package:med_connect/models/doctor_appointment.dart';
+import 'package:med_connect/models/doctor/appointment.dart';
 import 'package:med_connect/screens/home/appointment/appointment_details_screen.dart';
 import 'package:med_connect/screens/shared/header_text.dart';
 import 'package:med_connect/utils/functions.dart';
 
-class DoctorAppointmentTodayCard extends StatelessWidget {
-  DoctorAppointmentTodayCard({
+class AppointmentTodayCard extends StatelessWidget {
+  AppointmentTodayCard({
     Key? key,
     required this.appointment,
   }) : super(key: key);
 
-  final DoctorAppointment appointment;
+  final Appointment appointment;
 
   StorageService storage = StorageService();
 
@@ -106,6 +106,7 @@ class DoctorAppointmentTodayCard extends StatelessWidget {
                   child: Text(
                     DateFormat.jm().format(appointment.dateTime!),
                     style: const TextStyle(fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -113,6 +114,7 @@ class DoctorAppointmentTodayCard extends StatelessWidget {
             Text(
               appointment.doctorName!,
               style: const TextStyle(fontSize: 18),
+              overflow: TextOverflow.ellipsis,
             ),
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -123,6 +125,7 @@ class DoctorAppointmentTodayCard extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color: Colors.grey,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const Spacer(),
                 if (appointment.isConfirmed != null && appointment.isConfirmed!)
@@ -145,7 +148,7 @@ class DoctorAppointmentTodayCard extends StatelessWidget {
 }
 
 class AppointmentCard extends StatelessWidget {
-  final DoctorAppointment appointment;
+  final Appointment appointment;
   final EdgeInsetsGeometry padding;
   const AppointmentCard(
       {Key? key,
@@ -178,29 +181,39 @@ class AppointmentCard extends StatelessWidget {
                       DateFormat.d().format(appointment.dateTime!),
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 24),
+                      overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       DateFormat.MMM().format(appointment.dateTime!),
                       style: const TextStyle(fontWeight: FontWeight.bold),
-                    )
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ],
                 ),
               ),
               const SizedBox(width: 30),
-              Container(
-                height: 130,
-                padding: const EdgeInsets.symmetric(vertical: 30),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    HeaderText(text: appointment.service!),
-                    Text(appointment.doctorName!),
-                    Text(appointment.venueString!)
-                  ],
+              Expanded(
+                child: Container(
+                  height: 130,
+                  padding: const EdgeInsets.symmetric(vertical: 30),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      HeaderText(text: appointment.service!),
+                      Text(
+                        appointment.doctorName!,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        appointment.venueString!,
+                        overflow: TextOverflow.ellipsis,
+                      )
+                    ],
+                  ),
                 ),
               ),
-              const Spacer(),
+              const SizedBox(width: 20),
               Icon(
                 Icons.chevron_right_rounded,
                 color: Colors.grey.withOpacity(.5),

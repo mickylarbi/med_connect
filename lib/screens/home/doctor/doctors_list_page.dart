@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:med_connect/firebase_services/firestore_service.dart';
-import 'package:med_connect/models/doctor.dart';
-import 'package:med_connect/models/experience.dart';
+import 'package:med_connect/models/doctor/doctor.dart';
+import 'package:med_connect/models/patient/experience.dart';
 import 'package:med_connect/models/review.dart';
 import 'package:med_connect/screens/home/doctor/doctor_card.dart';
 import 'package:med_connect/screens/home/doctor/doctor_details_screen.dart';
@@ -103,6 +103,13 @@ class _DoctorsListViewState extends State<DoctorsListView> {
             );
           }
           if (snapshot.connectionState == ConnectionState.done) {
+            List<Doctor> doctorsList = snapshot.data!.docs
+                .map((e) => Doctor.fromFireStore(e.data(), e.id))
+                .toList();
+
+            doctorsList.sort((a, b) => '${a.firstName!}${a.surname!}'
+                .compareTo('${b.firstName!}${b.surname!}'));
+
             return ListView.separated(
               shrinkWrap: true,
               primary: false,
@@ -112,23 +119,18 @@ class _DoctorsListViewState extends State<DoctorsListView> {
                   navigate(
                     context,
                     DoctorDetailsScreen(
-                      doctor: Doctor.fromFireStore(
-                          snapshot.data!.docs[index].data(),
-                          snapshot.data!.docs[index].id),
+                      doctor: doctorsList[index],
                     ),
                   );
                 },
-                child: DoctorCard(
-                    doctor: Doctor.fromFireStore(
-                        snapshot.data!.docs[index].data(),
-                        snapshot.data!.docs[index].id)),
+                child: DoctorCard(doctor: doctorsList[index]),
               ),
               separatorBuilder: (context, index) => const Divider(
                 indent: 176,
                 endIndent: 36,
                 height: 50,
               ),
-              itemCount: snapshot.data!.docs.length,
+              itemCount: doctorsList.length,
             );
           }
           return const Center(child: CircularProgressIndicator.adaptive());

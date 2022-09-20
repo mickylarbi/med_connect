@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:med_connect/firebase_services/firestore_service.dart';
-import 'package:med_connect/models/order.dart';
+import 'package:med_connect/models/pharmacy/order.dart';
 import 'package:med_connect/screens/home/pharmacy/order_details_screen.dart';
 import 'package:med_connect/screens/home/pharmacy/order_history_screen.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
@@ -38,6 +38,11 @@ class OrdersListScreen extends StatelessWidget {
                           element.status == OrderStatus.pending ||
                           element.status == OrderStatus.enroute)
                       .toList();
+
+                  ordersList.sort(
+                    (a, b) => '${a.dateTime}${a.status}'
+                        .compareTo('${b.dateTime}${b.status}'),
+                  );
 
                   return ListView.separated(
                     padding: const EdgeInsets.fromLTRB(36, 100, 36, 50),

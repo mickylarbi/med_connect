@@ -3,10 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:med_connect/firebase_services/firestore_service.dart';
 import 'package:med_connect/firebase_services/storage_service.dart';
-import 'package:med_connect/models/drug.dart';
+import 'package:med_connect/models/pharmacy/drug.dart';
 import 'package:med_connect/screens/home/pharmacy/checkout_screen.dart';
 import 'package:med_connect/screens/home/pharmacy/drug_details_screen.dart';
-import 'package:med_connect/screens/home/pharmacy/order_details_screen.dart';
 import 'package:med_connect/screens/home/pharmacy/orders_list_screen.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
 import 'package:med_connect/screens/shared/custom_icon_buttons.dart';
@@ -80,7 +79,14 @@ class _PharmacyPageState extends State<PharmacyPage> {
                   },
                   itemBuilder: (BuildContext context, int index) {
                     List<Drug> categoryList = categories[groups[index]]!;
-//TODO; sort by brand name then generic name
+
+                    categoryList.sort(
+                      (a, b) =>
+                          "${a.brandName}${a.genericName}${a.price}${a.quantityInStock}"
+                              .compareTo(
+                                  "${b.brandName}${b.genericName}${b.price}${b.quantityInStock}"),
+                    );
+
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -160,7 +166,7 @@ class _PharmacyPageState extends State<PharmacyPage> {
             OutlineIconButton(
               iconData: Icons.view_list_rounded,
               onPressed: () {
-                navigate(context,  OrdersListScreen());
+                navigate(context, OrdersListScreen());
               },
             ),
           ],
@@ -178,7 +184,12 @@ class DrugCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        navigate(context, DrugDetailsScreen(drug: drug,showButton: true,));
+        navigate(
+            context,
+            DrugDetailsScreen(
+              drug: drug,
+              showButton: true,
+            ));
       },
       child: Container(
         padding: const EdgeInsets.all(24),
@@ -219,23 +230,23 @@ class DrugCard extends StatelessWidget {
                 builder: (context, value, child) {
                   return Align(
                     alignment: Alignment.centerRight,
-                    child: SolidIconButton(
-                      iconData: value.keys.contains(drug)
-                          ? Icons.delete_rounded
-                          : Icons.add_shopping_cart_rounded,
-                      color: value.keys.contains(drug)
-                          ? Colors.orange
-                          : Colors.green,
-                      onPressed: () {
-                        if (drug.inStock!) {
-                          if (value.keys.contains(drug)) {
-                            deleteFromCart(drug);
-                          } else {
-                            addToCart(drug);
-                          }
-                        }
-                      },
-                    ),
+                    child: drug.quantityInStock == 0
+                        ? const Text('Out of stock')
+                        : SolidIconButton(
+                            iconData: value.keys.contains(drug)
+                                ? Icons.delete_rounded
+                                : Icons.add_shopping_cart_rounded,
+                            color: value.keys.contains(drug)
+                                ? Colors.orange
+                                : Colors.green,
+                            onPressed: () {
+                              if (value.keys.contains(drug)) {
+                                deleteFromCart(drug);
+                              } else {
+                                addToCart(drug);
+                              }
+                            },
+                          ),
                   );
                 }),
           ],

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:med_connect/models/family_medical_history_entry.dart';
+import 'package:med_connect/models/patient/family_medical_history_entry.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
 import 'package:med_connect/screens/shared/custom_buttons.dart';
 import 'package:med_connect/screens/shared/custom_icon_buttons.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:med_connect/firebase_services/auth_service.dart';
 import 'package:med_connect/firebase_services/firestore_service.dart';
-import 'package:med_connect/models/patient.dart';
+import 'package:med_connect/models/patient/patient.dart';
 import 'package:med_connect/sandbox.dart';
 import 'package:med_connect/screens/shared/custom_buttons.dart';
 import 'package:med_connect/utils/dialogs.dart';

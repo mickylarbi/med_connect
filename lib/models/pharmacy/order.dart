@@ -6,14 +6,15 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Order {
   String? id;
+  String? patientId;
   Map<String, dynamic>? cart;
+  List<String>? pharmacyIds;
   String? locationString;
   LatLng? locationGeo;
   double? totalPrice;
   OrderStatus? status;
   bool? confirmDelivery;
   DateTime? dateTime;
-  List<String>? pharmacyIds;
 
   Order({
     this.id,

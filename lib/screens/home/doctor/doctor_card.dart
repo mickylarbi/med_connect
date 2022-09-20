@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:med_connect/firebase_services/storage_service.dart';
-import 'package:med_connect/models/doctor.dart';
+import 'package:med_connect/models/doctor/doctor.dart';
 import 'package:med_connect/utils/functions.dart';
 
 class DoctorCard extends StatelessWidget {
@@ -79,51 +79,56 @@ class DoctorCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 30),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                doctor.name,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(
-                doctor.mainSpecialty!,
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold, color: Colors.grey),
-              ),
-              Text(
-                doctor.currentLocation!.location!,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold, color: Colors.grey),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const Icon(
-                        Icons.star,
-                        color: Color.fromARGB(80, 252, 228, 6),
-                      ),
-                      Text(calculateRating(doctor.reviews).toStringAsFixed(2)),
-                    ],
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    doctor.reviews == null
-                        ? 'No reviews yet'
-                        : '(${doctor.reviews!.length} reviews)',
-                    style: const TextStyle(color: Colors.grey),
-                  )
-                ],
-              ),
-            ],
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  doctor.name,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  doctor.mainSpecialty!,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.grey),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  doctor.currentLocation!.location!,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.grey),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.star,
+                          color: Color.fromARGB(80, 252, 228, 6),
+                        ),
+                        Text(
+                            calculateRating(doctor.reviews).toStringAsFixed(2)),
+                      ],
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      doctor.reviews == null
+                          ? 'No reviews yet'
+                          : '(${doctor.reviews!.length} reviews)',
+                      style: const TextStyle(color: Colors.grey),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          if (showChevronRight) const Spacer(),
+          if (showChevronRight) const SizedBox(height: 20),
           if (showChevronRight)
             Icon(
               Icons.chevron_right_rounded,

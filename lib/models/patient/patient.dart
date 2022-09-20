@@ -1,10 +1,10 @@
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:med_connect/models/allergy.dart';
-import 'package:med_connect/models/family_medical_history_entry.dart';
-import 'package:med_connect/models/immunization.dart';
-import 'package:med_connect/models/medical_history_entry.dart';
+import 'package:med_connect/models/patient/allergy.dart';
+import 'package:med_connect/models/patient/family_medical_history_entry.dart';
+import 'package:med_connect/models/patient/immunization.dart';
+import 'package:med_connect/models/patient/medical_history_entry.dart';
 import 'package:med_connect/models/surgery.dart';
 
 class Patient {

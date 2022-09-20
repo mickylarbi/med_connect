@@ -4,8 +4,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:med_connect/firebase_services/auth_service.dart';
 import 'package:med_connect/firebase_services/firestore_service.dart';
-import 'package:med_connect/models/doctor.dart';
-import 'package:med_connect/models/doctor_appointment.dart';
+import 'package:med_connect/models/doctor/doctor.dart';
+import 'package:med_connect/models/doctor/appointment.dart';
 import 'package:med_connect/screens/home/appointment/choose_doctor_screen.dart';
 import 'package:med_connect/screens/home/appointment/map_screen.dart';
 import 'package:med_connect/screens/home/doctor/doctor_card.dart';
@@ -20,7 +20,7 @@ import 'package:med_connect/utils/functions.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AppointmentDetailsScreen extends StatelessWidget {
-  final DoctorAppointment appointment;
+  final Appointment appointment;
   AppointmentDetailsScreen({Key? key, required this.appointment})
       : super(key: key);
 
@@ -111,13 +111,13 @@ class AppointmentDetailsScreen extends StatelessWidget {
                           [
                             ListTile(
                               leading: const Icon(Icons.delete),
-                              title: const Text('Delete appointment'),
+                              title: const Text('Cancel appointment'),
                               onTap: () {
                                 Navigator.pop(context);
                                 showConfirmationDialog(
                                   context,
                                   message:
-                                      'Delete appointment\nThis cannot be undone',
+                                      'Cancel appointment?\nThis cannot be undone',
                                   confirmFunction: () {
                                     showLoadingDialog(context);
                                     db
@@ -130,7 +130,7 @@ class AppointmentDetailsScreen extends StatelessWidget {
                                       Navigator.pop(context);
                                       showAlertDialog(context,
                                           message:
-                                              'Error deleting appointment');
+                                              'Error canceling appointment');
                                     });
                                   },
                                 );
@@ -152,7 +152,7 @@ class AppointmentDetailsScreen extends StatelessWidget {
 
 class AppointmentsDetailsWidget extends StatefulWidget {
   final String? doctorIdNotifier;
-  final DoctorAppointment appointment;
+  final Appointment appointment;
 
   const AppointmentsDetailsWidget({
     Key? key,
@@ -576,7 +576,7 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
                         confirmFunction: () {
                           if (widget.appointment.id == null) {
                             db
-                                .addAppointment(DoctorAppointment(
+                                .addAppointment(Appointment(
                                     doctorId: doctorId,
                                     doctorName: doctor.name,
                                     dateTime: dateTime,
@@ -596,7 +596,7 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
                             });
                           } else {
                             db
-                                .updateAppointment(DoctorAppointment(
+                                .updateAppointment(Appointment(
                                     id: widget.appointment.id,
                                     doctorId: doctorId,
                                     doctorName: doctor.name,

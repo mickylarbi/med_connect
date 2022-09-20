@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:med_connect/firebase_services/auth_service.dart';
 import 'package:med_connect/firebase_services/firestore_service.dart';
-import 'package:med_connect/models/doctor_appointment.dart';
+import 'package:med_connect/models/doctor/appointment.dart';
 import 'package:med_connect/screens/home/appointment/appointment_card.dart';
 import 'package:med_connect/screens/home/appointment/appointment_details_screen.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
@@ -52,11 +52,15 @@ class _AppointmentsListPageState extends State<AppointmentsListPage> {
                     );
                   }
 
-                  List<DoctorAppointment> appointmentsList = snapshot.data!.docs
+                  List<Appointment> appointmentsList = snapshot.data!.docs
                       .map(
-                        (e) => DoctorAppointment.fromFirestore(e.data(), e.id),
+                        (e) => Appointment.fromFirestore(e.data(), e.id),
                       )
                       .toList();
+
+                  appointmentsList.sort((a, b) =>
+                      a.dateTime!.millisecondsSinceEpoch.toString().compareTo(
+                          b.dateTime!.millisecondsSinceEpoch.toString()));
 
                   return ListView.separated(
                     shrinkWrap: true,
@@ -84,12 +88,7 @@ class _AppointmentsListPageState extends State<AppointmentsListPage> {
           context,
           _scrollController,
           'Appointments',
-          [
-            OutlineIconButton(
-              iconData: Icons.filter_alt,
-              onPressed: () {},
-            ),
-          ],
+          [],
         ),
         Align(
           alignment: Alignment.bottomRight,
@@ -98,7 +97,7 @@ class _AppointmentsListPageState extends State<AppointmentsListPage> {
             child: FloatingActionButton(
               onPressed: () {
                 navigate(context,
-                    AppointmentDetailsScreen(appointment: DoctorAppointment()));
+                    AppointmentDetailsScreen(appointment: Appointment()));
               },
               child: const Icon(Icons.add),
             ),

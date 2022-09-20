@@ -1,11 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:med_connect/models/drug.dart';
+import 'package:med_connect/models/pharmacy/drug.dart';
 import 'package:med_connect/screens/home/pharmacy/checkout_screen.dart';
 import 'package:med_connect/screens/home/pharmacy/pharmacy_page.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
-import 'package:med_connect/screens/shared/custom_icon_buttons.dart';
 
 class DrugDetailsScreen extends StatelessWidget {
   final Drug drug;
@@ -59,34 +56,34 @@ class DrugDetailsScreen extends StatelessWidget {
                             ? Colors.orange
                             : Colors.green;
 
-                        return TextButton.icon(
-                          onPressed: () {
-                            if (drug.inStock!) {
-                              if (value.keys.contains(drug)) {
-                                deleteFromCart(drug);
-                              } else {
-                                addToCart(drug);
-                              }
-                            }
-                          },
-                          icon: Icon(
-                            value.keys.contains(drug)
-                                ? Icons.delete
-                                : Icons.add_shopping_cart,
-                            color: color,
-                          ),
-                          label: Text(
-                            value.keys.contains(drug)
-                                ? 'Remove from cart'
-                                : 'Add to cart',
-                            style: TextStyle(color: color),
-                          ),
-                          style: TextButton.styleFrom(
-                            backgroundColor: color.withOpacity(.2),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14)),
-                          ),
-                        );
+                        return drug.quantityInStock == 0
+                            ? const Text('Out of stock')
+                            : TextButton.icon(
+                                onPressed: () {
+                                  if (value.keys.contains(drug)) {
+                                    deleteFromCart(drug);
+                                  } else {
+                                    addToCart(drug);
+                                  }
+                                },
+                                icon: Icon(
+                                  value.keys.contains(drug)
+                                      ? Icons.delete
+                                      : Icons.add_shopping_cart,
+                                  color: color,
+                                ),
+                                label: Text(
+                                  value.keys.contains(drug)
+                                      ? 'Remove from cart'
+                                      : 'Add to cart',
+                                  style: TextStyle(color: color),
+                                ),
+                                style: TextButton.styleFrom(
+                                  backgroundColor: color.withOpacity(.2),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14)),
+                                ),
+                              );
                       }),
               ],
             ),

@@ -9,7 +9,7 @@ class Drug {
   String? genericName;
   String? brandName;
   double? price;
-  bool? inStock;
+  int? quantityInStock;
   String? otherDetails;
 
   Drug({
@@ -19,17 +19,18 @@ class Drug {
     this.genericName,
     this.brandName,
     this.price,
-    this.inStock,
+    this.quantityInStock,
     this.otherDetails,
   });
 
   Drug.fromFirestore(Map<String, dynamic> map, String dId) {
     id = dId;
+    pharmacyId = map['pharmacyId'];
     group = map['group'];
     genericName = map['genericName'];
     brandName = map['brandName'];
     price = map['price'].toDouble();
-    inStock = map['qtyInStock'] ?? true;
+    quantityInStock = map['quantityInStock'].toInt();
     otherDetails = map['otherDetails'];
   }
 
@@ -49,7 +50,7 @@ class Drug {
       genericName == other.genericName &&
       brandName == other.brandName &&
       price == other.price &&
-      inStock == other.inStock &&
+      quantityInStock == other.quantityInStock &&
       otherDetails == other.otherDetails;
 
   @override
@@ -58,7 +59,7 @@ class Drug {
         genericName,
         brandName,
         price,
-        inStock,
+        quantityInStock,
         otherDetails,
       );
 }

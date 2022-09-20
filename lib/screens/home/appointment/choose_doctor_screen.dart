@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:med_connect/firebase_services/firestore_service.dart';
-import 'package:med_connect/models/doctor.dart';
+import 'package:med_connect/models/doctor/doctor.dart';
 import 'package:med_connect/screens/home/doctor/doctor_card.dart';
 import 'package:med_connect/screens/home/doctor/doctor_details_screen.dart';
 import 'package:med_connect/screens/home/doctor/doctors_list_page.dart';
@@ -32,7 +32,11 @@ class _ChooseDoctorScreenState extends State<ChooseDoctorScreen> {
             title: 'Choose doctor',
             actions: [
               OutlineIconButton(
-                  iconData: Icons.filter_list_alt, onPressed: () {})
+                iconData: Icons.search,
+                onPressed: () {
+                  //TODO:
+                },
+              )
             ],
           ),
         ],

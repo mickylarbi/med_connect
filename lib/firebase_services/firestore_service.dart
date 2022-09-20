@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:med_connect/models/doctor_appointment.dart';
-import 'package:med_connect/models/order.dart';
-import 'package:med_connect/models/patient.dart';
+import 'package:med_connect/models/doctor/appointment.dart';
+import 'package:med_connect/models/pharmacy/order.dart';
+import 'package:med_connect/models/patient/patient.dart';
 
 class FirestoreService {
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -46,10 +46,10 @@ class FirestoreService {
       .where('patientId', isEqualTo: auth.currentUser!.uid);
 
   Future<DocumentReference<Map<String, dynamic>>> addAppointment(
-          DoctorAppointment appointment) =>
+          Appointment appointment) =>
       appointmentsCollection.add(appointment.toMap());
 
-  Future<void> updateAppointment(DoctorAppointment appointment) =>
+  Future<void> updateAppointment(Appointment appointment) =>
       appointmentsCollection.doc(appointment.id).update(appointment.toMap());
 
   Future<void> deleteAppointment(String appointmentId) =>

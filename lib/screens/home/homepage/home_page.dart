@@ -1,13 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:med_connect/firebase_services/auth_service.dart';
 import 'package:med_connect/firebase_services/firestore_service.dart';
 import 'package:med_connect/firebase_services/storage_service.dart';
-import 'package:med_connect/models/doctor_appointment.dart';
-import 'package:med_connect/models/patient.dart';
+import 'package:med_connect/models/doctor/appointment.dart';
+import 'package:med_connect/models/pharmacy/order.dart';
+import 'package:med_connect/models/patient/patient.dart';
 import 'package:med_connect/screens/home/appointment/appointment_card.dart';
 import 'package:med_connect/screens/home/homepage/profile/patient_profile.screen.dart';
+import 'package:med_connect/screens/home/pharmacy/order_details_screen.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
 import 'package:med_connect/screens/shared/header_text.dart';
 import 'package:med_connect/utils/dialogs.dart';
@@ -80,10 +83,9 @@ class _HomePageState extends State<HomePage> {
                           );
                         }
 
-                        List<DoctorAppointment> appointmentsList = snapshot
-                            .data!.docs
+                        List<Appointment> appointmentsList = snapshot.data!.docs
                             .map((e) =>
-                                DoctorAppointment.fromFirestore(e.data(), e.id))
+                                Appointment.fromFirestore(e.data(), e.id))
                             .toList()
                             .where((element) =>
                                 element.dateTime!.year == DateTime.now().year &&
@@ -91,6 +93,13 @@ class _HomePageState extends State<HomePage> {
                                     DateTime.now().month &&
                                 element.dateTime!.day == DateTime.now().day)
                             .toList();
+
+                        appointmentsList.sort((a, b) => a
+                            .dateTime!.millisecondsSinceEpoch
+                            .toString()
+                            .compareTo(
+                                b.dateTime!.millisecondsSinceEpoch.toString()));
+
                         return appointmentsList.isEmpty
                             ? const Center(
                                 child:
@@ -107,10 +116,10 @@ class _HomePageState extends State<HomePage> {
                                   return const SizedBox(width: 24);
                                 },
                                 itemBuilder: (BuildContext context, int index) {
-                                  DoctorAppointment appointment =
+                                  Appointment appointment =
                                       appointmentsList[index];
 
-                                  return DoctorAppointmentTodayCard(
+                                  return AppointmentTodayCard(
                                       appointment: appointment);
                                 },
                               );
@@ -118,6 +127,119 @@ class _HomePageState extends State<HomePage> {
                 }),
               ),
               const SizedBox(height: 50),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(36, 36, 36, 24),
+                child: Text(
+                  'Enroute medications',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              StatefulBuilder(builder: (context, setState) {
+                return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                    stream: db.myOrders
+                        .where('status', isEqualTo: OrderStatus.enroute.index)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text('Something went wrong'),
+                              IconButton(
+                                  onPressed: () {
+                                    setState(
+                                      () {},
+                                    );
+                                  },
+                                  icon: const Icon(Icons.refresh))
+                            ],
+                          ),
+                        );
+                      }
+
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator.adaptive(),
+                        );
+                      }
+
+                      List<Order> ordersList = snapshot.data!.docs
+                          .map((e) => Order.fromFirestore(e.data(), e.id))
+                          .toList();
+
+                      ordersList.sort((a, b) => a
+                          .dateTime!.millisecondsSinceEpoch
+                          .toString()
+                          .compareTo(
+                              b.dateTime!.millisecondsSinceEpoch.toString()));
+
+                      return ordersList.isEmpty
+                          ? const Center(
+                              child: Text('No pending orders'),
+                            )
+                          : ListView.separated(
+                              shrinkWrap: true,
+                              primary: false,
+                              physics: const NeverScrollableScrollPhysics(),
+                              clipBehavior: Clip.none,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 36),
+                              itemCount: ordersList.length,
+                              separatorBuilder:
+                                  (BuildContext context, int index) {
+                                return const SizedBox(height: 20);
+                              },
+                              itemBuilder: (BuildContext context, int index) =>
+                                  GestureDetector(
+                                onTap: () {
+                                  navigate(
+                                      context,
+                                      OrderDetailsScreen(
+                                        order: ordersList[index],
+                                      ));
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(24),
+                                  decoration: BoxDecoration(
+                                      color: Colors.blueGrey.withOpacity(.2),
+                                      borderRadius: BorderRadius.circular(20)),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(ordersList[index].id!),
+                                          Text(
+                                              '${DateFormat.yMMMMd().format(ordersList[index].dateTime!)} at ${DateFormat.jm().format(ordersList[index].dateTime!)}'),
+                                        ],
+                                      ),
+                                      CircleAvatar(
+                                        backgroundColor: orderStatusColor(
+                                            ordersList[index].status!),
+                                        radius: 14,
+                                        child: Icon(
+                                          orderStatusIconData(
+                                              ordersList[index].status!),
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                    });
+              }),
             ],
           ),
         ),

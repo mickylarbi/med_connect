@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:med_connect/models/pharmacy/drug.dart';
 import 'package:med_connect/screens/home/appointment/appointments_list_page.dart';
 import 'package:med_connect/screens/home/doctor/doctors_list_page.dart';
 import 'package:med_connect/screens/home/homepage/home_page.dart';
@@ -19,6 +20,14 @@ class _TabViewState extends State<TabView> {
   final PageController _pageController = PageController();
 
   @override
+  void initState() {
+    super.initState();
+    cart = ValueNotifier<Map<Drug, int>>({});
+    
+  }
+
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       // backgroundColor: kBackgroundColor,
@@ -26,11 +35,10 @@ class _TabViewState extends State<TabView> {
         child: PageView(
             controller: _pageController,
             physics: const NeverScrollableScrollPhysics(),
-            children: [
-              const HomePage(),
-              const AppointmentsListPage(),
-              const PharmacyPage(),
-              MorePage()
+            children: const [
+              HomePage(),
+              AppointmentsListPage(),
+              PharmacyPage(),
             ]),
       ),
       bottomNavigationBar: ValueListenableBuilder<int>(
@@ -49,12 +57,8 @@ class _TabViewState extends State<TabView> {
                 BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
                 BottomNavigationBarItem(
                     icon: Icon(Icons.calendar_month), label: ''),
-                // BottomNavigationBarItem(
-                //     icon: Icon(Icons.person_search), label: ''),
                 BottomNavigationBarItem(
                     icon: Icon(Icons.medical_information), label: ''),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.person_add_alt), label: ''),
               ],
             );
           }),

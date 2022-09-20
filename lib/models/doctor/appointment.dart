@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:med_connect/utils/constants.dart';
 
-class DoctorAppointment {
+class Appointment {
   String? id;
   String? doctorId;
   String? doctorName;
@@ -18,7 +18,7 @@ class DoctorAppointment {
   String? venueString;
   LatLng? venueGeo;
 
-  DoctorAppointment({
+  Appointment({
     this.id,
     this.doctorId,
     this.doctorName,
@@ -33,7 +33,7 @@ class DoctorAppointment {
     this.venueGeo,
   });
 
-  DoctorAppointment.fromFirestore(Map<String, dynamic> map, String aId) {
+  Appointment.fromFirestore(Map<String, dynamic> map, String aId) {
     id = aId;
     doctorId = map['doctorId'] as String?;
     doctorName = map['doctorName'] as String?;
@@ -81,7 +81,7 @@ class DoctorAppointment {
 
   @override
   bool operator ==(other) =>
-      other is DoctorAppointment &&
+      other is Appointment &&
       patientId == other.patientId &&
       patientName == other.patientName &&
       doctorId == other.doctorId &&

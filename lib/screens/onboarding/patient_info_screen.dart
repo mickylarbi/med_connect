@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:med_connect/firebase_services/auth_service.dart';
 import 'package:med_connect/firebase_services/firestore_service.dart';
 import 'package:med_connect/firebase_services/storage_service.dart';
-import 'package:med_connect/models/patient.dart';
+import 'package:med_connect/models/patient/patient.dart';
 import 'package:med_connect/screens/shared/custom_buttons.dart';
 import 'package:med_connect/screens/shared/custom_textformfield.dart';
 import 'package:med_connect/utils/dialogs.dart';
