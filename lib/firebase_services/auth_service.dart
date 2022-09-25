@@ -81,25 +81,41 @@ class AuthService {
 
   authFunction(BuildContext context) {
     if (currentUser != null) {
-      db.patientDocument.get().timeout(ktimeout).then((value) {
-        if (value.data() == null) {
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const WelcomeScreen()),
-              (route) => false);
+      db.adminDocument().get().timeout(ktimeout).then((value) {
+        if (value.data() != null && value.data()!['adminRole'] == 'pharmacy') {
+          showAlertDialog(context,
+                  message: 'Account has been registered as a pharmacy')
+              .then((value) {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        const AuthScreen(authType: AuthType.signUp)),
+                (route) => false);
+          });
         } else {
-          kpatientName = '${value.data()!['firstName']}';
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const TabView()),
-              (route) => false);
+          db.patientDocument.get().timeout(ktimeout).then((value) {
+            if (value.data() == null) {
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const WelcomeScreen()),
+                  (route) => false);
+            } else {
+              kpatientName = '${value.data()!['firstName']}';
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const TabView()),
+                  (route) => false);
+            }
+          }).onError((error, stackTrace) {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => ErrorScreen()),
+                (route) => false);
+          });
         }
-      }).onError((error, stackTrace) {
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => ErrorScreen()),
-            (route) => false);
-      });
+      }).onError((error, stackTrace) {});
     } else {
       Navigator.pushAndRemoveUntil(
           context,

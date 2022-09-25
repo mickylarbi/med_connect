@@ -27,5 +27,5 @@ class FamilyMedicalHistoryEntry {
       other.relation == relation;
 
   @override
-  int get hashCode => hashValues(condition, relation);
+  int get hashCode => Object.hash(condition, relation);
 }

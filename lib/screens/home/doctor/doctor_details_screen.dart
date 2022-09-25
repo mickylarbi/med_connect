@@ -1,24 +1,14 @@
-import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:med_connect/firebase_services/storage_service.dart';
 import 'package:med_connect/models/doctor/doctor.dart';
-import 'package:med_connect/models/doctor/doctor.dart';
-import 'package:med_connect/models/doctor/appointment.dart';
-import 'package:med_connect/models/review.dart';
-import 'package:med_connect/screens/home/appointment/appointment_details_screen.dart';
-import 'package:med_connect/screens/home/appointment/edit_appointment_screen.dart';
-import 'package:med_connect/screens/home/doctor/doctor_card.dart';
 import 'package:med_connect/screens/home/doctor/review_card.dart';
 import 'package:med_connect/screens/home/doctor/reviews_list_screen.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
 import 'package:med_connect/screens/shared/custom_buttons.dart';
 import 'package:med_connect/screens/shared/header_text.dart';
 import 'package:med_connect/screens/shared/custom_icon_buttons.dart';
-import 'package:med_connect/utils/constants.dart';
 import 'package:med_connect/utils/dialogs.dart';
 import 'package:med_connect/utils/functions.dart';
 import 'package:url_launcher/url_launcher.dart';

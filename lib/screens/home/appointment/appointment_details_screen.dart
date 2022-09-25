@@ -252,46 +252,60 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
                 StatefulBuilder(builder: (context, setState) {
                   return Center(
                     child: Material(
-                      color: Colors.blueGrey.withOpacity(.1),
+                      color: widget.appointment.status ==
+                                  AppointmentStatus.canceled ||
+                              widget.appointment.status ==
+                                  AppointmentStatus.completed
+                          ? Colors.grey.withOpacity(.1)
+                          : Colors.blueGrey.withOpacity(.1),
                       borderRadius: BorderRadius.circular(14),
                       textStyle: const TextStyle(color: Colors.blueGrey),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(14),
-                        onTap: () {
-                          showDatePicker(
-                                  context: context,
-                                  initialDate: dateTime ?? DateTime.now(),
-                                  firstDate: DateTime.now(),
-                                  lastDate: DateTime(2100))
-                              .then((date) {
-                            showTimePicker(
-                                    context: context,
-                                    initialTime: TimeOfDay.fromDateTime(
-                                        dateTime ?? DateTime.now()))
-                                .then((time) {
-                              dateTime ??= DateTime.now();
-                              if (date != null && time != null) {
-                                dateTime = DateTime(date.year, date.month,
-                                    date.day, time.hour, time.minute);
-                              } else if (time != null) {
-                                dateTime = DateTime(
-                                    dateTime!.year,
-                                    dateTime!.month,
-                                    dateTime!.day,
-                                    time.hour,
-                                    time.minute);
-                              } else if (date != null) {
-                                dateTime = DateTime(date.year, date.month,
-                                    date.day, dateTime!.hour, dateTime!.minute);
-                              }
-                              setState(() {});
-                            }).onError((error, stackTrace) {
-                              showAlertDialog(context);
-                            });
-                          }).onError((error, stackTrace) {
-                            showAlertDialog(context);
-                          });
-                        },
+                        onTap: widget.appointment.status ==
+                                    AppointmentStatus.canceled ||
+                                widget.appointment.status ==
+                                    AppointmentStatus.completed
+                            ? null
+                            : () {
+                                showDatePicker(
+                                        context: context,
+                                        initialDate: dateTime ?? DateTime.now(),
+                                        firstDate: DateTime.now(),
+                                        lastDate: DateTime(2100))
+                                    .then((date) {
+                                  showTimePicker(
+                                          context: context,
+                                          initialTime: TimeOfDay.fromDateTime(
+                                              dateTime ?? DateTime.now()))
+                                      .then((time) {
+                                    dateTime ??= DateTime.now();
+                                    if (date != null && time != null) {
+                                      dateTime = DateTime(date.year, date.month,
+                                          date.day, time.hour, time.minute);
+                                    } else if (time != null) {
+                                      dateTime = DateTime(
+                                          dateTime!.year,
+                                          dateTime!.month,
+                                          dateTime!.day,
+                                          time.hour,
+                                          time.minute);
+                                    } else if (date != null) {
+                                      dateTime = DateTime(
+                                          date.year,
+                                          date.month,
+                                          date.day,
+                                          dateTime!.hour,
+                                          dateTime!.minute);
+                                    }
+                                    setState(() {});
+                                  }).onError((error, stackTrace) {
+                                    showAlertDialog(context);
+                                  });
+                                }).onError((error, stackTrace) {
+                                  showAlertDialog(context);
+                                });
+                              },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 24, vertical: 20),
@@ -353,38 +367,56 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
                   ),
                 ),
                 const Divider(height: 50),
-                const Text('What services would you want to patronize?'),
+                Text(widget.appointment.status == AppointmentStatus.canceled ||
+                        widget.appointment.status == AppointmentStatus.completed
+                    ? 'Service'
+                    : 'What service would you want to patronize?'),
                 const SizedBox(height: 10),
-                StatefulBuilder(
-                  builder: (context, setState) {
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: doctor.services!.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return RadioListTile<String?>(
-                          value: doctor.services![index],
-                          groupValue: service,
-                          onChanged: (radioValue) {
-                            service = doctor.services![index];
-                            setState(() {});
-                          },
-                          title: Text(doctor.services![index]),
-                        );
-                      },
-                    );
-                  },
-                ),
+                if (widget.appointment.status == AppointmentStatus.canceled ||
+                    widget.appointment.status == AppointmentStatus.completed)
+                  ListTile(title: Text(service!)),
+                if (!(widget.appointment.status == AppointmentStatus.canceled ||
+                    widget.appointment.status == AppointmentStatus.completed))
+                  StatefulBuilder(
+                    builder: (context, setState) {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: doctor.services!.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return RadioListTile<String?>(
+                            value: doctor.services![index],
+                            groupValue: service,
+                            onChanged: (radioValue) {
+                              service = doctor.services![index];
+                              setState(() {});
+                            },
+                            title: Text(doctor.services![index]),
+                          );
+                        },
+                      );
+                    },
+                  ),
                 const Divider(height: 50),
-                const Text('Where would you want to meet?'),
-                const SizedBox(height: 20),
-                CustomTextFormField(
-                  hintText: 'Venue',
-                  initialValue: venueString,
-                  onChanged: (value) {
-                    venueString = value;
-                  },
-                ),
+                Text(widget.appointment.status == AppointmentStatus.canceled ||
+                        widget.appointment.status == AppointmentStatus.completed
+                    ? 'Location'
+                    : 'Where would you want to meet?'),
+                if (!(widget.appointment.status == AppointmentStatus.canceled ||
+                    widget.appointment.status == AppointmentStatus.completed))
+                  const SizedBox(height: 20),
+                if (widget.appointment.status == AppointmentStatus.canceled ||
+                    widget.appointment.status == AppointmentStatus.completed)
+                  ListTile(title: Text(venueString!)),
+                if (!(widget.appointment.status == AppointmentStatus.canceled ||
+                    widget.appointment.status == AppointmentStatus.completed))
+                  CustomTextFormField(
+                    hintText: 'Venue',
+                    initialValue: venueString,
+                    onChanged: (value) {
+                      venueString = value;
+                    },
+                  ),
                 const SizedBox(height: 10),
                 StatefulBuilder(builder: (context, setState) {
                   return Center(
@@ -417,27 +449,41 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
                           },
                         ),
                         const SizedBox(height: 10),
-                        if (venueGeo != null)
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton(
-                              onPressed: () {
-                                venueGeo = null;
-                                setState(() {});
-                              },
-                              child: const Text(
-                                'Clear geolocation',
-                                style: TextStyle(
-                                    decoration: TextDecoration.underline),
+                        if (!(widget.appointment.status ==
+                                AppointmentStatus.canceled ||
+                            widget.appointment.status ==
+                                AppointmentStatus.completed))
+                          if (venueGeo != null)
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () {
+                                  venueGeo = null;
+                                  setState(() {});
+                                },
+                                child: const Text(
+                                  'Clear geolocation',
+                                  style: TextStyle(
+                                      decoration: TextDecoration.underline),
+                                ),
                               ),
                             ),
-                          ),
                       ],
                     ),
                   );
                 }),
                 const Divider(height: 50),
-                const Text('What symptoms are you experiencing?'),
+                if (!((widget.appointment.status ==
+                            AppointmentStatus.canceled ||
+                        widget.appointment.status ==
+                            AppointmentStatus.completed) &&
+                    conditions!.isEmpty))
+                  Text(
+                      widget.appointment.status == AppointmentStatus.canceled ||
+                              widget.appointment.status ==
+                                  AppointmentStatus.completed
+                          ? 'Symptoms'
+                          : 'What symptoms are you experiencing?'),
                 const SizedBox(height: 10),
                 StatefulBuilder(
                   builder: (context, setState) {
@@ -449,74 +495,100 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: symptoms == null ? 0 : symptoms!.length,
                           separatorBuilder: (BuildContext context, int index) {
-                            return const SizedBox(height: 10);
+                            return widget.appointment.status ==
+                                        AppointmentStatus.canceled ||
+                                    widget.appointment.status ==
+                                        AppointmentStatus.completed
+                                ? Container()
+                                : const SizedBox(height: 10);
                           },
                           itemBuilder: (BuildContext context, int index) {
-                            return Material(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(14),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 36, vertical: 14),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      symptoms![index],
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
+                            return widget.appointment.status ==
+                                        AppointmentStatus.canceled ||
+                                    widget.appointment.status ==
+                                        AppointmentStatus.completed
+                                ? ListTile(
+                                    title: Text(symptoms![index]),
+                                  )
+                                : Material(
+                                    color: Colors.grey[100],
+                                    borderRadius: BorderRadius.circular(14),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 36, vertical: 14),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            symptoms![index],
+                                            maxLines: 3,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          InkWell(
+                                            onTap: () {
+                                              List<String> temp = symptoms!;
+                                              temp.removeAt(index);
+                                              symptoms = [...temp];
+                                              setState(() {});
+                                            },
+                                            child: const Icon(Icons.clear),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    InkWell(
-                                      onTap: () {
-                                        List<String> temp = symptoms!;
-                                        temp.removeAt(index);
-                                        symptoms = [...temp];
-                                        setState(() {});
-                                      },
-                                      child: const Icon(Icons.clear),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
+                                  );
                           },
                         ),
                         const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CustomTextFormField(
-                                hintText: 'Add symptom',
-                                controller: symptomsController,
-                                onFieldSubmitted: (value) {
+                        if (!(widget.appointment.status ==
+                                AppointmentStatus.canceled ||
+                            widget.appointment.status ==
+                                AppointmentStatus.completed))
+                          Row(
+                            children: [
+                              Expanded(
+                                child: CustomTextFormField(
+                                  hintText: 'Add symptom',
+                                  controller: symptomsController,
+                                  onFieldSubmitted: (value) {
+                                    onSymptomsFieldSubmitted(setState, context);
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              TextButton(
+                                onPressed: () {
                                   onSymptomsFieldSubmitted(setState, context);
                                 },
+                                style: TextButton.styleFrom(
+                                  backgroundColor:
+                                      Colors.blueGrey.withOpacity(.2),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14)),
+                                ),
+                                child: const Text('Add'),
                               ),
-                            ),
-                            const SizedBox(width: 10),
-                            TextButton(
-                              onPressed: () {
-                                onSymptomsFieldSubmitted(setState, context);
-                              },
-                              style: TextButton.styleFrom(
-                                backgroundColor:
-                                    Colors.blueGrey.withOpacity(.2),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(14)),
-                              ),
-                              child: const Text('Add'),
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
                       ],
                     );
                   },
                 ),
                 const Divider(height: 50),
-                const Text('What underlying conditions do you have?'),
+                if (!((widget.appointment.status ==
+                            AppointmentStatus.canceled ||
+                        widget.appointment.status ==
+                            AppointmentStatus.completed) &&
+                    conditions!.isEmpty))
+                  Text(
+                      widget.appointment.status == AppointmentStatus.canceled ||
+                              widget.appointment.status ==
+                                  AppointmentStatus.completed
+                          ? 'Conditions'
+                          : 'What underlying conditions do you have?'),
                 const SizedBox(height: 10),
                 StatefulBuilder(
                   builder: (context, setState) {
@@ -532,149 +604,163 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
                             return const SizedBox(height: 10);
                           },
                           itemBuilder: (BuildContext context, int index) {
-                            return Material(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(14),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 36, vertical: 14),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      conditions![index],
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
+                            return widget.appointment.status ==
+                                        AppointmentStatus.canceled ||
+                                    widget.appointment.status ==
+                                        AppointmentStatus.completed
+                                ? ListTile(
+                                    title: Text(conditions![index]),
+                                  )
+                                : Material(
+                                    color: Colors.grey[100],
+                                    borderRadius: BorderRadius.circular(14),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 36, vertical: 14),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            conditions![index],
+                                            maxLines: 3,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          InkWell(
+                                            onTap: () {
+                                              List<String> temp = conditions!;
+                                              temp.removeAt(index);
+                                              conditions = [...temp];
+                                              setState(() {});
+                                            },
+                                            child: const Icon(Icons.clear),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    InkWell(
-                                      onTap: () {
-                                        List<String> temp = conditions!;
-                                        temp.removeAt(index);
-                                        conditions = [...temp];
-                                        setState(() {});
-                                      },
-                                      child: const Icon(Icons.clear),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
+                                  );
                           },
                         ),
                         const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CustomTextFormField(
-                                hintText: 'Add condition',
-                                controller: conditionsController,
-                                onFieldSubmitted: (value) {
+                        if (!(widget.appointment.status ==
+                                AppointmentStatus.canceled ||
+                            widget.appointment.status ==
+                                AppointmentStatus.completed))
+                          Row(
+                            children: [
+                              Expanded(
+                                child: CustomTextFormField(
+                                  hintText: 'Add condition',
+                                  controller: conditionsController,
+                                  onFieldSubmitted: (value) {
+                                    onConditionsFieldSubmitted(
+                                        setState, context);
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              TextButton(
+                                onPressed: () {
                                   onConditionsFieldSubmitted(setState, context);
                                 },
+                                style: TextButton.styleFrom(
+                                  backgroundColor:
+                                      Colors.blueGrey.withOpacity(.2),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14)),
+                                ),
+                                child: const Text('Add'),
                               ),
-                            ),
-                            const SizedBox(width: 10),
-                            TextButton(
-                              onPressed: () {
-                                onConditionsFieldSubmitted(setState, context);
-                              },
-                              style: TextButton.styleFrom(
-                                backgroundColor:
-                                    Colors.blueGrey.withOpacity(.2),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(14)),
-                              ),
-                              child: const Text('Add'),
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
                       ],
                     );
                   },
                 ),
                 const SizedBox(height: 50),
-                CustomFlatButton(
-                  child: Text(widget.appointment.id == null
-                      ? 'Add appointment'
-                      : 'Update appointment'),
-                  onPressed: () {
-                    if (dateTime != null &&
-                        venueString != null &&
-                        venueGeo != null &&
-                        service != null) {
-                      showConfirmationDialog(
-                        context,
-                        message: widget.appointment.id == null
-                            ? 'Add appointment'
-                            : 'Update appointment?',
-                        confirmFunction: () {
-                          showLoadingDialog(context);
+                if (!(widget.appointment.status == AppointmentStatus.canceled ||
+                    widget.appointment.status == AppointmentStatus.completed))
+                  CustomFlatButton(
+                    child: Text(widget.appointment.id == null
+                        ? 'Add appointment'
+                        : 'Update appointment'),
+                    onPressed: () {
+                      if (dateTime != null &&
+                          venueString != null &&
+                          venueGeo != null &&
+                          service != null) {
+                        showConfirmationDialog(
+                          context,
+                          message: widget.appointment.id == null
+                              ? 'Add appointment'
+                              : 'Update appointment?',
+                          confirmFunction: () {
+                            showLoadingDialog(context);
 
-                          if (widget.appointment.id == null) {
-                            db
-                                .addAppointment(Appointment(
-                                    doctorId: doctorId,
-                                    doctorName: doctor.name,
-                                    dateTime: dateTime,
-                                    service: service,
-                                    venueGeo: venueGeo,
-                                    venueString: venueString,
-                                    symptoms: symptoms,
-                                    conditions: conditions))
-                                .timeout(ktimeout)
-                                .then((value) {
-                              Navigator.pop(context);
-                              Navigator.pop(context);
-                            }).onError((error, stackTrace) {
-                              Navigator.pop(context);
-                              showAlertDialog(context,
-                                  message: 'Error adding appointment');
-                            });
-                          } else {
-                            db
-                                .updateAppointment(Appointment(
-                                    id: widget.appointment.id,
-                                    doctorId: doctorId,
-                                    doctorName: doctor.name,
-                                    dateTime: dateTime,
-                                    service: service,
-                                    venueGeo: venueGeo,
-                                    venueString: venueString,
-                                    symptoms: symptoms,
-                                    conditions: conditions))
-                                .timeout(ktimeout)
-                                .then((value) {
-                              Navigator.pop(context);
-                              Navigator.pop(context);
-                            }).onError((error, stackTrace) {
-                              Navigator.pop(context);
-                              showAlertDialog(context,
-                                  message:
-                                      'Error updating appointment\n${error.toString()}');
-                            });
-                          }
-                        },
-                      );
-                    } else {
-                      if (dateTime == null) {
-                        showAlertDialog(context,
-                            message: 'Please choose a date and a time');
-                      } else if (venueString == null) {
-                        showAlertDialog(context,
-                            message: 'Please type a venue');
-                      } else if (venueGeo == null) {
-                        showAlertDialog(context,
-                            message: 'Please choose a venue on map');
-                      } else if (service == null) {
-                        showAlertDialog(context,
-                            message: 'Please choose a service');
+                            if (widget.appointment.id == null) {
+                              db
+                                  .addAppointment(Appointment(
+                                      doctorId: doctorId,
+                                      doctorName: doctor.name,
+                                      dateTime: dateTime,
+                                      service: service,
+                                      venueGeo: venueGeo,
+                                      venueString: venueString,
+                                      symptoms: symptoms,
+                                      conditions: conditions))
+                                  .timeout(ktimeout)
+                                  .then((value) {
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                              }).onError((error, stackTrace) {
+                                Navigator.pop(context);
+                                showAlertDialog(context,
+                                    message: 'Error adding appointment');
+                              });
+                            } else {
+                              db
+                                  .updateAppointment(Appointment(
+                                      id: widget.appointment.id,
+                                      doctorId: doctorId,
+                                      doctorName: doctor.name,
+                                      dateTime: dateTime,
+                                      service: service,
+                                      venueGeo: venueGeo,
+                                      venueString: venueString,
+                                      symptoms: symptoms,
+                                      conditions: conditions))
+                                  .timeout(ktimeout)
+                                  .then((value) {
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                              }).onError((error, stackTrace) {
+                                Navigator.pop(context);
+                                showAlertDialog(context,
+                                    message:
+                                        'Error updating appointment\n${error.toString()}');
+                              });
+                            }
+                          },
+                        );
+                      } else {
+                        if (dateTime == null) {
+                          showAlertDialog(context,
+                              message: 'Please choose a date and a time');
+                        } else if (venueString == null) {
+                          showAlertDialog(context,
+                              message: 'Please type a venue');
+                        } else if (venueGeo == null) {
+                          showAlertDialog(context,
+                              message: 'Please choose a venue on map');
+                        } else if (service == null) {
+                          showAlertDialog(context,
+                              message: 'Please choose a service');
+                        }
                       }
-                    }
-                  },
-                )
+                    },
+                  )
               ],
             );
           }
@@ -743,7 +829,7 @@ Color appointmentStatusColor(AppointmentStatus appointmentStatus) {
     case AppointmentStatus.confirmed:
       return Colors.green;
     case AppointmentStatus.completed:
-      return Colors.green;
+      return Colors.blue;
     case AppointmentStatus.canceled:
       return Colors.red;
     default:

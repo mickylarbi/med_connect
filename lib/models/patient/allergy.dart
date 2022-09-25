@@ -32,5 +32,5 @@ class Allergy {
       other.dateOfLastOccurence == dateOfLastOccurence;
 
   @override
-  int get hashCode => hashValues(allergy, reaction, dateOfLastOccurence);
+  int get hashCode => Object.hash(allergy, reaction, dateOfLastOccurence);
 }

@@ -31,5 +31,5 @@ class Immunization {
       other.date == date;
 
   @override
-  int get hashCode => hashValues(immunization, date);
+  int get hashCode => Object.hash(immunization, date);
 }

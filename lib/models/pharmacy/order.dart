@@ -66,9 +66,9 @@ class Order {
       confirmDelivery == other.confirmDelivery;
 
   @override
-  int get hashCode => hashValues(
+  int get hashCode => Object.hash(
         cart,
-        hashList(pharmacyIds),
+        Object.hashAll(pharmacyIds!.where((element) => true)),
         locationString,
         locationGeo,
         totalPrice,

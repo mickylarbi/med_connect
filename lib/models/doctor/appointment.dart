@@ -75,7 +75,7 @@ class Appointment {
       'conditions': conditions ?? [],
       'venueString': venueString,
       'venueGeo': {'lat': venueGeo!.latitude, 'lng': venueGeo!.longitude},
-        'status': AppointmentStatus.pending.index,
+      'status': AppointmentStatus.pending.index,
     };
   }
 
@@ -108,5 +108,4 @@ class Appointment {
       );
 }
 
-
-enum AppointmentStatus {canceled, completed, confirmed, pending}
+enum AppointmentStatus { canceled, completed, confirmed, pending }

@@ -29,6 +29,9 @@ class FirestoreService {
   CollectionReference<Map<String, dynamic>> get adminsCollection =>
       instance.collection('admins');
 
+  DocumentReference<Map<String, dynamic>> adminDocument([String? id]) =>
+      adminsCollection.doc(id ?? auth.currentUser!.uid);
+
   // DOCTOR
 
   Query<Map<String, dynamic>> get doctorsCollection =>
@@ -47,7 +50,6 @@ class FirestoreService {
 
   DocumentReference<Map<String, dynamic>> appointmentDocument(String id) =>
       appointmentsCollection.doc(id);
-
 
   Future<DocumentReference<Map<String, dynamic>>> addAppointment(
           Appointment appointment) =>

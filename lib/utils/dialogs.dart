@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-void showLoadingDialog(BuildContext context, {String? message}) {
-  showDialog(
+Future<T?> showLoadingDialog<T>(BuildContext context, {String? message}) {
+  return showDialog(
       barrierDismissible: false,
       context: context,
       builder: (context) => AlertDialog(
@@ -19,12 +19,12 @@ void showLoadingDialog(BuildContext context, {String? message}) {
           ));
 }
 
-void showAlertDialog(BuildContext context,
+Future<T?> showAlertDialog<T>(BuildContext context,
     {String message = 'Something went wrong',
     bool showIcon = true,
     IconData icon = Icons.warning_amber_rounded,
     Color iconColor = Colors.red}) {
-  showDialog(
+  return showDialog(
       context: context,
       builder: (context) => AlertDialog(
             title: showIcon
@@ -46,10 +46,11 @@ void showAlertDialog(BuildContext context,
           ));
 }
 
-void showConfirmationDialog(BuildContext context, //TODO: correct styles
+Future<T?> showConfirmationDialog<T>(
+    BuildContext context, //TODO: correct styles
     {String? message,
     required Function confirmFunction}) {
-  showDialog(
+  return showDialog(
     context: context,
     builder: (context) => AlertDialog(
       title: Row(

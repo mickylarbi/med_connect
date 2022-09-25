@@ -3,6 +3,7 @@ import 'package:med_connect/models/pharmacy/drug.dart';
 import 'package:med_connect/screens/home/pharmacy/checkout_screen.dart';
 import 'package:med_connect/screens/home/pharmacy/pharmacy_page.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
+import 'package:med_connect/utils/constants.dart';
 
 class DrugDetailsScreen extends StatelessWidget {
   final Drug drug;
@@ -20,6 +21,7 @@ class DrugDetailsScreen extends StatelessWidget {
             SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 36),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 100),
                   Center(
@@ -30,19 +32,38 @@ class DrugDetailsScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 30),
-                  Text(
-                    'GH¢ ${drug.price!.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16),
+                  Center(
+                    child: Text(
+                      'GH¢ ${drug.price!.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Brand name',
+                    style: labelTextStyle,
+                  ),
                   Text(drug.brandName!),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 20),
+                  Text(
+                    'General name',
+                    style: labelTextStyle,
+                  ),
                   Text(drug.genericName!),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Class',
+                    style: labelTextStyle,
+                  ),
                   Text(drug.group!),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Other details',
+                    style: labelTextStyle,
+                  ),
                   Text(drug.otherDetails!),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),

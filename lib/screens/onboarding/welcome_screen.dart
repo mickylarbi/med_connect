@@ -1,28 +1,60 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:med_connect/firebase_services/auth_service.dart';
 import 'package:med_connect/screens/onboarding/patient_info_screen.dart';
 import 'package:med_connect/screens/shared/custom_buttons.dart';
+import 'package:med_connect/utils/constants.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    //TODO: do the page better
     return Scaffold(
-      body: Center(
-        child: CustomFlatButton(
-          onPressed: () {
-            AuthService auth = AuthService();
-            auth.signOut(context);
-            // Navigator.pushAndRemoveUntil(
-            //     context,
-            //     MaterialPageRoute(
-            //         builder: (context) => const PatientInfoScreen()),
-            //     (route) => false);
-          },
-          child: const Text('Welcome'),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(36),
+            // controller: controller,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                  Center(
+                    child: Image.asset(
+                      'assets/images/undraw_doctors_hwty.png', //TODO: better resolution
+                      width: kScreenWidth(context) - 72,
+                      fit: BoxFit.fitWidth,
+                    ),
+                  ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Hey there...',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                    'Welcome to MedConnect.\nGetting appointments has never been easier'),
+                const SizedBox(height: 100),
+                CustomFlatButton(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Text('Get started'),
+                      SizedBox(width: 10),
+                      Icon(Icons.arrow_forward),
+                    ],
+                  ),
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => const PatientInfoScreen(),
+                      ),
+                    );
+                  },
+                )
+              ],
+            ),
+          ),
         ),
       ),
     );

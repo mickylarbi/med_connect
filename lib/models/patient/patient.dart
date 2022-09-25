@@ -46,9 +46,9 @@ class Patient {
     surname = map['surname'] as String?;
     phone = map['phone'] as String?;
 
-    if(map['dateOfBirth']!=null) {
+    if (map['dateOfBirth'] != null) {
       dateOfBirth = DateTime.fromMillisecondsSinceEpoch(
-        (map['dateOfBirth'] as Timestamp).millisecondsSinceEpoch);
+          (map['dateOfBirth'] as Timestamp).millisecondsSinceEpoch);
     }
 
     gender = map['gender'] as String?;
@@ -140,7 +140,7 @@ class Patient {
       surgeries == other.surgeries;
 
   @override
-  int get hashCode => hashValues(
+  int get hashCode => Object.hash(
         firstName,
         surname,
         phone,
@@ -149,10 +149,10 @@ class Patient {
         height,
         weight,
         bloodType,
-        hashList(medicalHistory),
-        hashList(immunizations),
-        hashList(allergies),
-        hashList(familyMedicalHistory),
-        hashList(surgeries),
+        Object.hashAll(medicalHistory!.where((element) => true)),
+        Object.hashAll(immunizations!.where((element) => true)),
+        Object.hashAll(allergies!.where((element) => true)),
+        Object.hashAll(familyMedicalHistory!.where((element) => true)),
+        Object.hashAll(surgeries!.where((element) => true)),
       );
 }

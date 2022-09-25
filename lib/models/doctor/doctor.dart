@@ -82,13 +82,13 @@ class Doctor {
       phone == other.phone;
 
   @override
-  int get hashCode => hashValues(
+  int get hashCode => Object.hash(
         name,
         bio,
         mainSpecialty,
-        hashList(otherSpecialties),
-        hashList(experiences),
-        hashList(services),
+        Object.hashAll(otherSpecialties!.where((element) => true)),
+        Object.hashAll(services!.where((element) => true)),
+        Object.hashAll(experiences!.where((element) => true)),
         currentLocation,
         phone,
       );

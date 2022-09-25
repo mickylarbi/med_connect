@@ -30,5 +30,5 @@ class MedicalHistoryEntry {
       other.dateOfOnset == dateOfOnset;
 
   @override
-  int get hashCode => hashValues(illness, dateOfOnset);
+  int get hashCode => Object.hash(illness, dateOfOnset);
 }

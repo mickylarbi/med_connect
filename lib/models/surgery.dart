@@ -55,5 +55,5 @@ class Surgery {
 
   @override
   int get hashCode =>
-      hashValues(date, doctor, hospital, surgicalProcedure, results, comments);
+      Object.hash(date, doctor, hospital, surgicalProcedure, results, comments);
 }

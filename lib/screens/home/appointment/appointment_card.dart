@@ -162,7 +162,6 @@ class AppointmentCard extends StatelessWidget {
         navigate(context, AppointmentDetailsScreen(appointment: appointment));
       },
       child: Padding(
-          //TODO: show time
           padding: padding,
           child: Row(
             children: [
@@ -213,37 +212,14 @@ class AppointmentCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 20),
-              Column(
-                children: [
-                  Opacity(
-                    opacity: 0,
-                    child: CircleAvatar(
-                      backgroundColor:
-                          appointmentStatusColor(appointment.status!),
-                      radius: 10,
-                      child: Icon(
-                        appointmentStatusIconData(appointment.status!),
-                        size: 10,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  Icon(
-                    Icons.chevron_right_rounded,
-                    color: Colors.grey.withOpacity(.5),
-                    size: 40,
-                  ),
-                  CircleAvatar(
-                    backgroundColor:
-                        appointmentStatusColor(appointment.status!),
-                    radius: 10,
-                    child: Icon(
-                      appointmentStatusIconData(appointment.status!),
-                      size: 10,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
+              CircleAvatar(
+                backgroundColor: appointmentStatusColor(appointment.status!),
+                radius: 10,
+                child: Icon(
+                  appointmentStatusIconData(appointment.status!),
+                  size: 10,
+                  color: Colors.white,
+                ),
               )
             ],
           )),
