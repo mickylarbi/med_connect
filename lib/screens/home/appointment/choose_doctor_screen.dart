@@ -20,8 +20,6 @@ class _ChooseDoctorScreenState extends State<ChooseDoctorScreen> {
   FirestoreService db = FirestoreService();
   List<Doctor> doctorsList = [];
 
-  
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,9 +76,6 @@ class _ChooseDoctorScreenState extends State<ChooseDoctorScreen> {
                 .compareTo('${b.firstName!}${b.surname!}'));
 
             return ListView.separated(
-              shrinkWrap: true,
-              primary: false,
-              physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) => InkWell(
                 onTap: () {
                   navigate(

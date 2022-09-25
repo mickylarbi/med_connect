@@ -6,6 +6,7 @@ import 'package:med_connect/firebase_services/firestore_service.dart';
 import 'package:med_connect/models/doctor/appointment.dart';
 import 'package:med_connect/screens/home/appointment/appointment_card.dart';
 import 'package:med_connect/screens/home/appointment/appointment_details_screen.dart';
+import 'package:med_connect/screens/home/appointment/appointments_history_screen.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
 import 'package:med_connect/screens/shared/header_text.dart';
 import 'package:med_connect/screens/shared/custom_icon_buttons.dart';
@@ -23,6 +24,9 @@ class _AppointmentsListPageState extends State<AppointmentsListPage> {
 
   AuthService auth = AuthService();
   FirestoreService db = FirestoreService();
+
+  ValueNotifier<List<Appointment>> appointmentsListNotifier =
+      ValueNotifier<List<Appointment>>([]);
 
   @override
   Widget build(BuildContext context) {
@@ -52,21 +56,33 @@ class _AppointmentsListPageState extends State<AppointmentsListPage> {
                     );
                   }
 
-                  List<Appointment> appointmentsList = snapshot.data!.docs
-                      .map(
-                        (e) => Appointment.fromFirestore(e.data(), e.id),
-                      )
-                      .toList();
+                  appointmentsListNotifier.value = [
+                    ...snapshot.data!.docs
+                        .map(
+                          (e) => Appointment.fromFirestore(e.data(), e.id),
+                        )
+                        .toList()
+                  ];
 
-                  appointmentsList.sort((a, b) =>
+                  appointmentsListNotifier.value.sort((a, b) =>
                       a.dateTime!.millisecondsSinceEpoch.toString().compareTo(
                           b.dateTime!.millisecondsSinceEpoch.toString()));
+
+                  appointmentsListNotifier.value =
+                      appointmentsListNotifier.value.reversed.toList();
+
+                  List<Appointment> currentAppointmentsList =
+                      appointmentsListNotifier.value
+                          .where((element) =>
+                              element.status == AppointmentStatus.pending ||
+                              element.status == AppointmentStatus.confirmed)
+                          .toList();
 
                   return ListView.separated(
                     shrinkWrap: true,
                     primary: false,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: appointmentsList.length,
+                    itemCount: currentAppointmentsList.length,
                     separatorBuilder: (BuildContext context, int index) {
                       return const Divider(
                         height: 0,
@@ -76,7 +92,7 @@ class _AppointmentsListPageState extends State<AppointmentsListPage> {
                     },
                     itemBuilder: (BuildContext context, int index) {
                       return AppointmentCard(
-                          appointment: appointmentsList[index]);
+                          appointment: currentAppointmentsList[index]);
                     },
                   );
                 },
@@ -88,7 +104,23 @@ class _AppointmentsListPageState extends State<AppointmentsListPage> {
           context,
           _scrollController,
           'Appointments',
-          [],
+          [
+            OutlineIconButton(
+              iconData: Icons.history,
+              onPressed: () {
+                navigate(
+                  context,
+                  AppointmentHistoryScreen(
+                    appointmentsList: appointmentsListNotifier.value
+                        .where((element) =>
+                            element.status == AppointmentStatus.canceled ||
+                            element.status == AppointmentStatus.completed)
+                        .toList(),
+                  ),
+                );
+              },
+            )
+          ],
         ),
         Align(
           alignment: Alignment.bottomRight,
@@ -110,6 +142,7 @@ class _AppointmentsListPageState extends State<AppointmentsListPage> {
   @override
   void dispose() {
     _scrollController.dispose();
+    appointmentsListNotifier.dispose();
     super.dispose();
   }
 }
