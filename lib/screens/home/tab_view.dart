@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:med_connect/models/doctor/doctor.dart';
 import 'package:med_connect/models/pharmacy/drug.dart';
 import 'package:med_connect/screens/home/appointment/appointments_list_page.dart';
+import 'package:med_connect/screens/home/appointment/doctor_search_delegate.dart';
 import 'package:med_connect/screens/home/doctor/doctors_list_page.dart';
 import 'package:med_connect/screens/home/homepage/home_page.dart';
 import 'package:med_connect/screens/home/more_page.dart';
@@ -23,14 +25,11 @@ class _TabViewState extends State<TabView> {
   void initState() {
     super.initState();
     cart = ValueNotifier<Map<Drug, int>>({});
-    
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: kBackgroundColor,
       body: SafeArea(
         child: PageView(
             controller: _pageController,

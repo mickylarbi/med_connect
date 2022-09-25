@@ -82,64 +82,103 @@ class AppointmentDetailsScreen extends StatelessWidget {
               CustomAppBar(
                 // title: 'Appointment',
                 actions: [
-                  if (appointment.isConfirmed != null &&
-                      appointment.isConfirmed!)
-                    GestureDetector(
-                      onTap: () {
-                        showAlertDialog(context,
-                            message:
-                                'This appointment has been confirmed by the doctor',
-                            icon: Icons.info_rounded,
-                            iconColor: Colors.blue);
-                      },
-                      child: const CircleAvatar(
-                        backgroundColor: Colors.green,
-                        radius: 14,
-                        child: Icon(
-                          Icons.done,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  const SizedBox(width: 20),
-                  if (appointment.id != null)
-                    OutlineIconButton(
-                      iconData: Icons.more_horiz,
-                      onPressed: () {
-                        showCustomBottomSheet(
-                          context,
-                          [
-                            ListTile(
-                              leading: const Icon(Icons.delete),
-                              title: const Text('Cancel appointment'),
-                              onTap: () {
-                                Navigator.pop(context);
-                                showConfirmationDialog(
-                                  context,
-                                  message:
-                                      'Cancel appointment?\nThis cannot be undone',
-                                  confirmFunction: () {
-                                    showLoadingDialog(context);
-                                    db
-                                        .deleteAppointment(appointment.id!)
-                                        .timeout(ktimeout)
-                                        .then((value) {
-                                      Navigator.pop(context);
-                                      Navigator.pop(context);
-                                    }).onError((error, stackTrace) {
-                                      Navigator.pop(context);
-                                      showAlertDialog(context,
-                                          message:
-                                              'Error canceling appointment');
-                                    });
+                  if (appointment.status != null)
+                    StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                        stream:
+                            db.appointmentDocument(appointment.id!).snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return const SizedBox();
+                          }
+
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const CircularProgressIndicator.adaptive();
+                          }
+
+                          Appointment currentAppointment =
+                              Appointment.fromFirestore(
+                                  snapshot.data!.data()!, snapshot.data!.id);
+
+                          return Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  showAlertDialog(context,
+                                      message: appointmentStatusMessage(
+                                          currentAppointment.status!),
+                                      icon: Icons.info_rounded,
+                                      iconColor: Colors.blue);
+                                },
+                                child: CircleAvatar(
+                                  backgroundColor: appointmentStatusColor(
+                                      currentAppointment.status!),
+                                  radius: 14,
+                                  child: Icon(
+                                    appointmentStatusIconData(
+                                        currentAppointment.status!),
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              if (currentAppointment.status ==
+                                      AppointmentStatus.pending ||
+                                  currentAppointment.status ==
+                                      AppointmentStatus.confirmed)
+                                const SizedBox(width: 20),
+                              if (currentAppointment.status ==
+                                      AppointmentStatus.pending ||
+                                  currentAppointment.status ==
+                                      AppointmentStatus.confirmed)
+                                OutlineIconButton(
+                                  iconData: Icons.more_horiz,
+                                  onPressed: () {
+                                    showCustomBottomSheet(
+                                      context,
+                                      [
+                                        ListTile(
+                                          leading: const Icon(Icons.delete),
+                                          title:
+                                              const Text('Cancel appointment'),
+                                          onTap: () {
+                                            Navigator.pop(context);
+                                            showConfirmationDialog(
+                                              context,
+                                              message:
+                                                  'Cancel appointment?\nThis cannot be undone',
+                                              confirmFunction: () {
+                                                showLoadingDialog(context);
+                                                db
+                                                    .appointmentDocument(
+                                                        appointment.id!)
+                                                    .update({
+                                                      'status':
+                                                          AppointmentStatus
+                                                              .canceled.index
+                                                    })
+                                                    .timeout(ktimeout)
+                                                    .then((value) {
+                                                      Navigator.pop(context);
+                                                      Navigator.pop(context);
+                                                    })
+                                                    .onError(
+                                                        (error, stackTrace) {
+                                                      Navigator.pop(context);
+                                                      showAlertDialog(context,
+                                                          message:
+                                                              'Error canceling appointment');
+                                                    });
+                                              },
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    );
                                   },
-                                );
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    )
+                                )
+                            ],
+                          );
+                        }),
                 ],
               ),
             ],
@@ -566,14 +605,14 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
                         venueString != null &&
                         venueGeo != null &&
                         service != null) {
-                      showLoadingDialog(context);
-
                       showConfirmationDialog(
                         context,
                         message: widget.appointment.id == null
                             ? 'Add appointment'
                             : 'Update appointment?',
                         confirmFunction: () {
+                          showLoadingDialog(context);
+
                           if (widget.appointment.id == null) {
                             db
                                 .addAppointment(Appointment(
@@ -694,5 +733,50 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
     conditionsController.dispose();
 
     super.dispose();
+  }
+}
+
+Color appointmentStatusColor(AppointmentStatus appointmentStatus) {
+  switch (appointmentStatus) {
+    case AppointmentStatus.pending:
+      return Colors.grey;
+    case AppointmentStatus.confirmed:
+      return Colors.green;
+    case AppointmentStatus.completed:
+      return Colors.green;
+    case AppointmentStatus.canceled:
+      return Colors.red;
+    default:
+      return Colors.grey;
+  }
+}
+
+IconData appointmentStatusIconData(AppointmentStatus appointmentStatus) {
+  switch (appointmentStatus) {
+    case AppointmentStatus.pending:
+      return Icons.more_horiz;
+    case AppointmentStatus.confirmed:
+      return Icons.done;
+    case AppointmentStatus.completed:
+      return Icons.done_all;
+    case AppointmentStatus.canceled:
+      return Icons.clear;
+    default:
+      return Icons.pending;
+  }
+}
+
+String appointmentStatusMessage(AppointmentStatus appointmentStatus) {
+  switch (appointmentStatus) {
+    case AppointmentStatus.pending:
+      return 'Appointment is pending confirmation';
+    case AppointmentStatus.confirmed:
+      return 'Appointment has been confirmed';
+    case AppointmentStatus.completed:
+      return 'Appointment has been completed';
+    case AppointmentStatus.canceled:
+      return 'Appointment has been canceled';
+    default:
+      return 'Appointment is pending';
   }
 }

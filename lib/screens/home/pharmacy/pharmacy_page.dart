@@ -6,6 +6,7 @@ import 'package:med_connect/firebase_services/storage_service.dart';
 import 'package:med_connect/models/pharmacy/drug.dart';
 import 'package:med_connect/screens/home/pharmacy/checkout_screen.dart';
 import 'package:med_connect/screens/home/pharmacy/drug_details_screen.dart';
+import 'package:med_connect/screens/home/pharmacy/drugs_search_delegate.dart';
 import 'package:med_connect/screens/home/pharmacy/orders_list_screen.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
 import 'package:med_connect/screens/shared/custom_icon_buttons.dart';
@@ -22,6 +23,9 @@ class _PharmacyPageState extends State<PharmacyPage> {
   ScrollController scrollController = ScrollController();
 
   FirestoreService db = FirestoreService();
+
+  List<Drug> drugsList = [];
+  List<String> groups = [];
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -50,76 +54,39 @@ class _PharmacyPageState extends State<PharmacyPage> {
                   );
                 }
 
-                List<Drug> drugsList = snapshot.data!.docs
+                drugsList = snapshot.data!.docs
                     .map((e) => Drug.fromFirestore(e.data(), e.id))
                     .toList();
 
-                Map<String, List<Drug>> categories = {};
-
-                for (Drug element in drugsList) {
-                  if (categories[element.group] == null) {
-                    categories[element.group!] = [element];
-                  } else {
-                    categories[element.group!]!.add(element);
+                for (Drug drug in drugsList) {
+                  if (!groups.contains(drug.group!.toLowerCase())) {
+                    groups.add(drug.group!);
                   }
                 }
-
-                List<String> groups = categories.keys.toList()..sort();
 
                 groups
                     .sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
 
-                return ListView.separated(
-                  shrinkWrap: true,
-                  primary: false,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: groups.length,
-                  separatorBuilder: (BuildContext context, int index) {
-                    return const SizedBox(height: 50);
-                  },
-                  itemBuilder: (BuildContext context, int index) {
-                    List<Drug> categoryList = categories[groups[index]]!;
-
-                    categoryList.sort(
-                      (a, b) =>
-                          "${a.brandName}${a.genericName}${a.price}${a.quantityInStock}"
-                              .compareTo(
-                                  "${b.brandName}${b.genericName}${b.price}${b.quantityInStock}"),
-                    );
-
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          groups[index],
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
+                return drugsList.isEmpty
+                    ? const Center(
+                        child: Text('No drugs to show'),
+                      )
+                    : GridView.builder(
+                        shrinkWrap: true,
+                        primary: false,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 20,
+                          mainAxisSpacing: 20,
+                          childAspectRatio: .55,
                         ),
-                        const SizedBox(height: 20),
-                        GridView.builder(
-                          shrinkWrap: true,
-                          primary: false,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 20,
-                            mainAxisSpacing: 20,
-                            childAspectRatio: .55,
-                          ),
-                          itemCount: categoryList.length,
-                          itemBuilder:
-                              (BuildContext context, int categoryIndex) {
-                            return DrugCard(drug: categoryList[categoryIndex]);
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
+                        itemCount: drugsList.length,
+                        itemBuilder: (BuildContext context, int categoryIndex) {
+                          return DrugCard(drug: drugsList[categoryIndex]);
+                        },
+                      );
               },
             ),
             const SizedBox(height: 50),
@@ -163,6 +130,15 @@ class _PharmacyPageState extends State<PharmacyPage> {
           scrollController,
           'Pharmacy',
           [
+            OutlineIconButton(
+              iconData: Icons.search,
+              onPressed: () {
+                showSearch(
+                    context: context,
+                    delegate: DrugSearchDelegate(drugsList, groups));
+              },
+            ),
+            const SizedBox(width: 10),
             OutlineIconButton(
               iconData: Icons.view_list_rounded,
               onPressed: () {
@@ -231,7 +207,10 @@ class DrugCard extends StatelessWidget {
                   return Align(
                     alignment: Alignment.centerRight,
                     child: drug.quantityInStock == 0
-                        ? const Text('Out of stock')
+                        ? Container(
+                            alignment: Alignment.centerRight,
+                            height: 40,
+                            child: const Text('Out of stock'))
                         : SolidIconButton(
                             iconData: value.keys.contains(drug)
                                 ? Icons.delete_rounded

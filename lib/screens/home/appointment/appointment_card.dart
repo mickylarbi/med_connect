@@ -128,16 +128,15 @@ class AppointmentTodayCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const Spacer(),
-                if (appointment.isConfirmed != null && appointment.isConfirmed!)
-                  const CircleAvatar(
-                    backgroundColor: Colors.green,
-                    radius: 10,
-                    child: Icon(
-                      Icons.done,
-                      size: 10,
-                      color: Colors.white,
-                    ),
+                CircleAvatar(
+                  backgroundColor: appointmentStatusColor(appointment.status!),
+                  radius: 10,
+                  child: Icon(
+                    appointmentStatusIconData(appointment.status!),
+                    size: 10,
+                    color: Colors.white,
                   ),
+                ),
               ],
             ),
           ],
@@ -206,7 +205,7 @@ class AppointmentCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        appointment.venueString!,
+                        DateFormat.jm().format(appointment.dateTime!),
                         overflow: TextOverflow.ellipsis,
                       )
                     ],
@@ -214,10 +213,37 @@ class AppointmentCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 20),
-              Icon(
-                Icons.chevron_right_rounded,
-                color: Colors.grey.withOpacity(.5),
-                size: 40,
+              Column(
+                children: [
+                  Opacity(
+                    opacity: 0,
+                    child: CircleAvatar(
+                      backgroundColor:
+                          appointmentStatusColor(appointment.status!),
+                      radius: 10,
+                      child: Icon(
+                        appointmentStatusIconData(appointment.status!),
+                        size: 10,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: Colors.grey.withOpacity(.5),
+                    size: 40,
+                  ),
+                  CircleAvatar(
+                    backgroundColor:
+                        appointmentStatusColor(appointment.status!),
+                    radius: 10,
+                    child: Icon(
+                      appointmentStatusIconData(appointment.status!),
+                      size: 10,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               )
             ],
           )),

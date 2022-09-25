@@ -14,7 +14,7 @@ class Appointment {
   DateTime? dateTime;
   List<String>? symptoms;
   List<String>? conditions;
-  bool? isConfirmed;
+  AppointmentStatus? status;
   String? venueString;
   LatLng? venueGeo;
 
@@ -28,7 +28,7 @@ class Appointment {
     this.service,
     this.conditions,
     this.symptoms,
-    this.isConfirmed,
+    this.status,
     this.venueString,
     this.venueGeo,
   });
@@ -56,7 +56,7 @@ class Appointment {
             .map((e) => e.toString())
             .toList();
 
-    isConfirmed = map['isConfirmed'] as bool?;
+    status = AppointmentStatus.values[map['status']];
 
     venueString = map['venueString'] as String?;
 
@@ -75,7 +75,7 @@ class Appointment {
       'conditions': conditions ?? [],
       'venueString': venueString,
       'venueGeo': {'lat': venueGeo!.latitude, 'lng': venueGeo!.longitude},
-      'isConfirmed': false,
+        'status': AppointmentStatus.pending.index,
     };
   }
 
@@ -89,21 +89,24 @@ class Appointment {
       service == other.service &&
       symptoms == other.symptoms &&
       conditions == other.conditions &&
-      other.isConfirmed == isConfirmed &&
+      other.status == status &&
       other.venueString == venueString &&
       other.venueGeo == venueGeo;
 
   @override
-  int get hashCode => hashValues(
+  int get hashCode => Object.hash(
         patientId,
         patientName,
         doctorId,
         dateTime,
         service,
-        hashList(symptoms),
-        hashList(conditions),
-        isConfirmed,
+        Object.hashAll(symptoms!.where((element) => true)),
+        Object.hashAll(conditions!.where((element) => true)),
+        status,
         venueString,
         venueGeo,
       );
 }
+
+
+enum AppointmentStatus {canceled, completed, confirmed, pending}

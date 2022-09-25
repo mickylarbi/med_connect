@@ -84,56 +84,60 @@ class _DoctorsListViewState extends State<DoctorsListView> {
 
   @override
   Widget build(BuildContext context) {
+    return doctorsListView();
+  }
+
+  FutureBuilder<QuerySnapshot<Map<String, dynamic>>> doctorsListView() {
     return FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        future: db.doctorsCollection.get(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                children: [
-                  const Text('Something went wrong. Tap to reload'),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {});
-                    },
-                    icon: const Icon(Icons.refresh),
+      future: db.doctorsCollection.get(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Column(
+              children: [
+                const Text('Something went wrong. Tap to reload'),
+                IconButton(
+                  onPressed: () {
+                    setState(() {});
+                  },
+                  icon: const Icon(Icons.refresh),
+                ),
+              ],
+            ),
+          );
+        }
+        if (snapshot.connectionState == ConnectionState.done) {
+          List<Doctor> doctorsList = snapshot.data!.docs
+              .map((e) => Doctor.fromFireStore(e.data(), e.id))
+              .toList();
+
+          doctorsList.sort((a, b) => '${a.firstName!}${a.surname!}'
+              .compareTo('${b.firstName!}${b.surname!}'));
+
+          return ListView.separated(
+            shrinkWrap: true,
+            primary: false,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) => InkWell(
+              onTap: () {
+                navigate(
+                  context,
+                  DoctorDetailsScreen(
+                    doctor: doctorsList[index],
                   ),
-                ],
-              ),
-            );
-          }
-          if (snapshot.connectionState == ConnectionState.done) {
-            List<Doctor> doctorsList = snapshot.data!.docs
-                .map((e) => Doctor.fromFireStore(e.data(), e.id))
-                .toList();
-
-            doctorsList.sort((a, b) => '${a.firstName!}${a.surname!}'
-                .compareTo('${b.firstName!}${b.surname!}'));
-
-            return ListView.separated(
-              shrinkWrap: true,
-              primary: false,
-              physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) => InkWell(
-                onTap: () {
-                  navigate(
-                    context,
-                    DoctorDetailsScreen(
-                      doctor: doctorsList[index],
-                    ),
-                  );
-                },
-                child: DoctorCard(doctor: doctorsList[index]),
-              ),
-              separatorBuilder: (context, index) => const Divider(
-                indent: 176,
-                endIndent: 36,
-                height: 50,
-              ),
-              itemCount: doctorsList.length,
-            );
-          }
-          return const Center(child: CircularProgressIndicator.adaptive());
-        });
+                );
+              },
+              child: DoctorCard(doctor: doctorsList[index]),
+            ),
+            separatorBuilder: (context, index) => const Divider(
+              indent: 176,
+              endIndent: 36,
+              height: 50,
+            ),
+            itemCount: doctorsList.length,
+          );
+        }
+        return const Center(child: CircularProgressIndicator.adaptive());
+      });
   }
 }

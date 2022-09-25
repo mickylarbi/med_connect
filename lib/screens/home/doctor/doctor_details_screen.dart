@@ -26,10 +26,12 @@ import 'package:url_launcher/url_launcher.dart';
 class DoctorDetailsScreen extends StatefulWidget {
   final Doctor doctor;
   final bool showButton;
+  final bool fromSearch;
   const DoctorDetailsScreen({
     Key? key,
     required this.doctor,
     this.showButton = true,
+    this.fromSearch = false,
   }) : super(key: key);
 
   @override
@@ -350,6 +352,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                       ),
                       onPressed: () {
                         Navigator.pop(context);
+                        if (widget.fromSearch) Navigator.pop(context);
                         Navigator.pop(context, widget.doctor.id);
                       },
                     ),

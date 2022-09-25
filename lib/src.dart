@@ -12,15 +12,19 @@ class Src extends StatelessWidget {
     return MaterialApp(
       home: const SplashScreen(),
       theme: ThemeData(
-        primaryColor: Colors.blueGrey,
-        primarySwatch: Colors.blueGrey,
-        iconTheme: const IconThemeData(color: Colors.blueGrey),
-        textTheme: GoogleFonts.openSansTextTheme(
-          const TextTheme(
-            bodyText2: TextStyle(color: Colors.blueGrey, letterSpacing: .2),
+          primaryColor: Colors.blueGrey,
+          primarySwatch: Colors.blueGrey,
+          iconTheme: const IconThemeData(color: Colors.blueGrey),
+          textTheme: GoogleFonts.openSansTextTheme(
+            const TextTheme(
+              bodyText2: TextStyle(color: Colors.blueGrey, letterSpacing: .2),
+            ),
           ),
-        ),
-      ),
+          appBarTheme: AppBarTheme(
+            elevation: 0,
+            backgroundColor: Colors.grey[50],
+            
+          )),
     );
   }
 }
