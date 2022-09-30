@@ -1,15 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:med_connect/firebase_services/auth_service.dart';
 import 'package:med_connect/firebase_services/firestore_service.dart';
 import 'package:med_connect/models/doctor/doctor.dart';
 import 'package:med_connect/models/doctor/appointment.dart';
+import 'package:med_connect/models/review.dart';
 import 'package:med_connect/screens/home/appointment/choose_doctor_screen.dart';
 import 'package:med_connect/screens/home/appointment/map_screen.dart';
 import 'package:med_connect/screens/home/doctor/doctor_card.dart';
 import 'package:med_connect/screens/home/doctor/doctor_details_screen.dart';
+import 'package:med_connect/screens/home/doctor/review_card.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
 import 'package:med_connect/screens/shared/custom_buttons.dart';
 import 'package:med_connect/screens/shared/custom_textformfield.dart';
@@ -233,6 +237,16 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
     symptoms = widget.appointment.symptoms;
     conditions = widget.appointment.conditions;
 
+    DateTime? initialDateTime() {
+      if (dateTime != null) {
+        if (dateTime!.isBefore(DateTime.now())) {
+          return DateTime.now();
+        }
+        return dateTime;
+      }
+      return null;
+    }
+
     return StatefulBuilder(builder: (context, setState) {
       return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
         future: db.doctor(doctorId!),
@@ -249,6 +263,9 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (widget.appointment.status == AppointmentStatus.completed)
+                  RatingColumn(appointment: widget.appointment),
+                const SizedBox(height: 30),
                 StatefulBuilder(builder: (context, setState) {
                   return Center(
                     child: Material(
@@ -270,7 +287,8 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
                             : () {
                                 showDatePicker(
                                         context: context,
-                                        initialDate: dateTime ?? DateTime.now(),
+                                        initialDate:
+                                            initialDateTime() ?? DateTime.now(),
                                         firstDate: DateTime.now(),
                                         lastDate: DateTime(2100))
                                     .then((date) {
@@ -336,6 +354,7 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
                         DoctorDetailsScreen(
                           doctor: doctor,
                           showButton: false,
+                          showContactButtons: true,
                         ));
                   },
                   child: DoctorCard(
@@ -760,7 +779,7 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
                         }
                       }
                     },
-                  )
+                  ),
               ],
             );
           }
@@ -819,6 +838,112 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
     conditionsController.dispose();
 
     super.dispose();
+  }
+}
+
+class RatingColumn extends StatelessWidget {
+  const RatingColumn({
+    Key? key,
+    required this.appointment,
+  }) : super(key: key);
+
+  final Appointment appointment;
+
+  @override
+  Widget build(BuildContext context) {
+    double rating = 2.5;
+    String comment = '';
+    FirestoreService db = FirestoreService();
+
+    return StatefulBuilder(builder: (context, setState) {
+      return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+          future: db.instance
+              .collection('doctor_reviews')
+              .doc(appointment.id)
+              .get(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {}
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.data!.exists) {
+                return ReviewCard(
+                    review: Review.fromFirestore(snapshot.data!.data()!));
+              }
+
+              return Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.grey[200]),
+                child: Column(
+                  children: [
+                    const Text('Rate service'),
+                    const SizedBox(height: 10),
+                    RatingBar(
+                      ratingWidget: RatingWidget(
+                          empty: const Icon(
+                            Icons.star_outline,
+                            color: Colors.amber,
+                          ),
+                          full: const Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                          ),
+                          half: const Icon(
+                            Icons.star_half,
+                            color: Colors.amber,
+                          )),
+                      initialRating: rating,
+                      allowHalfRating: true,
+                      onRatingUpdate: (value) {
+                        rating = value;
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    CustomTextFormField(
+                      hintText: 'Leave a comment',
+                      onChanged: (value) {
+                        comment = value;
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    TextButton(
+                      onPressed: () {
+                        showLoadingDialog(context);
+                        db.instance
+                            .collection('doctor_reviews')
+                            .doc(appointment.id)
+                            .set(Review(
+                              comment: comment,
+                              dateTime: DateTime.now(),
+                              rating: rating,
+                              userId: FirebaseAuth.instance.currentUser!.uid,
+                              appointmentId: appointment.id,
+                              doctorId: appointment.doctorId,
+                            ).toMap())
+                            .then((value) {
+                          Navigator.pop(context);
+                          setState(() {});
+                        }).onError((error, stackTrace) {
+                          Navigator.pop(context);
+                          showAlertDialog(context,
+                              message: 'Error sending review');
+                        });
+                      },
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.blueGrey.withOpacity(.2),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: const Text('Done'),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return const SizedBox();
+          });
+    });
   }
 }
 

@@ -3,6 +3,7 @@ import 'package:med_connect/models/review.dart';
 import 'package:med_connect/screens/home/doctor/review_card.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
 import 'package:med_connect/screens/shared/custom_icon_buttons.dart';
+import 'package:med_connect/utils/dialogs.dart';
 
 class ReviewListScreen extends StatelessWidget {
   final List<Review> reviews;
@@ -10,35 +11,64 @@ class ReviewListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            ListView.separated(
-              padding: const EdgeInsets.fromLTRB(36, 88, 36, 36),
-              physics: const BouncingScrollPhysics(),
-              itemCount: reviews.length,
-              separatorBuilder: (BuildContext context, int index) {
-                return const Divider(
-                  height: 50,
-                );
-              },
-              itemBuilder: (BuildContext context, int index) {
-                return ReviewCard(review: reviews[index]);
-              },
-            ),
-            CustomAppBar(
-              title: 'Reviews',
-              actions: [
-                OutlineIconButton(
-                  iconData: Icons.sort_rounded,
-                  onPressed: () {},
-                )
-              ],
-            )
-          ],
+    List<Review> sortedList = reviews;
+
+    return StatefulBuilder(builder: (context, setState) {
+      return Scaffold(
+        body: SafeArea(
+          child: Stack(
+            children: [
+              ListView.separated(
+                padding: const EdgeInsets.fromLTRB(36, 88, 36, 36),
+                physics: const BouncingScrollPhysics(),
+                itemCount: sortedList.length,
+                separatorBuilder: (BuildContext context, int index) {
+                  return const Divider(
+                    height: 50,
+                  );
+                },
+                itemBuilder: (BuildContext context, int index) {
+                  return ReviewCard(
+                      review: sortedList.reversed.toList()[index]);
+                },
+              ),
+              CustomAppBar(
+                title: 'Reviews',
+                actions: [
+                  OutlineIconButton(
+                    iconData: Icons.sort_rounded,
+                    onPressed: () {
+                      showCustomBottomSheet(
+                        context,
+                        [
+                          ListTile(
+                            title: const Text('Sort by date'),
+                            onTap: () {
+                              sortedList.sort(((a, b) =>
+                                  a.dateTime!.compareTo(b.dateTime!)));
+                              Navigator.pop(context);
+                              setState(() {});
+                            },
+                          ),
+                          ListTile(
+                            title: const Text('Sort by rating'),
+                            onTap: () {
+                              sortedList.sort(
+                                  ((a, b) => a.rating!.compareTo(b.rating!)));
+                              Navigator.pop(context);
+                              setState(() {});
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  )
+                ],
+              )
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

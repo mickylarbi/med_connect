@@ -10,6 +10,8 @@ class CustomTextFormField extends StatelessWidget {
   final void Function(String)? onFieldSubmitted;
   final String? initialValue;
   final void Function(String)? onChanged;
+  final Widget? prefix;
+
   const CustomTextFormField({
     Key? key,
     required this.hintText,
@@ -21,6 +23,7 @@ class CustomTextFormField extends StatelessWidget {
     this.onFieldSubmitted,
     this.initialValue,
     this.onChanged,
+    this.prefix,
   }) : super(key: key);
 
   @override
@@ -46,6 +49,7 @@ class CustomTextFormField extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
         ),
+        prefix: prefix,
       ),
     );
   }

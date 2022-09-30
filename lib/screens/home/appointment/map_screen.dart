@@ -1,13 +1,9 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:med_connect/screens/shared/custom_buttons.dart';
-import 'package:med_connect/utils/constants.dart';
 
 class MapScreen extends StatefulWidget {
   final LatLng? initialSelectedPostion;
@@ -35,7 +31,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     lifter.addListener(() {
       setState(() {});
     });
-  } //TODO: test on live device
+  }
 
   @override
   Widget build(BuildContext context) {

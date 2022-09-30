@@ -1,8 +1,12 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:med_connect/firebase_services/firestore_service.dart';
 import 'package:med_connect/firebase_services/storage_service.dart';
 import 'package:med_connect/models/doctor/doctor.dart';
+import 'package:med_connect/models/review.dart';
 import 'package:med_connect/screens/home/doctor/review_card.dart';
 import 'package:med_connect/screens/home/doctor/reviews_list_screen.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
@@ -17,11 +21,14 @@ class DoctorDetailsScreen extends StatefulWidget {
   final Doctor doctor;
   final bool showButton;
   final bool fromSearch;
+  final bool showContactButtons;
+
   const DoctorDetailsScreen({
     Key? key,
     required this.doctor,
     this.showButton = true,
     this.fromSearch = false,
+    this.showContactButtons = false,
   }) : super(key: key);
 
   @override
@@ -30,6 +37,7 @@ class DoctorDetailsScreen extends StatefulWidget {
 
 class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   StorageService storage = StorageService();
+  FirestoreService db = FirestoreService();
 
   @override
   Widget build(BuildContext context) {
@@ -154,43 +162,86 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                 ),
 
                 const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SolidIconButton(
-                        iconData: Icons.call,
-                        onPressed: () async {
-                          final Uri phoneUri = Uri(
-                            scheme: 'tel',
-                            path: widget.doctor.phone,
-                          );
+                if (widget.showContactButtons)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton.icon(
+                          icon: const Icon(Icons.call),
+                          label: const Text('Call doctor'),
+                          style: TextButton.styleFrom(
+                              backgroundColor: Colors.blueGrey.withOpacity(.2),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14))),
+                          onPressed: () async {
+                            final Uri phoneUri = Uri(
+                              scheme: 'tel',
+                              path: widget.doctor.phone,
+                            );
 
-                          if (await canLaunchUrl(phoneUri)) {
-                            launchUrl(phoneUri);
-                          } else {
-                            showAlertDialog(context);
-                          }
-                        }),
-                    const SizedBox(width: 14),
-                    SolidIconButton(
-                        iconData: Icons.sms_rounded,
-                        onPressed: () async {
-                          final Uri smsUri = Uri(
-                            scheme: 'sms',
-                            path: widget.doctor.phone,
-                            queryParameters: <String, String>{
-                              'body': Uri.encodeComponent('From MedConnect\n'),
-                            },
-                          );
+                            if (await canLaunchUrl(phoneUri)) {
+                              launchUrl(phoneUri);
+                            } else {
+                              showAlertDialog(context);
+                            }
+                          }),
+                      const SizedBox(width: 14),
+                      TextButton.icon(
+                          icon: const Icon(Icons.sms_rounded),
+                          label: const Text('Send a text'),
+                          style: TextButton.styleFrom(
+                              backgroundColor: Colors.blueGrey.withOpacity(.2),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14))),
+                          onPressed: () {
+                            showCustomBottomSheet(
+                              context,
+                              [
+                                ListTile(
+                                  leading: const Icon(
+                                      CupertinoIcons.chat_bubble_text),
+                                  title: const Text('SMS'),
+                                  onTap: () async {
+                                    final Uri smsUri = Uri(
+                                      scheme: 'sms',
+                                      path: widget.doctor.phone,
+                                      queryParameters: <String, String>{
+                                        'body': Uri.encodeComponent(
+                                            'From MedConnect\n'),
+                                      },
+                                    );
 
-                          if (await canLaunchUrl(smsUri)) {
-                            launchUrl(smsUri);
-                          } else {
-                            showAlertDialog(context);
-                          }
-                        })
-                  ],
-                ),
+                                    if (await canLaunchUrl(smsUri)) {
+                                      launchUrl(smsUri);
+                                    } else {
+                                      showAlertDialog(context);
+                                    }
+
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                                ListTile(
+                                  leading:
+                                      const FaIcon(FontAwesomeIcons.whatsapp),
+                                  title: const Text('WhatsApp'),
+                                  onTap: () async {
+                                    final Uri whatsAppUri = Uri.parse(
+                                        'https://wa.me/${widget.doctor.phone}?text=From MedConnect');
+
+                                    if (await canLaunchUrl(whatsAppUri)) {
+                                      launchUrl(whatsAppUri);
+                                    } else {
+                                      showAlertDialog(context);
+                                    }
+
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
+                            );
+                          })
+                    ],
+                  ),
 
                 if (widget.doctor.bio != null && widget.doctor.bio!.isNotEmpty)
                   const SizedBox(height: 30),
@@ -245,9 +296,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                const CircleAvatar(
-                                  radius: 2,
-                                ),
+                                const CircleAvatar(radius: 2),
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Text(
@@ -288,37 +337,49 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
 
                 ///REVIEWS
 
-                if (widget.doctor.reviews != null &&
-                    widget.doctor.reviews!.isNotEmpty)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const HeaderText(text: 'Reviews'),
-                      TextButton(
-                        style: ButtonStyle(
-                            padding: MaterialStateProperty.all(
-                                const EdgeInsets.symmetric(vertical: 14))),
-                        onPressed: () {
-                          navigate(
-                              context,
-                              ReviewListScreen(
-                                  reviews: widget.doctor.reviews!));
-                        },
-                        child: const Text('See all'),
-                      ),
-                    ],
-                  ),
-                if (widget.doctor.reviews != null &&
-                    widget.doctor.reviews!.isNotEmpty)
-                  ReviewCard(
-                    review: widget.doctor.reviews!
-                        .where((element) =>
-                            element.comment != null &&
-                            element.comment!.isNotEmpty)
-                        .toList()[0],
-                  ),
+                FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                    future: db.instance.collection('doctor_reviews').get(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {}
 
-                ///BUTTON
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        List<Review> reviewsList = snapshot.data!.docs
+                            .map(
+                              (e) => Review.fromFirestore(e.data()),
+                            )
+                            .toList();
+                        return Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const HeaderText(text: 'Reviews'),
+                                TextButton(
+                                  style: ButtonStyle(
+                                      padding: MaterialStateProperty.all(
+                                          const EdgeInsets.symmetric(
+                                              vertical: 14))),
+                                  onPressed: () {
+                                    navigate(context,
+                                        ReviewListScreen(reviews: reviewsList));
+                                  },
+                                  child: const Text('See all'),
+                                ),
+                              ],
+                            ),
+                            ReviewCard(
+                              review: reviewsList
+                                  .where((element) =>
+                                      element.comment != null &&
+                                      element.comment!.isNotEmpty)
+                                  .toList()[0],
+                            ),
+                          ],
+                        );
+                      }
+
+                      return const SizedBox();
+                    }),
 
                 const SizedBox(height: 50),
               ],

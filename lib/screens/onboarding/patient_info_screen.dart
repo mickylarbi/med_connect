@@ -134,6 +134,7 @@ class _PatientInfoScreenState extends State<PatientInfoScreen> {
                     hintText: 'Phone',
                     keyboardType: TextInputType.number,
                     controller: phoneController,
+                    prefix: const Text('+233'),
                   ),
                   const SizedBox(height: 30),
                   CustomFlatButton(
@@ -174,6 +175,12 @@ class _PatientInfoScreenState extends State<PatientInfoScreen> {
                     },
                     child: const Text('Upload info'),
                   ),
+                  // TextButton(
+                  //     onPressed: () {
+                  //       AuthService auth = AuthService();
+                  //       auth.signOut(context);
+                  //     },
+                  //     child: const Text('signout'))
                 ],
               ),
             ),

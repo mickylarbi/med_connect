@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:med_connect/firebase_services/storage_service.dart';
 import 'package:med_connect/models/doctor/doctor.dart';
 import 'package:med_connect/models/pharmacy/drug.dart';
 import 'package:med_connect/screens/home/appointment/appointments_list_page.dart';
@@ -72,5 +74,73 @@ class _TabViewState extends State<TabView> {
     cart.dispose();
 
     super.dispose();
+  }
+}
+
+class ProfileImageWidget extends StatelessWidget {
+  ProfileImageWidget({
+    Key? key,
+    this.patientId,
+    required this.height,
+    required this.width,
+    this.borderRadius,
+  }) : super(key: key);
+
+  StorageService storage = StorageService();
+  final String? patientId;
+  final double height;
+  final double width;
+  final BorderRadius? borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: borderRadius ?? BorderRadius.circular(20),
+      child: Container(
+        height: height,
+        width: width,
+        alignment: Alignment.center,
+        color: Colors.grey.withOpacity(.1),
+        child: StatefulBuilder(builder: (context, setState) {
+          return FutureBuilder<String>(
+            future: storage.profileImageDownloadUrl(patientId),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return GestureDetector(
+                  onTap: () async {
+                    setState(() {});
+                  },
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.refresh,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () async {
+                      setState(() {});
+                    },
+                  ),
+                );
+              }
+              if (snapshot.connectionState == ConnectionState.done) {
+                return CachedNetworkImage(
+                  imageUrl: snapshot.data!,
+                  height: height,
+                  width: width,
+                  fit: BoxFit.cover,
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      Center(
+                    child: CircularProgressIndicator.adaptive(
+                        value: downloadProgress.progress),
+                  ),
+                  errorWidget: (context, url, error) =>
+                      const Center(child: Icon(Icons.person)),
+                );
+              }
+              return const Center(child: CircularProgressIndicator.adaptive());
+            },
+          );
+        }),
+      ),
+    );
   }
 }
