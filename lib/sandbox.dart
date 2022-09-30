@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:med_connect/models/doctor/appointment.dart';
-import 'package:med_connect/models/patient/experience.dart';
+import 'package:med_connect/models/doctor/experience.dart';
 import 'package:med_connect/models/review.dart';
 import 'package:med_connect/utils/constants.dart';
 import 'package:med_connect/utils/dialogs.dart';

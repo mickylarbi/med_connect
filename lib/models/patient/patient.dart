@@ -5,7 +5,7 @@ import 'package:med_connect/models/patient/allergy.dart';
 import 'package:med_connect/models/patient/family_medical_history_entry.dart';
 import 'package:med_connect/models/patient/immunization.dart';
 import 'package:med_connect/models/patient/medical_history_entry.dart';
-import 'package:med_connect/models/surgery.dart';
+import 'package:med_connect/models/patient/surgery.dart';
 
 class Patient {
   String? id;

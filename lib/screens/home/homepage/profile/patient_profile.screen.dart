@@ -12,7 +12,7 @@ import 'package:med_connect/models/patient/family_medical_history_entry.dart';
 import 'package:med_connect/models/patient/immunization.dart';
 import 'package:med_connect/models/patient/medical_history_entry.dart';
 import 'package:med_connect/models/patient/patient.dart';
-import 'package:med_connect/models/surgery.dart';
+import 'package:med_connect/models/patient/surgery.dart';
 import 'package:med_connect/screens/home/homepage/profile/edit_allergy_screen.dart';
 import 'package:med_connect/screens/home/homepage/profile/edit_family_medical_history.dart';
 import 'package:med_connect/screens/home/homepage/profile/edit_immunization_screen.dart';
