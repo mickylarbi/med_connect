@@ -4,7 +4,7 @@ import 'dart:ui';
 
 class Drug {
   String? id;
-  String? pharmacyId;
+  String? pharmacyId; 
   String? group;
   String? genericName;
   String? brandName;
