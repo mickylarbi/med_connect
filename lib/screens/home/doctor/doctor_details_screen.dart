@@ -339,7 +339,10 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                 ///REVIEWS
 
                 FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                    future: db.instance.collection('doctor_reviews').get(),
+                    future: db.instance
+                        .collection('doctor_reviews')
+                        .where('doctorId', isEqualTo: widget.doctor.id)
+                        .get(),
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {}
 

@@ -15,6 +15,7 @@ import 'package:med_connect/screens/shared/custom_app_bar.dart';
 import 'package:med_connect/screens/shared/header_text.dart';
 import 'package:med_connect/utils/dialogs.dart';
 import 'package:med_connect/utils/functions.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -337,11 +338,20 @@ class _HomePageState extends State<HomePage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Image.asset(
-                                'assets/images/sic.png',
+                                'assets/images/acacia.png',
                                 height: 50,
                               ),
                               TextButton(
-                                onPressed: () {},
+                                onPressed: () async {
+                                  final Uri acaciaUri =
+                                      Uri.parse('https: //www.ahighana.com/');
+
+                                  if (await canLaunchUrl(acaciaUri)) {
+                                    launchUrl(acaciaUri);
+                                  } else {
+                                    showAlertDialog(context);
+                                  }
+                                },
                                 child: const Text('Go to website'),
                               ),
                             ],
