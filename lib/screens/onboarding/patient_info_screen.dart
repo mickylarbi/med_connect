@@ -33,7 +33,8 @@ class _PatientInfoScreenState extends State<PatientInfoScreen> {
             Center(
               child: ListView(
                 shrinkWrap: true,
-                padding: const EdgeInsets.symmetric(horizontal: 36),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 36, vertical: 50),
                 children: [
                   ValueListenableBuilder<XFile?>(
                       valueListenable: pictureNotifier,

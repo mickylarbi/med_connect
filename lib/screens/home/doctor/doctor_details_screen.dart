@@ -176,7 +176,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                           onPressed: () async {
                             final Uri phoneUri = Uri(
                               scheme: 'tel',
-                              path: widget.doctor.phone,
+                              path: '+233${widget.doctor.phone}',
                             );
 
                             if (await canLaunchUrl(phoneUri)) {
@@ -187,59 +187,60 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                           }),
                       const SizedBox(width: 14),
                       TextButton.icon(
-                          icon: const Icon(Icons.sms_rounded),
-                          label: const Text('Send a text'),
-                          style: TextButton.styleFrom(
-                              backgroundColor: Colors.blueGrey.withOpacity(.2),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14))),
-                          onPressed: () {
-                            showCustomBottomSheet(
-                              context,
-                              [
-                                ListTile(
-                                  leading: const Icon(
-                                      CupertinoIcons.chat_bubble_text),
-                                  title: const Text('SMS'),
-                                  onTap: () async {
-                                    final Uri smsUri = Uri(
-                                      scheme: 'sms',
-                                      path: widget.doctor.phone,
-                                      queryParameters: <String, String>{
-                                        'body': Uri.encodeComponent(
-                                            'From MedConnect\n'),
-                                      },
-                                    );
+                        icon: const Icon(Icons.sms_rounded),
+                        label: const Text('Send a text'),
+                        style: TextButton.styleFrom(
+                            backgroundColor: Colors.blueGrey.withOpacity(.2),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14))),
+                        onPressed: () {
+                          showCustomBottomSheet(
+                            context,
+                            [
+                              ListTile(
+                                leading:
+                                    const Icon(CupertinoIcons.chat_bubble_text),
+                                title: const Text('SMS'),
+                                onTap: () async {
+                                  final Uri smsUri = Uri(
+                                    scheme: 'sms',
+                                    path: '+233${widget.doctor.phone}',
+                                    queryParameters: <String, String>{
+                                      'body': Uri.encodeComponent(
+                                          'From MedConnect\n'),
+                                    },
+                                  );
 
-                                    if (await canLaunchUrl(smsUri)) {
-                                      launchUrl(smsUri);
-                                    } else {
-                                      showAlertDialog(context);
-                                    }
+                                  if (await canLaunchUrl(smsUri)) {
+                                    launchUrl(smsUri);
+                                  } else {
+                                    showAlertDialog(context);
+                                  }
 
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                                ListTile(
-                                  leading:
-                                      const FaIcon(FontAwesomeIcons.whatsapp),
-                                  title: const Text('WhatsApp'),
-                                  onTap: () async {
-                                    final Uri whatsAppUri = Uri.parse(
-                                        'https://wa.me/${widget.doctor.phone}?text=From MedConnect');
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              ListTile(
+                                leading:
+                                    const FaIcon(FontAwesomeIcons.whatsapp),
+                                title: const Text('WhatsApp'),
+                                onTap: () async {
+                                  final Uri whatsAppUri = Uri.parse(
+                                      'https://wa.me/+233${widget.doctor.phone}?text=From MedConnect');
 
-                                    if (await canLaunchUrl(whatsAppUri)) {
-                                      launchUrl(whatsAppUri);
-                                    } else {
-                                      showAlertDialog(context);
-                                    }
+                                  if (await canLaunchUrl(whatsAppUri)) {
+                                    launchUrl(whatsAppUri);
+                                  } else {
+                                    showAlertDialog(context);
+                                  }
 
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
-                            );
-                          })
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      )
                     ],
                   ),
 

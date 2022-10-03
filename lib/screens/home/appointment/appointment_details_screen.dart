@@ -8,9 +8,13 @@ import 'package:med_connect/firebase_services/auth_service.dart';
 import 'package:med_connect/firebase_services/firestore_service.dart';
 import 'package:med_connect/models/doctor/doctor.dart';
 import 'package:med_connect/models/doctor/appointment.dart';
+import 'package:med_connect/models/doctor/prescription.dart';
+import 'package:med_connect/models/pharmacy/drug.dart';
+import 'package:med_connect/models/pharmacy/order.dart';
 import 'package:med_connect/models/review.dart';
 import 'package:med_connect/screens/home/appointment/choose_doctor_screen.dart';
 import 'package:med_connect/screens/home/appointment/map_screen.dart';
+import 'package:med_connect/screens/home/appointment/prescription_details_screen.dart';
 import 'package:med_connect/screens/home/doctor/doctor_card.dart';
 import 'package:med_connect/screens/home/doctor/doctor_details_screen.dart';
 import 'package:med_connect/screens/home/doctor/review_card.dart';
@@ -263,6 +267,44 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                    stream: db.instance
+                        .collection('prescriptions')
+                        .doc(widget.appointment.id)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {}
+                      if (snapshot.connectionState ==
+                          ConnectionState.waiting) {}
+
+                      return snapshot.data == null || !snapshot.data!.exists
+                          ? Container()
+                          : SizedBox(
+                              width: double.maxFinite,
+                              child: TextButton(
+                                onPressed: () {
+                                  Prescription prescription =
+                                      Prescription.fromFirestore(
+                                          snapshot.data!.data()!,
+                                          snapshot.data!.id);
+
+                                  navigate(
+                                      context,
+                                      PrescriptionDetailsScreen(
+                                          prescription: prescription));
+                                },
+                                style: TextButton.styleFrom(
+                                    backgroundColor:
+                                        Colors.blueGrey.withOpacity(.1),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 24, vertical: 20),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(14))),
+                                child: const Text('View prescription'),
+                              ),
+                            );
+                    }),
                 if (widget.appointment.status == AppointmentStatus.completed)
                   RatingColumn(appointment: widget.appointment),
                 const SizedBox(height: 30),
@@ -364,8 +406,8 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
                   ),
                 ),
                 const SizedBox(height: 14),
-                Align(
-                  child: Center(
+                if (widget.appointment.status == AppointmentStatus.pending)
+                  Center(
                     child: TextButton(
                       onPressed: () async {
                         String? result =
@@ -384,7 +426,6 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
                       ),
                     ),
                   ),
-                ),
                 const Divider(height: 50),
                 Text(widget.appointment.status == AppointmentStatus.canceled ||
                         widget.appointment.status == AppointmentStatus.completed

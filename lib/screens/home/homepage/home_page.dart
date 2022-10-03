@@ -29,6 +29,8 @@ class _HomePageState extends State<HomePage> {
   AuthService auth = AuthService();
   FirestoreService db = FirestoreService();
 
+  bool isClosed = false;
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -316,6 +318,50 @@ class _HomePageState extends State<HomePage> {
             );
           },
         ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: StatefulBuilder(builder: (context, setState) {
+            return isClosed
+                ? Container()
+                : Container(
+                    height: 150,
+                    margin: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Stack(
+                      children: [
+                        Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Image.asset(
+                                'assets/images/sic.png',
+                                height: 50,
+                              ),
+                              TextButton(
+                                onPressed: () {},
+                                child: const Text('Go to website'),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: IconButton(
+                            onPressed: () {
+                              isClosed = true;
+                              setState(() {});
+                            },
+                            icon: const Icon(Icons.close),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+          }),
+        )
       ],
     );
   }
