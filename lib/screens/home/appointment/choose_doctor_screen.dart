@@ -50,7 +50,7 @@ class _ChooseDoctorScreenState extends State<ChooseDoctorScreen> {
 
   FutureBuilder<QuerySnapshot<Map<String, dynamic>>> doctorsListView() {
     return FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        future: db.doctorsCollection.get(),
+        future: db.doctorsCollection.where('isVerified', isEqualTo: true).get(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(

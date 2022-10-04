@@ -1,10 +1,6 @@
-import 'dart:ui';
-
-// import 'package:firebase_auth/firebase_auth.dart';
-
 class Drug {
   String? id;
-  String? pharmacyId; 
+  String? pharmacyId;
   String? group;
   String? genericName;
   String? brandName;
@@ -54,7 +50,7 @@ class Drug {
       otherDetails == other.otherDetails;
 
   @override
-  int get hashCode => hashValues(
+  int get hashCode => Object.hash(
         group,
         genericName,
         brandName,

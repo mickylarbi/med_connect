@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -140,10 +139,23 @@ class _PatientInfoScreenState extends State<PatientInfoScreen> {
                   const SizedBox(height: 30),
                   CustomFlatButton(
                     onPressed: () {
-                      if (pictureNotifier.value != null &&
-                          firstNameController.text.trim().isNotEmpty &&
-                          surnameController.text.trim().isNotEmpty &&
-                          phoneController.text.trim().isNotEmpty) {
+                      if (pictureNotifier.value == null) {
+                        showAlertDialog(context,
+                            message: 'Please add a picture');
+                      } else if (firstNameController.text.trim().isEmpty) {
+                        showAlertDialog(context,
+                            message: 'Please input your first name');
+                      } else if (surnameController.text.trim().isEmpty) {
+                        showAlertDialog(context,
+                            message: 'Please input your surname');
+                      } else if (phoneController.text.trim().isEmpty) {
+                        showAlertDialog(context,
+                            message: 'Please enter your phone number');
+                      } else if (phoneController.text.trim().length != 9) {
+                        showAlertDialog(context,
+                            message: 'Please enter a valid phone number');
+                      } else {
+                        showAlertDialog(context);
                         FirestoreService db = FirestoreService();
                         StorageService storage = StorageService();
 

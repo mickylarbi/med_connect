@@ -344,7 +344,7 @@ class _HomePageState extends State<HomePage> {
                               TextButton(
                                 onPressed: () async {
                                   final Uri acaciaUri =
-                                      Uri.parse('https: //www.ahighana.com/');
+                                      Uri.parse('https://www.ahighana.com/');
 
                                   if (await canLaunchUrl(acaciaUri)) {
                                     launchUrl(acaciaUri);

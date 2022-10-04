@@ -1,7 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:med_connect/models/doctor/experience.dart';
 import 'package:med_connect/models/review.dart';
-import 'package:flutter/material.dart';
 
 class Doctor {
   String? id;

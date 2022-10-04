@@ -85,14 +85,18 @@ class _EditSurgeryScreenState extends State<EditSurgeryScreen> {
                                       style: TextStyle(
                                         decoration: TextDecoration.underline,
                                       ),
+                                      overflow: TextOverflow.fade,
                                     ),
-                                    Text(
-                                      value == null
-                                          ? '-'
-                                          : DateFormat.yMMMMd().format(value),
-                                      style: const TextStyle(
-                                        color: Colors.grey,
-                                        fontWeight: FontWeight.bold,
+                                    Expanded(
+                                      child: Text(
+                                        value == null
+                                            ? '-'
+                                            : DateFormat.yMMMMd().format(value),
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        overflow: TextOverflow.fade,
                                       ),
                                     ),
                                   ],
@@ -116,7 +120,7 @@ class _EditSurgeryScreenState extends State<EditSurgeryScreen> {
                       ),
                       const SizedBox(height: 20),
                       CustomTextFormField(
-                        hintText: 'Surgical Procedure',
+                        hintText: 'Surgical procedure',
                         keyboardType: TextInputType.number,
                         controller: surgicalProcedureController,
                       ),
@@ -161,12 +165,22 @@ class _EditSurgeryScreenState extends State<EditSurgeryScreen> {
                     child: CustomFlatButton(
                       child: Text(widget.surgery == null ? 'Add' : 'Save'),
                       onPressed: () {
-                        if (dateNotifier.value != null &&
-                            doctorController.text.trim().isNotEmpty &&
-                            hospitalController.text.trim().isNotEmpty &&
-                            surgicalProcedureController.text
-                                .trim()
-                                .isNotEmpty) {
+                        if (dateNotifier.value == null) {
+                          showAlertDialog(context,
+                              message: 'Please select a date');
+                        } else if (doctorController.text.trim().isEmpty) {
+                          showAlertDialog(context,
+                              message: 'Doctor field cannot be empty');
+                        } else if (hospitalController.text.trim().isEmpty) {
+                          showAlertDialog(context,
+                              message: 'Hospital field cannot be empty');
+                        } else if (surgicalProcedureController.text
+                            .trim()
+                            .isEmpty) {
+                          showAlertDialog(context,
+                              message:
+                                  'Surgical procedure field cannot be empty');
+                        } else {
                           Navigator.pop(
                             context,
                             EditObject(

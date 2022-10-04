@@ -9,8 +9,6 @@ import 'package:med_connect/firebase_services/firestore_service.dart';
 import 'package:med_connect/models/doctor/doctor.dart';
 import 'package:med_connect/models/doctor/appointment.dart';
 import 'package:med_connect/models/doctor/prescription.dart';
-import 'package:med_connect/models/pharmacy/drug.dart';
-import 'package:med_connect/models/pharmacy/order.dart';
 import 'package:med_connect/models/review.dart';
 import 'package:med_connect/screens/home/appointment/choose_doctor_screen.dart';
 import 'package:med_connect/screens/home/appointment/map_screen.dart';
@@ -25,7 +23,6 @@ import 'package:med_connect/screens/shared/custom_icon_buttons.dart';
 import 'package:med_connect/utils/constants.dart';
 import 'package:med_connect/utils/dialogs.dart';
 import 'package:med_connect/utils/functions.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class AppointmentDetailsScreen extends StatelessWidget {
   final Appointment appointment;
@@ -432,6 +429,8 @@ class _AppointmentsDetailsWidgetState extends State<AppointmentsDetailsWidget> {
                     ? 'Service'
                     : 'What service would you want to patronize?'),
                 const SizedBox(height: 10),
+                
+                //SERVICES
                 if (widget.appointment.status == AppointmentStatus.canceled ||
                     widget.appointment.status == AppointmentStatus.completed)
                   ListTile(title: Text(service!)),

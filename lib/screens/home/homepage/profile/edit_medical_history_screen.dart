@@ -82,14 +82,18 @@ class _EditMedicalHistoryScreenState extends State<EditMedicalHistoryScreen> {
                                       style: TextStyle(
                                         decoration: TextDecoration.underline,
                                       ),
+                                     overflow: TextOverflow.fade,
                                     ),
-                                    Text(
-                                      value == null
-                                          ? '-'
-                                          : DateFormat.yMMMMd().format(value),
-                                      style: const TextStyle(
-                                        color: Colors.grey,
-                                        fontWeight: FontWeight.bold,
+                                    Expanded(
+                                      child: Text(
+                                        value == null
+                                            ? '-'
+                                            : DateFormat.yMMMMd().format(value),
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        overflow: TextOverflow.fade,
                                       ),
                                     ),
                                   ],
@@ -129,8 +133,13 @@ class _EditMedicalHistoryScreenState extends State<EditMedicalHistoryScreen> {
                       child: Text(
                           widget.medicalHistoryEntry == null ? 'Add' : 'Save'),
                       onPressed: () {
-                        if (illnessController.text.trim().isNotEmpty &&
-                            dateOfOnsetNotifier.value != null) {
+                        if (illnessController.text.trim().isEmpty) {
+                          showAlertDialog(context,
+                              message: 'Illness field cannot be empty');
+                        } else if (dateOfOnsetNotifier.value == null) {
+                          showAlertDialog(context,
+                              message: 'Please select a date');
+                        } else {
                           Navigator.pop(
                             context,
                             EditObject(

@@ -81,14 +81,18 @@ class _EditImmunizationScreenState extends State<EditImmunizationScreen> {
                                       style: TextStyle(
                                         decoration: TextDecoration.underline,
                                       ),
+                                      overflow: TextOverflow.fade,
                                     ),
-                                    Text(
-                                      value == null
-                                          ? '-'
-                                          : DateFormat.yMMMMd().format(value),
-                                      style: const TextStyle(
-                                        color: Colors.grey,
-                                        fontWeight: FontWeight.bold,
+                                    Expanded(
+                                      child: Text(
+                                        value == null
+                                            ? '-'
+                                            : DateFormat.yMMMMd().format(value),
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        overflow: TextOverflow.fade,
                                       ),
                                     ),
                                   ],
@@ -127,8 +131,13 @@ class _EditImmunizationScreenState extends State<EditImmunizationScreen> {
                     child: CustomFlatButton(
                       child: Text(widget.immunization == null ? 'Add' : 'Save'),
                       onPressed: () {
-                        if (immunizationController.text.trim().isNotEmpty &&
-                            dateNotifier.value != null) {
+                        if (immunizationController.text.trim().isEmpty) {
+                          showAlertDialog(context,
+                              message: 'Immunization field cannot be empty');
+                        } else if (dateNotifier.value == null) {
+                          showAlertDialog(context,
+                              message: 'Please select a date');
+                        } else {
                           Navigator.pop(
                             context,
                             EditObject(

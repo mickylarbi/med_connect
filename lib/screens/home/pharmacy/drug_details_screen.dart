@@ -32,12 +32,14 @@ class DrugDetailsScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 30),
-                  Center(
-                    child: Text(
-                      'GH¢ ${drug.price!.toStringAsFixed(2)}',
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
+                  Text(
+                    'Price',
+                    style: labelTextStyle,
+                  ),
+                  Text(
+                    'GH¢ ${drug.price!.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   const SizedBox(height: 20),
                   Text(

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:med_connect/models/patient/allergy.dart';
 import 'package:med_connect/models/patient/family_medical_history_entry.dart';

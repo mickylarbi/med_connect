@@ -37,14 +37,13 @@ class _PharmacyPageState extends State<PharmacyPage> {
           children: [
             const SizedBox(height: 150),
             StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: db.drugsCollection.snapshots(),
+              stream: db.drugsCollection
+                  .where('isOverTheCounter', isEqualTo: true)
+                  .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return Center(
-                    child: TextButton(
-                      onPressed: () {},
-                      child: const Text('Reload'),
-                    ),
+                  return const Center(
+                    child: Text('An error occurred'),
                   );
                 }
 

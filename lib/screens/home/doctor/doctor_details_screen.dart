@@ -134,26 +134,6 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                                   fontWeight: FontWeight.bold,
                                   color: Colors.grey),
                             ),
-                            Wrap(
-                              children: [
-                                const Icon(
-                                  Icons.star,
-                                  color: Color.fromARGB(80, 252, 228, 6),
-                                ),
-                                Text(
-                                  calculateRating(widget.doctor.reviews)
-                                      .toStringAsFixed(2),
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  widget.doctor.reviews == null
-                                      ? 'No reviews yet'
-                                      : '(${widget.doctor.reviews!.length} reviews)',
-                                  style: const TextStyle(color: Colors.grey),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            )
                           ],
                         ),
                       ),
@@ -226,10 +206,11 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                                 title: const Text('WhatsApp'),
                                 onTap: () async {
                                   final Uri whatsAppUri = Uri.parse(
-                                      'https://wa.me/+233${widget.doctor.phone}?text=From MedConnect');
+                                      'https://wa.me/233${widget.doctor.phone}?text=From MedConnect');
 
                                   if (await canLaunchUrl(whatsAppUri)) {
-                                    launchUrl(whatsAppUri);
+                                    launchUrl(whatsAppUri,
+                                        mode: LaunchMode.externalApplication);
                                   } else {
                                     showAlertDialog(context);
                                   }
@@ -347,13 +328,27 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                       if (snapshot.hasError) {}
 
                       if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.data == null ||
+                            !snapshot.hasData ||
+                            snapshot.data!.docs.isEmpty) {
+                          return const SizedBox();
+                        }
+
                         List<Review> reviewsList = snapshot.data!.docs
                             .map(
                               (e) => Review.fromFirestore(e.data()),
                             )
                             .toList();
+
+                        double totalRating = 0;
+                        for (Review element in reviewsList) {
+                          totalRating += element.rating!;
+                        }
+                        totalRating /= reviewsList.length;
+
                         return Column(
                           children: [
+                            const SizedBox(height: 50),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -378,6 +373,16 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                                       element.comment!.isNotEmpty)
                                   .toList()[0],
                             ),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                const Text('Total rating'),
+                                const Spacer(),
+                                const Icon(Icons.star, color: Colors.yellow),
+                                HeaderText(
+                                    text: totalRating.toStringAsFixed(1)),
+                              ],
+                            )
                           ],
                         );
                       }

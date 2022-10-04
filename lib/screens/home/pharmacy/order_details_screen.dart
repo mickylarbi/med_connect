@@ -198,26 +198,43 @@ class OrderDetailsScreen extends StatelessWidget {
                       Order currentOrder = Order.fromFirestore(
                           snapshot.data!.data()!, snapshot.data!.id);
 
-                      return currentOrder.status != OrderStatus.pending
+                      return currentOrder.status == OrderStatus.delivered ||
+                              currentOrder.status == OrderStatus.canceled
                           ? const SizedBox()
                           : TextButton(
-                              child: const Text(
-                                'Cancel order',
-                                style: TextStyle(color: Colors.red),
+                              child: Text(
+                                currentOrder.status == OrderStatus.enroute
+                                    ? 'Delivered'
+                                    : 'Cancel order',
+                                style: TextStyle(
+                                    color: currentOrder.status ==
+                                            OrderStatus.enroute
+                                        ? Colors.green
+                                        : Colors.red),
                               ),
                               style: TextButton.styleFrom(
                                   fixedSize:
                                       Size(kScreenWidth(context) - 72, 48),
-                                  backgroundColor: Colors.red.withOpacity(.3),
+                                  backgroundColor:
+                                      currentOrder.status == OrderStatus.enroute
+                                          ? Colors.green.withOpacity(.1)
+                                          : Colors.red.withOpacity(.1),
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(14))),
                               onPressed: () async {
                                 showConfirmationDialog(
                                   context,
-                                  message: 'Cancel order?',
+                                  message:
+                                      currentOrder.status == OrderStatus.enroute
+                                          ? 'Set order status to delivered?'
+                                          : 'Cancel order?',
                                   confirmFunction: () {
-                                    db.orderDocument(order.id!).update(
-                                        {'status': OrderStatus.canceled.index});
+                                    db.orderDocument(order.id!).update({
+                                      'status': currentOrder.status ==
+                                              OrderStatus.enroute
+                                          ? OrderStatus.delivered.index
+                                          : OrderStatus.canceled.index
+                                    });
                                   },
                                 );
                               },

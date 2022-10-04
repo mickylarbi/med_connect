@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:med_connect/firebase_services/auth_service.dart';
-import 'package:med_connect/screens/auth/auth_screen.dart';
 import 'package:med_connect/utils/constants.dart';
 
 class SplashScreen extends StatefulWidget {

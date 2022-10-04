@@ -57,7 +57,6 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
   ValueNotifier<List<Surgery>?> surgeriesNotifier =
       ValueNotifier<List<Surgery>?>([]);
 
-
   @override
   void initState() {
     super.initState();
@@ -103,7 +102,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 36, vertical: 88),
                 children: [
-                  const SizedBox(height: 10), //TODO: keep alive
+                  const SizedBox(height: 10),
                   const ProfileImage(),
                   const SizedBox(height: 30),
                   const Text(
@@ -263,7 +262,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: CustomTextFormField(
-                          hintText: 'Weidht (kg)',
+                          hintText: 'Weight (kg)',
                           controller: weightController,
                           keyboardType: TextInputType.number,
                         ),

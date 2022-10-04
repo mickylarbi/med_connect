@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:med_connect/sandbox.dart';
-import 'package:med_connect/screens/home/tab_view.dart';
 import 'package:med_connect/screens/splash_screen.dart';
 
 class Src extends StatelessWidget {
@@ -11,6 +9,7 @@ class Src extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: const SplashScreen(),
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
           primaryColor: Colors.blueGrey,
           primarySwatch: Colors.blueGrey,

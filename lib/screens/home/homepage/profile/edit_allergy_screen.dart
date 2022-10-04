@@ -85,14 +85,18 @@ class _EditAllergyScreenState extends State<EditAllergyScreen> {
                                       style: TextStyle(
                                         decoration: TextDecoration.underline,
                                       ),
+                                      overflow: TextOverflow.fade,
                                     ),
-                                    Text(
-                                      value == null
-                                          ? '-'
-                                          : DateFormat.yMMMMd().format(value),
-                                      style: const TextStyle(
-                                        color: Colors.grey,
-                                        fontWeight: FontWeight.bold,
+                                    Expanded(
+                                      child: Text(
+                                        value == null
+                                            ? '-'
+                                            : DateFormat.yMMMMd().format(value),
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        overflow: TextOverflow.fade,
                                       ),
                                     ),
                                   ],
@@ -131,9 +135,16 @@ class _EditAllergyScreenState extends State<EditAllergyScreen> {
                     child: CustomFlatButton(
                       child: Text(widget.allergy == null ? 'Add' : 'Save'),
                       onPressed: () {
-                        if (allergyController.text.trim().isNotEmpty &&
-                            reactionController.text.trim().isNotEmpty &&
-                            dateNotifier.value != null) {
+                        if (allergyController.text.trim().isEmpty) {
+                          showAlertDialog(context,
+                              message: 'Allergy field cannot be empty');
+                        } else if (reactionController.text.trim().isEmpty) {
+                          showAlertDialog(context,
+                              message: 'Reaction field cannot be empty');
+                        } else if (dateNotifier.value == null) {
+                          showAlertDialog(context,
+                              message: 'Date must be selected');
+                        } else {
                           Navigator.pop(
                             context,
                             EditObject(

@@ -85,8 +85,13 @@ class _EditFamilyMedicalHistoryScreenState
                     child: CustomFlatButton(
                       child: Text(widget.entry == null ? 'Add' : 'Save'),
                       onPressed: () {
-                        if (conditionController.text.trim().isNotEmpty &&
-                            relationController.text.trim().isNotEmpty) {
+                        if (conditionController.text.trim().isEmpty) {
+                          showAlertDialog(context,
+                              message: 'Condition field cannot be empty');
+                        } else if (relationController.text.trim().isEmpty) {
+                          showAlertDialog(context,
+                              message: 'Relation field cannot be empty');
+                        } else {
                           Navigator.pop(
                             context,
                             EditObject(

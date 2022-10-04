@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:med_connect/firebase_services/auth_service.dart';
 import 'package:med_connect/firebase_services/firestore_service.dart';
 import 'package:med_connect/models/doctor/appointment.dart';
@@ -8,7 +7,6 @@ import 'package:med_connect/screens/home/appointment/appointment_card.dart';
 import 'package:med_connect/screens/home/appointment/appointment_details_screen.dart';
 import 'package:med_connect/screens/home/appointment/appointments_history_screen.dart';
 import 'package:med_connect/screens/shared/custom_app_bar.dart';
-import 'package:med_connect/screens/shared/header_text.dart';
 import 'package:med_connect/screens/shared/custom_icon_buttons.dart';
 import 'package:med_connect/utils/functions.dart';
 
