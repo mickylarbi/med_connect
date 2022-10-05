@@ -173,12 +173,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       CustomFlatButton(
                         child: const Text('Order medication'),
                         onPressed: () {
+                          List<String> pharmIds = [];
+                          for (Drug drug in cart.value.keys) {
+                            if (!pharmIds.contains(drug.pharmacyId)) {
+                              pharmIds.add(drug.pharmacyId!);
+                            }
+                          }
                           Order newOrder = Order(
                             cart: cart.value
                                 .map((key, value) => MapEntry(key.id!, value)),
-                            pharmacyIds: cart.value.keys
-                                .map((e) => e.pharmacyId!)
-                                .toList(),
+                            pharmacyIds: pharmIds,
                             locationGeo: locationGeo,
                             locationString:
                                 locationStringController.text.trim(),

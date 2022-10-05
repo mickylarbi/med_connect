@@ -243,7 +243,7 @@ class PrescriptionDetailsScreen extends StatelessWidget {
                           onPressed: () {
                             Order newOrder = Order(
                               cart: prescription.cart,
-                              pharmacyIds: prescription.cart!.keys.toList(),
+                              pharmacyIds: prescription.pharmacyIds,
                               locationGeo: locationGeo,
                               locationString: locationString?.trim(),
                               totalPrice: prescription.totalPrice,

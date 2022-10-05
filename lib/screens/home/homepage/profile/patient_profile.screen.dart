@@ -123,10 +123,10 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                   ),
                   const SizedBox(height: 10),
                   CustomTextFormField(
-                    hintText: 'Phone',
-                    keyboardType: TextInputType.number,
-                    controller: phoneController,
-                  ),
+                      hintText: 'Phone',
+                      keyboardType: TextInputType.number,
+                      controller: phoneController,
+                      prefix: const Text('+233 ')),
                   const SizedBox(height: 20),
                   ValueListenableBuilder<DateTime?>(
                       valueListenable: dateOfBirthNotifier,
@@ -792,7 +792,8 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                       );
                       if ((firstNameController.text.trim().isNotEmpty &&
                               surnameController.text.trim().isNotEmpty &&
-                              phoneController.text.trim().isNotEmpty) ||
+                              phoneController.text.trim().isNotEmpty &&
+                              phoneController.text.trim().length == 9) ||
                           widget.patient != newPatient) {
                         showConfirmationDialog(context,
                             message: 'Save changes to profile?',
